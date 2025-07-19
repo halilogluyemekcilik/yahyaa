@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yapım Aşamasında</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      font-size: 4em;
+      margin-bottom: 0.2em;
+      animation: pulse 2s infinite;
+      will-change: transform;
+      transform-origin: center;
+    }
+
+    p {
+      font-size: 1.5em;
+      margin: 0.5em 0;
+    }
+
+    .signature {
+      margin-top: 2em;
+      font-style: italic;
+      font-size: 1.2em;
+    }
+
+    .thank-you {
+      font-size: 1.3em;
+      color: #000000;
+      margin-top: 1.5em;
+      animation: fadeIn 3s ease-in-out;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .button-container {
+      margin-top: 2em;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1em;
+    }
+
+    .contact-button {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      background-color: rgba(255, 255, 255, 0.2);
+      border: 2px solid #fff;
+      color: #fff;
+      padding: 0.6em 1em;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 1em;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .contact-button:hover {
+      background-color: rgba(255, 255, 255, 0.4);
+      transform: scale(1.05);
+    }
+
+    .contact-button i {
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <h1>🚧 Yapım Aşamasında 🚧</h1>
+  <p>Bu sayfa çok yakında sizlerle olacak.</p>
+  <p class="thank-you">Ziyaret ettiğiniz için teşekkür ederiz!</p>
+
+  <div class="button-container">
+    <a class="contact-button" href="https://www.linkedin.com/in/yahya-haliloglu/" target="_blank">
+      <i class="fab fa-linkedin"></i> LinkedIn
+    </a>
+    <a class="contact-button" href="https://github.com/YahyaLom" target="_blank">
+      <i class="fab fa-github"></i> GitHub
+    </a>
+    <a class="contact-button" href="tel:05389249250">
+      <i class="fas fa-phone"></i> Ara
+    </a>
+    <a class="contact-button" href="https://wa.me/905389249250" target="_blank">
+      <i class="fab fa-whatsapp"></i> WhatsApp
+    </a>
+    <a class="contact-button" href="mailto:halilogluyahya@gmail.com">
+      <i class="fas fa-envelope"></i> Mail Gönder
+    </a>
+  </div>
+
+  <div class="signature">– Yahya Haliloğlu</div>
+</body>
+</html>
