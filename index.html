@@ -1,117 +1,242 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Yapım Aşamasında</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #fff;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      height: 100vh;
-    }
-
-    h1 {
-      font-size: 4em;
-      margin-bottom: 0.2em;
-      animation: pulse 2s infinite;
-      will-change: transform;
-      transform-origin: center;
-    }
-
-    p {
-      font-size: 1.5em;
-      margin: 0.5em 0;
-    }
-
-    .signature {
-      margin-top: 2em;
-      font-style: italic;
-      font-size: 1.2em;
-    }
-
-    .thank-you {
-      font-size: 1.3em;
-      color: #000000;
-      margin-top: 1.5em;
-      animation: fadeIn 3s ease-in-out;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.05); opacity: 0.8; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .button-container {
-      margin-top: 2em;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1em;
-    }
-
-    .contact-button {
-      display: flex;
-      align-items: center;
-      gap: 0.5em;
-      background-color: rgba(255, 255, 255, 0.2);
-      border: 2px solid #fff;
-      color: #fff;
-      padding: 0.6em 1em;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 1em;
-      transition: background 0.3s, transform 0.2s;
-    }
-
-    .contact-button:hover {
-      background-color: rgba(255, 255, 255, 0.4);
-      transform: scale(1.05);
-    }
-
-    .contact-button i {
-      font-size: 1.2em;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yahya Haliloğlu - Software Engineer</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-  <h1>🚧 Yapım Aşamasında 🚧</h1>
-  <p>Bu sayfa çok yakında sizlerle olacak.</p>
-  <p class="thank-you">Ziyaret ettiğiniz için teşekkür ederiz!</p>
+    <!-- Header - Tüm sayfalarda aynı olacak -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h2>Yahya Haliloğlu</h2>
+            </div>
+            <div class="nav-menu" id="nav-menu">
+                <ul class="nav-list">
+                    <li><a href="index.html" class="nav-link active">Ana Sayfa</a></li>
+                    <li><a href="projects/projects.html" class="nav-link">Projeler</a></li>
+                    <li><a href="contact/contact.html" class="nav-link">İletişim</a></li>
+                </ul>
+            </div>
+            <div class="nav-toggle" id="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </nav>
+    </header>
 
-  <div class="button-container">
-    <a class="contact-button" href="https://www.linkedin.com/in/yahya-haliloglu/" target="_blank">
-      <i class="fab fa-linkedin"></i> LinkedIn
-    </a>
-    <a class="contact-button" href="https://github.com/YahyaLom" target="_blank">
-      <i class="fab fa-github"></i> GitHub
-    </a>
-    <a class="contact-button" href="tel:05389249250">
-      <i class="fas fa-phone"></i> Ara
-    </a>
-    <a class="contact-button" href="https://wa.me/905389249250" target="_blank">
-      <i class="fab fa-whatsapp"></i> WhatsApp
-    </a>
-    <a class="contact-button" href="mailto:halilogluyahya@gmail.com">
-      <i class="fas fa-envelope"></i> Mail Gönder
-    </a>
-  </div>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    Merhaba, Ben <span class="highlight">Yahya</span>
+                </h1>
+                <h2 class="hero-subtitle">Software Engineer & Full-Stack Developer</h2>
+                <p class="hero-description">
+                    Code, Create, Innovate - Building Tomorrow's Solutions Today
+                </p>
+                <div class="hero-buttons">
+                    <a href="projects/projects.html" class="btn btn-primary">Projelerimi Gör</a>
+                    <a href="contact/contact.html" class="btn btn-outline">İletişime Geç</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <!-- Profil fotoğrafı buraya gelecek -->
+                <div class="profile-placeholder">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
 
-  <div class="signature">– Yahya Haliloğlu</div>
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <h2 class="section-title">Hakkımda</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>
+                        Sakarya Üniversitesi Bilgisayar Mühendisliği mezunuyum. Full-stack geliştirici olarak 
+                        web uygulamaları, mobil uygulamalar ve yapay zeka projelerinde deneyim sahibiyim.
+                    </p>
+                    <p>
+                        Windows uygulamaları, web uygulamaları ve backend sistemleri geliştiriyorum. 
+                        Ayrıca freelancer olarak web sitesi tasarım hizmetleri de sunuyorum.
+                    </p>
+                    <div class="about-stats">
+                        <div class="stat">
+                            <h3>5+</h3>
+                            <p>Tamamlanan Proje</p>
+                        </div>
+                        <div class="stat">
+                            <h3>2025</h3>
+                            <p>Mezuniyet Yılı</p>
+                        </div>
+                        <div class="stat">
+                            <h3>10+</h3>
+                            <p>Teknoloji</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section class="skills">
+        <div class="container">
+            <h2 class="section-title">Yeteneklerim</h2>
+            <div class="skills-grid">
+                <div class="skill-category">
+                    <h3>Frontend</h3>
+                    <div class="skill-items">
+                        <div class="skill-item">
+                            <i class="fab fa-js-square"></i>
+                            <span>JavaScript</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="fab fa-react"></i>
+                            <span>React Native</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="fas fa-code"></i>
+                            <span>C#/.NET</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="skill-category">
+                    <h3>Backend</h3>
+                    <div class="skill-items">
+                        <div class="skill-item">
+                            <i class="fab fa-python"></i>
+                            <span>Python</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="fas fa-server"></i>
+                            <span>Django</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="fas fa-database"></i>
+                            <span>PostgreSQL</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="fas fa-database"></i>
+                            <span>MSSQL</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="skill-category">
+                    <h3>DevOps & Tools</h3>
+                    <div class="skill-items">
+                        <div class="skill-item">
+                            <i class="fab fa-docker"></i>
+                            <span>Docker</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="fab fa-aws"></i>
+                            <span>AWS</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="fab fa-git-alt"></i>
+                            <span>Git/GitHub</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="fas fa-brain"></i>
+                            <span>AI/ML</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Projects Preview -->
+    <section class="projects-preview">
+        <div class="container">
+            <h2 class="section-title">Son Projelerim</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <div class="project-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3>Kütüphane Yer Tutma Uygulaması</h3>
+                    <p>React Native ve Django ile geliştirilen mobil uygulama</p>
+                    <div class="project-tech">
+                        <span>React Native</span>
+                        <span>Django</span>
+                        <span>PostgreSQL</span>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <div class="project-icon">
+                        <i class="fas fa-money-bill"></i>
+                    </div>
+                    <h3>AI Banknot Tanıma</h3>
+                    <p>CNN ve ResNet50 ile banknot tanıma sistemi</p>
+                    <div class="project-tech">
+                        <span>Python</span>
+                        <span>AI/ML</span>
+                        <span>CNN</span>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <div class="project-icon">
+                        <i class="fas fa-hospital"></i>
+                    </div>
+                    <h3>Hastane Randevu Sistemi</h3>
+                    <p>MVC mimarisi ile web uygulaması</p>
+                    <div class="project-tech">
+                        <span>.NET MVC</span>
+                        <span>MSSQL</span>
+                        <span>C#</span>
+                    </div>
+                </div>
+            </div>
+            <div class="projects-cta">
+                <a href="projects/projects.html" class="btn btn-primary">Tüm Projeleri Gör</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer - Tüm sayfalarda aynı olacak -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Yahya Haliloğlu</h3>
+                    <p>Software Engineer & Full-Stack Developer</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Hızlı Linkler</h4>
+                    <ul>
+                        <li><a href="index.html">Ana Sayfa</a></li>
+                        <li><a href="projects/projects.html">Projeler</a></li>
+                        <li><a href="contact/contact.html">İletişim</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Sosyal Medya</h4>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-link"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Yahya Haliloğlu. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>

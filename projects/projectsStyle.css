@@ -1,0 +1,194 @@
+/* Genel Stil Ayarlamaları (Ana style.css'ten alınacak, burada sadece özelleştirmeler) */
+/* projectsStyle.css dosyası, ana style.css'i tamamlayıcı nitelikte olmalıdır.
+   Bu nedenle, :root değişkenleri ve genel body, hx, a, ul gibi stil tanımlarını buraya tekrar eklemeyin.
+   Ana style.css dosyanızda tanımlı oldukları varsayılmaktadır. */
+
+/* Projects Hero Section */
+.projects-hero {
+    background: linear-gradient(to right, var(--primary-color), #0056b3);
+    color: #fff;
+    padding: 80px 0;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.projects-hero .hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.projects-hero .hero-title {
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.projects-hero .hero-description {
+    font-size: 1.25rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+/* Projects Section (Tüm projelerin listelendiği ana bölüm) */
+.projects-section {
+    padding: 60px 0;
+}
+
+.projects-section .section-title {
+    font-size: 2.5rem;
+    color: var(--heading-color);
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px; /* Kartlar arası boşluk */
+}
+
+/* Project Card */
+.project-card {
+    background-color: var(--card-bg);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px var(--shadow-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 30px var(--shadow-strong);
+}
+
+.project-card .project-icon {
+    font-size: 3.5rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.project-card h3 {
+    font-size: 1.8rem;
+    color: var(--heading-color);
+    margin-bottom: 15px;
+    min-height: 54px; /* Başlıklar için minimum yükseklik sağlayarak kartların eşit boyda olmasına yardımcı olur */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.project-card p {
+    font-size: 1rem;
+    color: var(--text-color);
+    margin-bottom: 20px;
+    flex-grow: 1; /* Paragrafın kalan alanı doldurmasını sağlar */
+}
+
+.project-card .project-tech {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: auto; /* Teknolojilerin en alta hizalanmasını sağlar */
+}
+
+.project-card .project-tech span {
+    background-color: var(--accent-bg);
+    color: var(--accent-color);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.project-card .btn-outline {
+    margin-top: 25px;
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.project-card .btn-outline:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+/* Responsive Tasarım */
+@media (max-width: 992px) {
+    .projects-hero .hero-title {
+        font-size: 2.8rem;
+    }
+    .projects-hero .hero-description {
+        font-size: 1.1rem;
+    }
+    .project-card h3 {
+        font-size: 1.6rem;
+    }
+    .project-card .project-icon {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .projects-hero {
+        padding: 60px 0;
+    }
+    .projects-hero .hero-title {
+        font-size: 2.2rem;
+    }
+    .projects-hero .hero-description {
+        font-size: 1rem;
+    }
+    .projects-grid {
+        grid-template-columns: 1fr; /* Tek sütunlu düzen */
+    }
+    .project-card {
+        padding: 25px;
+    }
+    .project-card h3 {
+        font-size: 1.5rem;
+    }
+    .project-card .project-icon {
+        font-size: 2.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .projects-hero {
+        padding: 40px 0;
+    }
+    .projects-hero .hero-title {
+        font-size: 1.8rem;
+    }
+    .projects-section .section-title {
+        font-size: 2rem;
+    }
+    .project-card h3 {
+        font-size: 1.3rem;
+        min-height: auto; /* Mobil için başlık yüksekliğini esnek bırak */
+    }
+    .project-card .project-icon {
+        font-size: 2.5rem;
+    }
+    .project-card p {
+        font-size: 0.95rem;
+    }
+    .project-card .project-tech span {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+    .project-card .btn-outline {
+        font-size: 0.9rem;
+        padding: 10px 15px;
+    }
+}
