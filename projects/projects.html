@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projelerim - Yahya Haliloğlu</title>
-    <link rel="stylesheet" href="../style.css"> <link rel="stylesheet" href="projectsStyle.css"> <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="projectsStyle.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+    <!-- Header -->
     <header class="header">
         <nav class="navbar">
             <div class="nav-brand">
@@ -27,120 +30,441 @@
         </nav>
     </header>
 
-    <section class="projects-hero">
+    <!-- Hero Section -->
+    <section class="page-hero">
         <div class="container">
             <div class="hero-content">
-                <h1 class="hero-title">Projelerim</h1>
-                <p class="hero-description">
-                    Yaptığım bazı önemli projeleri ve kullandığım teknolojileri keşfedin.
+                <h1 class="page-title">
+                    <span class="highlight">Projelerim</span>
+                </h1>
+                <p class="page-subtitle">
+                    "Code is poetry written for machines but read by humans"
+                </p>
+                <p class="page-description">
+                    Full-stack geliştirici olarak çeşitli teknolojilerle geliştirdiğim projeler. 
+                    Web uygulamalarından mobil uygulamalara, AI projelerinden sistem tasarımına kadar.
                 </p>
             </div>
         </div>
     </section>
 
-    <section class="projects-section">
+    <!-- Filter Section -->
+    <section class="project-filter">
         <div class="container">
-            <h2 class="section-title">Tamamladığım Çalışmalar</h2>
-            <div class="projects-grid">
-                <div class="project-card">
-                    <div class="project-icon">
-                        <i class="fas fa-book"></i>
-                    </div>
-                    <h3>Kütüphane Yer Tutma Uygulaması</h3>
-                    <p>Öğrencilerin kütüphanede yer ayırtmalarını sağlayan, gerçek zamanlı doluluk takipli mobil uygulama.</p>
-                    <div class="project-tech">
-                        <span>React Native</span>
-                        <span>Django</span>
-                        <span>PostgreSQL</span>
-                        <span>REST API</span>
-                    </div>
-                    <a href="#" class="btn btn-outline">Detayları Gör</a> </div>
-
-                <div class="project-card">
-                    <div class="project-icon">
-                        <i class="fas fa-money-bill"></i>
-                    </div>
-                    <h3>AI Destekli Banknot Tanıma Sistemi</h3>
-                    <p>Farklı ülke banknotlarını yüksek doğrulukla tanıyan derin öğrenme tabanlı bir sistem.</p>
-                    <div class="project-tech">
-                        <span>Python</span>
-                        <span>TensorFlow</span>
-                        <span>Keras</span>
-                        <span>CNN</span>
-                        <span>ResNet50</span>
-                    </div>
-                    <a href="#" class="btn btn-outline">Detayları Gör</a>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-icon">
-                        <i class="fas fa-hospital"></i>
-                    </div>
-                    <h3>Hastane Randevu Yönetim Sistemi</h3>
-                    <p>Hastaların online randevu almasını, doktorların randevularını yönetmesini sağlayan web tabanlı uygulama.</p>
-                    <div class="project-tech">
-                        <span>.NET MVC</span>
-                        <span>C#</span>
-                        <span>MSSQL</span>
-                        <span>jQuery</span>
-                    </div>
-                    <a href="#" class="btn btn-outline">Detayları Gör</a>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-icon">
-                        <i class="fas fa-globe"></i>
-                    </div>
-                    <h3>Kişisel Portföy Web Sitesi</h3>
-                    <p>Kendimi ve yeteneklerimi sergilediğim, tamamen duyarlı ve modern tasarıma sahip web sitesi.</p>
-                    <div class="project-tech">
-                        <span>HTML5</span>
-                        <span>CSS3</span>
-                        <span>JavaScript</span>
-                        <span>Responsive Design</span>
-                    </div>
-                    <a href="#" class="btn btn-outline">Detayları Gör</a>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
-                    <h3>E-Ticaret Web Uygulaması Prototipi</h3>
-                    <p>Ürün yönetimi, sepet ve ödeme akışı içeren temel bir e-ticaret platformu prototipi.</p>
-                    <div class="project-tech">
-                        <span>Node.js</span>
-                        <span>Express.js</span>
-                        <span>MongoDB</span>
-                        <span>Handlebars.js</span>
-                    </div>
-                    <a href="#" class="btn btn-outline">Detayları Gör</a>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-icon">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <h3>Oyun İçi Yapay Zeka Geliştirme</h3>
-                    <p>Bir strateji oyununda düşman davranışlarını kontrol eden temel bir yapay zeka algoritması.</p>
-                    <div class="project-tech">
-                        <span>C++</span>
-                        <span>Unity/Unreal Engine</span>
-                        <span>Pathfinding</span>
-                    </div>
-                    <a href="#" class="btn btn-outline">Detayları Gör</a>
-                </div>
-
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all" aria-label="Tüm projeleri göster">
+                    <i class="fas fa-th"></i>
+                    <span>Tümü</span>
+                </button>
+                <button class="filter-btn" data-filter="fullstack" aria-label="Full-Stack projelerini göster">
+                    <i class="fas fa-layers"></i>
+                    <span>Full-Stack</span>
+                </button>
+                <button class="filter-btn" data-filter="mobile" aria-label="Mobil projelerini göster">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>Mobil</span>
+                </button>
+                <button class="filter-btn" data-filter="ai" aria-label="AI/ML projelerini göster">
+                    <i class="fas fa-brain"></i>
+                    <span>AI/ML</span>
+                </button>
+                <button class="filter-btn" data-filter="web" aria-label="Web projelerini göster">
+                    <i class="fas fa-globe"></i>
+                    <span>Web</span>
+                </button>
+                <button class="filter-btn" data-filter="system" aria-label="Sistem projelerini göster">
+                    <i class="fas fa-cogs"></i>
+                    <span>Sistem</span>
+                </button>
+            </div>
+            
+            <!-- Search Input -->
+            <div class="search-container">
+                <input type="text" class="project-search" placeholder="Proje ara..." aria-label="Projelerde ara">
+                <i class="fas fa-search search-icon"></i>
             </div>
         </div>
     </section>
 
+    <!-- Projects Grid -->
+    <section class="projects-section">
+        <div class="container">
+            <div class="projects-grid">
+                
+                <!-- Kütüphane Yer Tutma Uygulaması -->
+                <article class="project-card" data-category="fullstack mobile" aria-label="Kütüphane Yer Tutma Mobil Uygulaması projesi">
+                    <div class="project-image">
+                        <div class="project-icon">
+                            <i class="fas fa-book-reader"></i>
+                        </div>
+                        <div class="project-overlay">
+                            <div class="project-links">
+                                <a href="#" class="project-link" title="GitHub Repository" aria-label="GitHub'da görüntüle">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a href="#" class="project-link" title="Demo" aria-label="Canlı demo">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="project-content">
+                        <div class="project-header">
+                            <h3>Kütüphane Yer Tutma Mobil Uygulaması</h3>
+                            <time class="project-date" datetime="2025-06">Haziran 2025</time>
+                        </div>
+                        
+                        <p class="project-description">
+                            Sakarya Üniversitesi kütüphanesinde işgal edilen yer problemine çözüm için 
+                            geliştirdiğim mobil uygulama. Öğrenciler yer rezervasyonu yapabilir ve 
+                            kütüphane kapasitesini optimal şekilde kullanabilir.
+                        </p>
+                        
+                        <div class="project-tech">
+                            <span class="tech-tag">React Native</span>
+                            <span class="tech-tag">Django</span>
+                            <span class="tech-tag">PostgreSQL</span>
+                            <span class="tech-tag">AWS</span>
+                            <span class="tech-tag">Docker</span>
+                            <span class="tech-tag">Expo Go</span>
+                        </div>
+                        
+                        <ul class="project-features">
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>Real-time yer takibi</span>
+                            </li>
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>Push notification sistemi</span>
+                            </li>
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>QR kod ile check-in</span>
+                            </li>
+                        </ul>
+                    </div>
+                </article>
+
+                <!-- AI Banknot Tanıma -->
+                <article class="project-card" data-category="ai" aria-label="Yapay Zeka İle Türk Banknotu Tanıma projesi">
+                    <div class="project-image">
+                        <div class="project-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="project-overlay">
+                            <div class="project-links">
+                                <a href="#" class="project-link" title="GitHub Repository" aria-label="GitHub'da görüntüle">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a href="#" class="project-link" title="Sunum" aria-label="Proje sunumu">
+                                    <i class="fas fa-presentation"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="project-content">
+                        <div class="project-header">
+                            <h3>Yapay Zeka İle Türk Banknotu Tanıma</h3>
+                            <time class="project-date" datetime="2025-05">Mayıs 2025</time>
+                        </div>
+                        
+                        <p class="project-description">
+                            ResNet50, VGG16, CNN ve EfficientNet modellerini karşılaştırarak en iyi 
+                            performansı veren modeli tespit ettim. GradCAM ile açıklanabilir AI modeli 
+                            oluşturdum ve canlı kamera görüntüsünden banknot tanıma sistemi geliştirdim.
+                        </p>
+                        
+                        <div class="project-tech">
+                            <span class="tech-tag">Python</span>
+                            <span class="tech-tag">TensorFlow</span>
+                            <span class="tech-tag">ResNet50</span>
+                            <span class="tech-tag">VGG16</span>
+                            <span class="tech-tag">CNN</span>
+                            <span class="tech-tag">GradCAM</span>
+                        </div>
+                        
+                        <ul class="project-features">
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>%95+ doğruluk oranı</span>
+                            </li>
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>Real-time kamera tanıma</span>
+                            </li>
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>Açıklanabilir AI (XAI)</span>
+                            </li>
+                        </ul>
+                    </div>
+                </article>
+
+                <!-- Youtuber Web Sitesi -->
+                <article class="project-card" data-category="web fullstack" aria-label="Youtuber Web Sitesi projesi">
+                    <div class="project-image">
+                        <div class="project-icon">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                        <div class="project-overlay">
+                            <div class="project-links">
+                                <a href="#" class="project-link" title="GitHub Repository" aria-label="GitHub'da görüntüle">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a href="#" class="project-link" title="Live Demo" aria-label="Canlı demo">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="project-content">
+                        <div class="project-header">
+                            <h3>Youtuber Web Sitesi</h3>
+                            <time class="project-date" datetime="2025-04">Nisan 2025</time>
+                        </div>
+                        
+                        <p class="project-description">
+                            Ekip projesi olarak geliştirdiğimiz modern Youtuber web sitesi. 
+                            Proje yöneticisi rolünü üstlenerek DevOps süreçlerini ve Agile 
+                            metodolojisini başarıyla yönettim.
+                        </p>
+                        
+                        <div class="project-tech">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">React</span>
+                            <span class="tech-tag">Node.js</span>
+                            <span class="tech-tag">MongoDB</span>
+                            <span class="tech-tag">Docker</span>
+                            <span class="tech-tag">GitLab CI/CD</span>
+                        </div>
+                        
+                        <ul class="project-features">
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>DevOps pipeline yönetimi</span>
+                            </li>
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>Agile & Scrum metodolojisi</span>
+                            </li>
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>Responsive tasarım</span>
+                            </li>
+                        </ul>
+                    </div>
+                </article>
+
+                <!-- Hastane Randevu Sistemi -->
+                <article class="project-card" data-category="web fullstack" aria-label="Hastane Randevu Web Uygulaması projesi">
+                    <div class="project-image">
+                        <div class="project-icon">
+                            <i class="fas fa-hospital"></i>
+                        </div>
+                        <div class="project-overlay">
+                            <div class="project-links">
+                                <a href="#" class="project-link" title="GitHub Repository" aria-label="GitHub'da görüntüle">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a href="#" class="project-link" title="Demo" aria-label="Proje demosu">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="project-content">
+                        <div class="project-header">
+                            <h3>Hastane Randevu Web Uygulaması</h3>
+                            <time class="project-date" datetime="2024-02">Şubat 2024</time>
+                        </div>
+                        
+                        <p class="project-description">
+                            MVC mimarisinde geliştirdiğim hastane randevu sistemi. Hastalar hastalık 
+                            türüne göre doktor seçimi yapabilir, randevu oluşturabilir ve yönetebilir. 
+                            Admin paneli ile sistem yönetimi sağlanır.
+                        </p>
+                        
+                        <div class="project-tech">
+                            <span class="tech-tag">.NET MVC</span>
+                            <span class="tech-tag">C#</span>
+                            <span class="tech-tag">MSSQL</span>
+                            <span class="tech-tag">Entity Framework</span>
+                            <span class="tech-tag">Bootstrap</span>
+                        </div>
+                        
+                        <ul class="project-features">
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>Rol tabanlı yetkilendirme</span>
+                            </li>
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>Otomatik randevu yönetimi</span>
+                            </li>
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>Admin dashboard</span>
+                            </li>
+                        </ul>
+                    </div>
+                </article>
+
+                <!-- Mini Dosya Yönetim Sistemi -->
+                <article class="project-card" data-category="system" aria-label="Mini Dosya Yönetim Sistemi projesi">
+                    <div class="project-image">
+                        <div class="project-icon">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                        <div class="project-overlay">
+                            <div class="project-links">
+                                <a href="#" class="project-link" title="GitHub Repository" aria-label="GitHub'da görüntüle">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="project-content">
+                        <div class="project-header">
+                            <h3>Mini Dosya Yönetim Sistemi</h3>
+                            <time class="project-date" datetime="2024-05">Mayıs 2024</time>
+                        </div>
+                        
+                        <p class="project-description">
+                            C dilinde tasarladığım klavye tabanlı dosya yönetim sistemi. 
+                            Dosya oluşturma, okuma, yazma ve silme işlemlerini klavye 
+                            kısayolları ile gerçekleştiren mini işletim sistemi benzeri proje.
+                        </p>
+                        
+                        <div class="project-tech">
+                            <span class="tech-tag">C</span>
+                            <span class="tech-tag">File I/O</span>
+                            <span class="tech-tag">System Programming</span>
+                        </div>
+                        
+                        <ul class="project-features">
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>Klavye tabanlı UI</span>
+                            </li>
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>CRUD dosya işlemleri</span>
+                            </li>
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>Memory optimization</span>
+                            </li>
+                        </ul>
+                    </div>
+                </article>
+
+                <!-- ESP8266 Hırsız Algılama -->
+                <article class="project-card" data-category="system" aria-label="ESP8266 Hırsız Algılama Sistemi projesi">
+                    <div class="project-image">
+                        <div class="project-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="project-overlay">
+                            <div class="project-links">
+                                <a href="#" class="project-link" title="GitHub Repository" aria-label="GitHub'da görüntüle">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a href="#" class="project-link" title="Video" aria-label="Proje videosu">
+                                    <i class="fas fa-play"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="project-content">
+                        <div class="project-header">
+                            <h3>ESP8266 Hırsız Algılama Sistemi</h3>
+                            <time class="project-date" datetime="2023-12">Aralık 2023</time>
+                        </div>
+                        
+                        <p class="project-description">
+                            IoT tabanlı güvenlik sistemi. Kapı açıldığında alarm çalan, 
+                            LED uyarısı veren ve kullanıcıya mobil bildirim gönderen 
+                            akıllı ev güvenlik çözümü.
+                        </p>
+                        
+                        <div class="project-tech">
+                            <span class="tech-tag">C++</span>
+                            <span class="tech-tag">ESP8266</span>
+                            <span class="tech-tag">Arduino IDE</span>
+                            <span class="tech-tag">Blynk</span>
+                            <span class="tech-tag">IoT</span>
+                        </div>
+                        
+                        <ul class="project-features">
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>Real-time uyarı sistemi</span>
+                            </li>
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>Mobil uygulama entegrasyonu</span>
+                            </li>
+                            <li class="feature">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <span>WiFi üzerinden kontrol</span>
+                            </li>
+                        </ul>
+                    </div>
+                </article>
+
+            </div>
+            
+            <!-- Empty State -->
+            <div class="projects-empty hidden">
+                <i class="fas fa-search"></i>
+                <h3>Bu kategoride proje bulunamadı</h3>
+                <p>Farklı bir kategori seçerek diğer projelerimi keşfedebilirsiniz.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="projects-cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Birlikte Çalışalım</h2>
+                <blockquote>
+                    <p>"Innovation distinguishes between a leader and a follower"</p>
+                    <cite>- Steve Jobs</cite>
+                </blockquote>
+                <p>
+                    Freelancer olarak web sitesi tasarım hizmetleri de sunuyorum. 
+                    Projeleriniz için profesyonel çözümler üretmeye hazırım.
+                </p>
+                <div class="cta-buttons">
+                    <a href="../contact/contact.html" class="btn btn-primary">
+                        <i class="fas fa-envelope"></i>
+                        İletişime Geç
+                    </a>
+                    <a href="#" class="btn btn-outline">
+                        <i class="fab fa-github"></i>
+                        GitHub Profilim
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>Yahya Haliloğlu</h3>
                     <p>Software Engineer & Full-Stack Developer</p>
+                    <p class="motto">"Code, Create, Innovate"</p>
                 </div>
                 <div class="footer-section">
                     <h4>Hızlı Linkler</h4>
@@ -151,11 +475,26 @@
                     </ul>
                 </div>
                 <div class="footer-section">
+                    <h4>Teknolojiler</h4>
+                    <ul>
+                        <li><a href="#" data-filter="fullstack">Full-Stack</a></li>
+                        <li><a href="#" data-filter="ai">AI/ML</a></li>
+                        <li><a href="#" data-filter="mobile">Mobile</a></li>
+                        <li><a href="#" data-filter="web">Web</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
                     <h4>Sosyal Medya</h4>
                     <div class="social-links">
-                        <a href="https://tr.linkedin.com/in/yahya-haliloglu" target="_blank" class="social-link"><i class="fab fa-linkedin"></i></a>
-                        <a href="https://github.com/YahyaLom" target="_blank" class="social-link"><i class="fab fa-github"></i></a>
-                        <a href="mailto:halilogluyahya@gmail.com" class="social-link"><i class="fas fa-envelope"></i></a>
+                        <a href="#" class="social-link" aria-label="LinkedIn profili">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="GitHub profili">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="E-posta">
+                            <i class="fas fa-envelope"></i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -165,5 +504,7 @@
         </div>
     </footer>
 
-    <script src="../script.js"></script> </body>
+    <script src="../script.js"></script>
+    <script src="projectsScript.js"></script>
+</body>
 </html>

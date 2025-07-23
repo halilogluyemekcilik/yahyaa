@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İletişim - Yahya Haliloğlu</title>
-    <link rel="stylesheet" href="../style.css"> <link rel="stylesheet" href="contactStyle.css"> <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="contactStyle.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+    <!-- Header -->
     <header class="header">
         <nav class="navbar">
             <div class="nav-brand">
@@ -27,77 +30,346 @@
         </nav>
     </header>
 
-    <section class="contact-hero">
+    <!-- Hero Section -->
+    <section class="page-hero">
         <div class="container">
             <div class="hero-content">
-                <h1 class="hero-title">Bana Ulaşın</h1>
-                <p class="hero-description">
-                    Projeleriniz, iş birliği veya herhangi bir sorunuz için benimle iletişime geçmekten çekinmeyin.
+                <h1 class="page-title">
+                    <span class="highlight">İletişim</span>
+                </h1>
+                <p class="page-subtitle">
+                    "Great things in business are never done by one person, they're done by a team of people"
+                </p>
+                <p class="page-description">
+                    Projeleriniz için işbirliği yapmak, freelance web tasarım hizmetleri almak 
+                    veya herhangi bir konuda benimle iletişime geçmek için aşağıdaki kanalları kullanabilirsiniz.
                 </p>
             </div>
         </div>
     </section>
 
-    <section class="contact-section">
+    <!-- Contact Info Section -->
+    <section class="contact-info">
         <div class="container">
-            <div class="contact-grid">
-                <div class="contact-info">
-                    <h2 class="section-subtitle">İletişim Bilgilerim</h2>
-                    <div class="info-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Sakarya, Türkiye</span>
-                    </div>
-                    <div class="info-item">
+            <div class="contact-cards">
+                <div class="contact-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="contact-icon">
                         <i class="fas fa-envelope"></i>
-                        <a href="mailto:halilogluyahya@gmail.com">halilogluyahya@gmail.com</a>
                     </div>
-                    <div class="info-item">
-                        <i class="fas fa-phone"></i>
-                        <a href="tel:+905392492500">+90 539 249 25 00</a>
-                    </div>
-                    <div class="info-item">
-                        <i class="fab fa-linkedin"></i>
-                        <a href="https://tr.linkedin.com/in/yahya-haliloglu" target="_blank">LinkedIn Profilim</a>
-                    </div>
-                    <div class="info-item">
-                        <i class="fab fa-github"></i>
-                        <a href="https://github.com/YahyaLom" target="_blank">GitHub Profilim</a>
-                    </div>
+                    <h3>E-posta</h3>
+                    <p>Projeleriniz için detaylı görüşme</p>
+                    <a href="mailto:yahyahaliloglu@gmail.com" class="contact-link">
+                        yahyahaliloglu@gmail.com
+                    </a>
                 </div>
 
-                <div class="contact-form">
-                    <h2 class="section-subtitle">Mesaj Gönderin</h2>
-                    <form action="#" method="POST" id="contactForm">
-                        <div class="form-group">
-                            <label for="name">Adınız Soyadınız</label>
-                            <input type="text" id="name" name="name" required placeholder="Adınız Soyadınız">
-                        </div>
-                        <div class="form-group">
-                            <label for="email">E-posta Adresiniz</label>
-                            <input type="email" id="email" name="email" required placeholder="ornek@mail.com">
-                        </div>
-                        <div class="form-group">
-                            <label for="subject">Konu</label>
-                            <input type="text" id="subject" name="subject" required placeholder="Konu">
-                        </div>
-                        <div class="form-group">
-                            <label for="message">Mesajınız</label>
-                            <textarea id="message" name="message" rows="6" required placeholder="Mesajınızı buraya yazın..."></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Mesajı Gönder</button>
-                        <div id="formMessage" class="form-message"></div>
-                    </form>
+                <div class="contact-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="contact-icon">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <h3>WhatsApp</h3>
+                    <p>Hızlı iletişim ve anlık mesajlaşma</p>
+                    <a href="https://wa.me/905389249250" target="_blank" class="contact-link">
+                        +90 538 924 92 50
+                    </a>
+                </div>
+
+                <div class="contact-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="contact-icon">
+                        <i class="fab fa-linkedin"></i>
+                    </div>
+                    <h3>LinkedIn</h3>
+                    <p>Profesyonel ağ ve kariyer</p>
+                    <a href="https://tr.linkedin.com/in/yahya-haliloglu" target="_blank" class="contact-link">
+                        linkedin.com/in/yahyahaliloglu
+                    </a>
+                </div>
+
+                <div class="contact-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="contact-icon">
+                        <i class="fab fa-github"></i>
+                    </div>
+                    <h3>GitHub</h3>
+                    <p>Kod örnekleri ve açık kaynak projeler</p>
+                    <a href="https://github.com/YahyaLom" target="_blank" class="contact-link">
+                        github.com/YahyaLom
+                    </a>
+                </div>
+                <div class="contact-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone-alt"></i> <!-- Telefon simgesi -->
+                    </div>
+                    <h3>Telefon</h3>
+                    <p>Hemen arayın, hızlı iletişime geçin</p>
+                    <a href="tel:+905389249250" class="contact-link">
+                        +90 538 924 92 50
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- Contact Form Section -->
+    <section class="contact-form-section">
+        <div class="container">
+            <div class="contact-content">
+                <div class="form-container">
+                    <h2 class="form-title">Mesaj Gönder</h2>
+                    <p class="form-description">
+                        Aşağıdaki formu doldurarak benimle iletişime geçebilirsiniz. 
+                        En kısa sürede size dönüş yapacağım.
+                    </p>
+
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <label for="name" class="form-label">
+                                <i class="fas fa-user"></i>
+                                Ad Soyad
+                            </label>
+                            <input 
+                                type="text" 
+                                id="name" 
+                                name="name" 
+                                class="form-input" 
+                                required
+                                placeholder="Adınızı ve soyadınızı girin"
+                            >
+                            <div class="form-error" id="nameError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope"></i>
+                                E-posta Adresi
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                class="form-input" 
+                                required
+                                placeholder="example@email.com"
+                            >
+                            <div class="form-error" id="emailError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone" class="form-label">
+                                <i class="fas fa-phone"></i>
+                                Telefon Numarası (Opsiyonel)
+                            </label>
+                            <input 
+                                type="tel" 
+                                id="phone" 
+                                name="phone" 
+                                class="form-input"
+                                placeholder="+90 5XX XXX XX XX"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject" class="form-label">
+                                <i class="fas fa-tag"></i>
+                                Konu
+                            </label>
+                            <select id="subject" name="subject" class="form-input" required>
+                                <option value="">Konu seçin</option>
+                                <option value="web-tasarim">Web Sitesi Tasarımı</option>
+                                <option value="mobil-uygulama">Mobil Uygulama Geliştirme</option>
+                                <option value="fullstack">Full-Stack Web Uygulaması</option>
+                                <option value="ai-ml">AI/ML Projesi</option>
+                                <option value="danismanlik">Teknik Danışmanlık</option>
+                                <option value="isbirligi">İş Birliği Teklifi</option>
+                                <option value="diger">Diğer</option>
+                            </select>
+                            <div class="form-error" id="subjectError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message" class="form-label">
+                                <i class="fas fa-comment"></i>
+                                Mesajınız
+                            </label>
+                            <textarea 
+                                id="message" 
+                                name="message" 
+                                class="form-input form-textarea" 
+                                rows="6" 
+                                required
+                                placeholder="Projeniz hakkında detaylı bilgi verin..."
+                            ></textarea>
+                            <div class="form-error" id="messageError"></div>
+                            <div class="character-count">
+                                <span id="charCount">0</span>/500 karakter
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="privacy" name="privacy" required>
+                                <span class="checkbox-checkmark"></span>
+                                <span class="checkbox-text">
+                                    Kişisel verilerimin işlenmesini ve benimle iletişime geçilmesini kabul ediyorum.
+                                </span>
+                            </label>
+                            <div class="form-error" id="privacyError"></div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-submit" id="submitBtn">
+                                <i class="fas fa-paper-plane"></i>
+                                <span class="btn-text">Mesaj Gönder</span>
+                                <div class="btn-loading hidden">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    Gönderiliyor...
+                                </div>
+                            </button>
+                            <button type="button" class="btn btn-outline btn-whatsapp" id="whatsappBtn">
+                                <i class="fab fa-whatsapp"></i>
+                                WhatsApp'tan Mesaj At
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="contact-info-sidebar">
+                    <div class="info-card">
+                        <h3>Neden Benimle Çalışmalısınız?</h3>
+                        <ul class="info-list">
+                            <li>
+                                <i class="fas fa-check"></i>
+                                Modern ve responsive tasarım
+                            </li>
+                            <li>
+                                <i class="fas fa-check"></i>
+                                Full-stack geliştirme deneyimi
+                            </li>
+                            <li>
+                                <i class="fas fa-check"></i>
+                                Hızlı ve güvenilir çözümler
+                            </li>
+                            <li>
+                                <i class="fas fa-check"></i>
+                                SEO optimizasyonu
+                            </li>
+                            <li>
+                                <i class="fas fa-check"></i>
+                                7/24 destek ve bakım
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>Hizmetlerim</h3>
+                        <div class="service-tags">
+                            <span class="service-tag">Web Tasarım</span>
+                            <span class="service-tag">E-ticaret</span>
+                            <span class="service-tag">Mobil App</span>
+                            <span class="service-tag">AI/ML</span>
+                            <span class="service-tag">API Geliştirme</span>
+                            <span class="service-tag">Database</span>
+                            <span class="service-tag">DevOps</span>
+                            <span class="service-tag">Danışmanlık</span>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>İletişim Saatleri</h3>
+                        <div class="schedule">
+                            <div class="schedule-item">
+                                <span class="day">Pazartesi - Cuma</span>
+                                <span class="time">09:00 - 18:00</span>
+                            </div>
+                            <div class="schedule-item">
+                                <span class="day">Cumartesi</span>
+                                <span class="time">10:00 - 16:00</span>
+                            </div>
+                            <div class="schedule-item">
+                                <span class="day">Pazar</span>
+                                <span class="time">Kapalı</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-icon success">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3>Mesajınız Başarıyla Gönderildi!</h3>
+            <p>En kısa sürede size dönüş yapacağım. Sabırlı olduğunuz için teşekkürler.</p>
+            <button type="button" class="btn btn-primary" id="closeSuccessModal">
+                Tamam
+            </button>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <h2 class="section-title">Sıkça Sorulan Sorular</h2>
+            <div class="faq-container">
+                <div class="faq-item" data-aos="fade-up">
+                    <div class="faq-question">
+                        <h3>Web sitesi projesi ne kadar sürede tamamlanır?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Projenin karmaşıklığına göre değişmekle birlikte, basit web siteleri 1-2 hafta, 
+                        e-ticaret siteleri 3-4 hafta, özel uygulamalar ise 4-8 hafta sürmektedir.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-aos="fade-up" data-aos-delay="100">
+                    <div class="faq-question">
+                        <h3>Mobil uygulamalar hangi platformlarda çalışır?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>React Native kullanarak hem Android hem iOS platformlarında çalışan 
+                        uygulamalar geliştiriyorum. Bu sayede her iki platforma da aynı anda ulaşabilirsiniz.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="faq-question">
+                        <h3>Proje sonrası destek hizmeti var mı?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Evet, tüm projelerimde 3 ay ücretsiz teknik destek ve küçük güncellemeler sunuyorum. 
+                        Sonrasında ise uygun fiyatlı bakım paketleri mevcuttur.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-aos="fade-up" data-aos-delay="300">
+                    <div class="faq-question">
+                        <h3>Fiyatlandırma nasıl belirleniyor?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Her proje kendine özgüdür. Projenizin detaylarını değerlendirdikten sonra 
+                        size özel bir teklif hazırlıyorum. İletişime geçerek ücretsiz fiyat teklifi alabilirsiniz.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>Yahya Haliloğlu</h3>
                     <p>Software Engineer & Full-Stack Developer</p>
+                    <p class="motto">"Code, Create, Innovate"</p>
                 </div>
                 <div class="footer-section">
                     <h4>Hızlı Linkler</h4>
@@ -108,11 +380,33 @@
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>Sosyal Medya</h4>
+                    <h4>Hizmetler</h4>
+                    <ul>
+                        <li><a href="#" data-service="web-tasarim">Web Tasarım</a></li>
+                        <li><a href="#" data-service="mobil-uygulama">Mobil Uygulama</a></li>
+                        <li><a href="#" data-service="ai-ml">AI/ML Projeler</a></li>
+                        <li><a href="#" data-service="danismanlik">Danışmanlık</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>İletişim</h4>
+                    <div class="footer-contact">
+                        <p><i class="fas fa-envelope"></i> yahyahaliloglu@gmail.com</p>
+                        <p><i class="fab fa-whatsapp"></i> +90 538 924 92 50</p>
+                    </div>
                     <div class="social-links">
-                        <a href="https://tr.linkedin.com/in/yahya-haliloglu" target="_blank" class="social-link"><i class="fab fa-linkedin"></i></a>
-                        <a href="https://github.com/YahyaLom" target="_blank" class="social-link"><i class="fab fa-github"></i></a>
-                        <a href="mailto:halilogluyahya@gmail.com" class="social-link"><i class="fas fa-envelope"></i></a>
+                        <a href="#" class="social-link" aria-label="LinkedIn profili">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="GitHub profili">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="mailto:yahyahaliloglu@gmail.com" class="social-link" aria-label="E-posta">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                        <a href="https://wa.me/905389249250" class="social-link" aria-label="WhatsApp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -122,5 +416,7 @@
         </div>
     </footer>
 
-    <script src="../script.js"></script> <script src="contactScript.js"></script> </body>
+    <script src="../script.js"></script>
+    <script src="contactScript.js"></script>
+</body>
 </html>
