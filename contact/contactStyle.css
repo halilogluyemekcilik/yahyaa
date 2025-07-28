@@ -262,6 +262,29 @@
     transition: all 0.3s ease;
     backdrop-filter: blur(5px);
 }
+/* EKLE: Select ve Option elementleri için özel stiller */
+.form-input option {
+    background: var(--primary-dark, #1a1a2e);
+    color: var(--light-text, #ffffff);
+    padding: 10px;
+    border: none;
+}
+
+.form-input select option {
+    background: #1a1a2e;
+    color: #ffffff;
+}
+
+/* Farklı tarayıcılar için uyumluluk */
+.form-input select {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--light-text, #ffffff);
+}
+
+select.form-input option:checked {
+    background: rgba(0, 255, 136, 0.2);
+    color: #ffffff;
+}
 
 .form-input:focus {
     outline: none;

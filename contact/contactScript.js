@@ -226,7 +226,7 @@ function updateCharacterCount() {
 }
 
 // =====================
-// FORM SUBMISSION
+// FORM SUBMISSION - MAİL GÖNDERME
 // =====================
 async function handleFormSubmit(e) {
     e.preventDefault();
@@ -240,39 +240,65 @@ async function handleFormSubmit(e) {
     setButtonLoading(submitBtn, true);
     
     try {
-        // Simulate form submission (replace with actual API call)
-        await simulateFormSubmission();
+        // Form verilerini al
+        const formData = {
+            name: document.getElementById('name').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            phone: document.getElementById('phone').value.trim() || 'Belirtilmemiş',
+            subject: document.getElementById('subject').selectedOptions[0]?.text || 'Genel İletişim',
+            message: document.getElementById('message').value.trim()
+        };
         
-        // Show success modal
-        showSuccessModal();
+        // Mail içeriğini oluştur
+        const mailSubject = `Portfolio İletişim: ${formData.subject}`;
+        const mailBody = `Merhaba Yahya,
+
+Portfolio sitenizden yeni bir mesaj geldi:
+
+👤 Ad Soyad: ${formData.name}
+📧 E-posta: ${formData.email}
+📱 Telefon: ${formData.phone}
+🏷️ Konu: ${formData.subject}
+
+💬 Mesaj:
+${formData.message}
+
+---
+Bu mesaj portfolio sitenizdeki iletişim formundan gönderilmiştir.
+
+İyi çalışmalar!`;
         
-        // Reset form
-        contactForm.reset();
-        updateCharacterCount();
+        // Mailto linkini oluştur ve aç
+        const mailtoLink = `mailto:halilogluyahya@gmail.com?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
         
-        // Track successful submission
-        trackUserInteraction('form_submit', 'contact_form');
+        // Test: Mail istemcisini aç
+        console.log('Mail linki:', mailtoLink);
+        
+        try {
+            window.location.href = mailtoLink;
+            
+            // Kullanıcıya bilgi ver
+            showNotification('Mail istemciniz açılıyor...', 'info');
+            
+            // Başarı mesajı göster
+            setTimeout(() => {
+                showSuccessModal();
+                contactForm.reset();
+                updateCharacterCount();
+                trackUserInteraction('mail_sent', 'contact_form');
+            }, 1000);
+            
+        } catch (error) {
+            console.error('Mail açma hatası:', error);
+            showNotification('Mail istemcisi açılamadı. Lütfen halilogluyahya@gmail.com adresine manuel mesaj gönderin.', 'error');
+        }
         
     } catch (error) {
-        console.error('Form submission error:', error);
-        showNotification('Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.', 'error');
+        console.error('Mail gönderme hatası:', error);
+        showNotification('Mail gönderilemedi. Lütfen tekrar deneyin.', 'error');
     } finally {
         setButtonLoading(submitBtn, false);
     }
-}
-
-function simulateFormSubmission() {
-    return new Promise((resolve, reject) => {
-        // Simulate network delay
-        setTimeout(() => {
-            // 90% success rate for demo
-            if (Math.random() > 0.1) {
-                resolve();
-            } else {
-                reject(new Error('Network error'));
-            }
-        }, 2000);
-    });
 }
 
 function setButtonLoading(button, isLoading) {
@@ -750,6 +776,7 @@ window.addEventListener('beforeunload', function() {
 console.log(`
 📞 Contact Page Features:
 ✅ Form validation and submission
+✅ Mail integration (mailto)
 ✅ WhatsApp integration
 ✅ FAQ accordion
 ✅ Character counter
