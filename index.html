@@ -38,6 +38,24 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://yahyahaliloglu.com.tr">
 
+    <!-- PWA Manifest ve Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#16213e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Yahya Haliloğlu">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/icon-128x128.png">
+
+    <!-- Diğer Platform İkonları -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png">
+    <link rel="shortcut icon" href="/favicon.ico">
+
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
     {
@@ -302,5 +320,61 @@
     </footer>
 
     <script src="script.js"></script>
+    <script>
+// Service Worker kaydı
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(registration) {
+        console.log('SW kayıt başarılı: ', registration.scope);
+      }, function(err) {
+        console.log('SW kayıt başarısız: ', err);
+      });
+  });
+}
+
+// Install prompt için
+let deferredPrompt;
+const addBtn = document.createElement('button');
+addBtn.textContent = 'Ana Ekrana Ekle';
+addBtn.style.display = 'none';
+addBtn.style.position = 'fixed';
+addBtn.style.bottom = '20px';
+addBtn.style.right = '20px';
+addBtn.style.padding = '10px 15px';
+addBtn.style.backgroundColor = '#16213e';
+addBtn.style.color = 'white';
+addBtn.style.border = 'none';
+addBtn.style.borderRadius = '5px';
+addBtn.style.cursor = 'pointer';
+addBtn.style.zIndex = '9999';
+
+document.body.appendChild(addBtn);
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  console.log('beforeinstallprompt tetiklendi');
+  e.preventDefault();
+  deferredPrompt = e;
+  addBtn.style.display = 'block';
+
+  addBtn.addEventListener('click', (e) => {
+    addBtn.style.display = 'none';
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('Kullanıcı PWA kurulumunu kabul etti');
+      } else {
+        console.log('Kullanıcı PWA kurulumunu reddetti');
+      }
+      deferredPrompt = null;
+    });
+  });
+});
+
+window.addEventListener('appinstalled', (evt) => {
+  console.log('PWA kuruldu');
+  addBtn.style.display = 'none';
+});
+</script>
 </body>
 </html>
