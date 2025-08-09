@@ -1,6 +1,6 @@
-Sesli harflerden en çok akla gelenler
-A 25
-E 20
-İ 15
-O 10
-U 5
+Bir dükkana müşteri dışında girebilecek birini söyleyin
+Dükkan sahibi 24
+Zabıta/Maliye 19
+Hırsız 18
+Toptancı 13
+Arkadaş 11

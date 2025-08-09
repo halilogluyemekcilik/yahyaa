@@ -1,6 +1,6 @@
 Kahvaltıda en çok tüketilen yiyecekler
-Ekmek 30
-Yumurta 25
-Peynir 20
-Zeytin 15
-Bal 10
+Ekmek 25
+Yumurta 22
+Peynir 16
+Zeytin 11
+Bal 8

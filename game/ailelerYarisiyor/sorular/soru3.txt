@@ -1,0 +1,6 @@
+Boşluğu doldurun ".....Balığı"
+Ton 35
+Köpek 27
+Japon 13
+Fok 12
+Yılan 7

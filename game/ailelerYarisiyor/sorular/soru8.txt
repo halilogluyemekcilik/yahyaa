@@ -1,0 +1,6 @@
+Bozulduğunda vurarak çalıştırmayı denediğiniz bir şey söyleyin
+Televizyon 27
+Bilgisayar 20
+Radyo 19
+Uzaktan Kumanda 13
+Cep Telefonu 10

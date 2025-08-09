@@ -115,6 +115,7 @@ async function loadRandomQuestion() {
   if (available.length === 0) {
     // hepsi kullanıldıysa sıfırla
     state.usedQuestionFiles.clear();
+    persistUsedQuestions();
   }
   const pool = available.length > 0 ? available : existing;
   if (pool.length === 0) {
@@ -124,13 +125,14 @@ async function loadRandomQuestion() {
   const file = pool[Math.floor(Math.random() * pool.length)];
   const text = await (await fetch(file, { cache: 'no-store' })).text();
   state.usedQuestionFiles.add(file);
+  persistUsedQuestions();
 
   const parsed = parseQuestionFile(text);
   state.currentQuestion = parsed;
   state.wrongCount = 0;
   state.revealedCount = parsed.answers.filter((a) => a.revealed).length;
 
-  setHidden('round-controls', true);
+  setHidden('round-controls', false);
   setHidden('steal-section', true);
   setHidden('answer-input-area', false);
 
@@ -230,6 +232,46 @@ function endRound() {
   showStarterSelection();
 }
 
+function changeQuestionInRound() {
+  // Aynı tur içinde yeni rastgele soru getirir, önceki soru "kullanıldı" olarak kalır
+  loadRandomQuestion();
+  $('#answer-input').focus();
+}
+
+function endGameAndRestart() {
+  // Takım isimlerini yeniden sor, skorları sıfırla. Sorulan sorular korunur.
+  // Önce bitiş ekranında skorları göster
+  $('#end-team-0-name').textContent = state.teams[0].name;
+  $('#end-team-1-name').textContent = state.teams[1].name;
+  $('#end-team-0-score').textContent = state.teams[0].score;
+  $('#end-team-1-score').textContent = state.teams[1].score;
+
+  setHidden('game', true);
+  setHidden('choose-starter', true);
+  setHidden('setup-names', true);
+  setHidden('end-screen', false);
+}
+
+// Basit yerel depolama ile sorulan soru listesini koru (sayfa yenilenirse de kalsın)
+function persistUsedQuestions() {
+  try {
+    const arr = Array.from(state.usedQuestionFiles);
+    localStorage.setItem('ay_usedQuestions', JSON.stringify(arr));
+  } catch (_) { /* yok say */ }
+}
+
+function restoreUsedQuestions() {
+  try {
+    const raw = localStorage.getItem('ay_usedQuestions');
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) {
+        state.usedQuestionFiles = new Set(arr);
+      }
+    }
+  } catch (_) { /* yok say */ }
+}
+
 // Event listeners
 function wireEvents() {
   $('#names-form').addEventListener('submit', (e) => {
@@ -288,9 +330,52 @@ function wireEvents() {
     // Artık yeni soru için başlangıç takımı tekrar sorulacak
     endRound();
   });
+
+  const changeBtn = document.getElementById('change-question');
+  if (changeBtn) {
+    changeBtn.addEventListener('click', () => {
+      changeQuestionInRound();
+    });
+  }
+
+  const endBtn = document.getElementById('end-game');
+  if (endBtn) {
+    endBtn.addEventListener('click', () => {
+      endGameAndRestart();
+    });
+  }
+
+  const restartBtn = document.getElementById('restart-game');
+  if (restartBtn) {
+    restartBtn.addEventListener('click', () => {
+      // Skor ve takım isimlerini sıfırla, isimleri tekrar sor
+      state.teams = [
+        { name: 'Takım 1', score: 0 },
+        { name: 'Takım 2', score: 0 },
+      ];
+      state.currentTeamIndex = 0;
+      state.wrongCount = 0;
+      state.currentQuestion = null;
+      state.revealedCount = 0;
+      renderScoreboard();
+
+      // Ekranları düzenle
+      setHidden('end-screen', true);
+      setHidden('choose-starter', true);
+      setHidden('game', true);
+      setHidden('setup-names', false);
+
+      // isim inputlarını temizle
+      const a = $('#team-a-input');
+      const b = $('#team-b-input');
+      if (a) a.value = '';
+      if (b) b.value = '';
+    });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  restoreUsedQuestions();
   renderScoreboard();
   wireEvents();
 });

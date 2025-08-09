@@ -93,7 +93,26 @@
         </div>
 
         <div id="round-controls" class="round-controls hidden">
+          <button id="change-question" class="btn">Soru Değiştir</button>
           <button id="next-question" class="btn secondary">Yeni Soru</button>
+          <button id="end-game" class="btn danger">Oyunu Bitir</button>
+        </div>
+      </section>
+
+      <section id="end-screen" class="card hidden">
+        <h2>Oyun Bitti</h2>
+        <div class="scoreboard">
+          <div class="team">
+            <span class="team-name" id="end-team-0-name">Takım 1</span>
+            <span class="team-score" id="end-team-0-score">0</span>
+          </div>
+          <div class="team">
+            <span class="team-name" id="end-team-1-name">Takım 2</span>
+            <span class="team-score" id="end-team-1-score">0</span>
+          </div>
+        </div>
+        <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
+          <button id="restart-game" class="btn primary">Yeni Oyunu Başlat</button>
         </div>
       </section>
     </main>
