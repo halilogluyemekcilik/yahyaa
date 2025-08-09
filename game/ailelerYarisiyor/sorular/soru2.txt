@@ -1,0 +1,6 @@
+Kahvaltıda en çok tüketilen yiyecekler
+Ekmek 30
+Yumurta 25
+Peynir 20
+Zeytin 15
+Bal 10

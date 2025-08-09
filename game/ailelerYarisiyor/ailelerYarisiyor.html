@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Aileler Yarışıyor</title>
+    <link rel="stylesheet" href="ailelerYarisiyor.css" />
+  </head>
+  <body>
+    <nav class="topnav">
+      <a id="home-link" href="https://yahyahaliloglu.com.tr/" rel="noopener">← Ana sayfa</a>
+    </nav>
+    <header class="scoreboard" id="scoreboard">
+      <div class="team" id="team-0">
+        <span class="team-name" id="team-0-name">Takım 1</span>
+        <span class="team-score" id="team-0-score">0</span>
+      </div>
+      <div class="team" id="team-1">
+        <span class="team-name" id="team-1-name">Takım 2</span>
+        <span class="team-score" id="team-1-score">0</span>
+      </div>
+    </header>
+
+    <main class="container">
+      <section id="setup-names" class="card">
+        <h2>Takım isimleri</h2>
+        <form id="names-form">
+          <label>
+            Takım 1 adı
+            <input type="text" id="team-a-input" placeholder="Örn: Maviler" required />
+          </label>
+          <label>
+            Takım 2 adı
+            <input type="text" id="team-b-input" placeholder="Örn: Kırmızılar" required />
+          </label>
+          <button type="submit" class="btn primary">Devam</button>
+        </form>
+      </section>
+
+      <section id="choose-starter" class="card hidden">
+        <h2>Yarışmaya kim başlayacak?</h2>
+        <form id="starter-form">
+          <label class="radio">
+            <input type="radio" name="starter" value="0" checked />
+            <span id="starter-team-0">Takım 1</span>
+          </label>
+          <label class="radio">
+            <input type="radio" name="starter" value="1" />
+            <span id="starter-team-1">Takım 2</span>
+          </label>
+          <button type="submit" class="btn primary">Başlat</button>
+        </form>
+      </section>
+
+      <section id="game" class="card hidden">
+        <div class="round-header">
+          <div class="turn-indicator">
+            Sıra: <strong id="current-team-name">-</strong>
+          </div>
+          <div class="wrong-boxes" id="wrong-boxes" aria-label="yanlış sayısı">
+            <span class="wrong-box">-</span>
+            <span class="wrong-box">-</span>
+            <span class="wrong-box">-</span>
+          </div>
+        </div>
+
+        <h2 id="question-text">Soru yükleniyor...</h2>
+
+        <ol id="answers-board" class="answers-board" start="1"></ol>
+
+        <div id="answer-input-area" class="answer-area">
+          <form id="answer-form">
+            <input
+              type="text"
+              id="answer-input"
+              placeholder="Cevabınızı yazın ve Enter'a basın"
+              autocomplete="off"
+              required
+            />
+            <button type="submit" class="btn">Cevapla</button>
+          </form>
+          <p class="hint">Toplam 5 doğru cevabı bulun ya da 3 yanlışta çalma hakkı diğer takıma geçer.</p>
+        </div>
+
+        <div id="steal-section" class="steal-area hidden">
+          <p>
+            Çalma hakkı: <strong id="steal-team-name">-</strong> bir tahmin yapabilir.
+          </p>
+          <form id="steal-form">
+            <input type="text" id="steal-input" placeholder="Çalma cevabı" autocomplete="off" required />
+            <button type="submit" class="btn danger">Çal</button>
+          </form>
+        </div>
+
+        <div id="round-controls" class="round-controls hidden">
+          <button id="next-question" class="btn secondary">Yeni Soru</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <small>Yalnızca HTML, CSS ve JS ile hazırlanmıştır.</small>
+    </footer>
+
+    <script defer src="ailelerYarisiyor.js"></script>
+  </body>
+  </html>
+
+

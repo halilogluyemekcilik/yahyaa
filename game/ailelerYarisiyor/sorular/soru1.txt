@@ -1,0 +1,6 @@
+Sesli harflerden en çok akla gelenler
+A 25
+E 20
+İ 15
+O 10
+U 5
