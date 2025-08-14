@@ -11,6 +11,11 @@ const state = {
   currentQuestion: null, // { text: string, answers: [{text, points, revealed}] }
   revealedCount: 0,
   usedQuestionFiles: new Set(),
+  roundPoints: 0, // Bu el için toplanan puanlar
+  stealAttempted: false, // Çalma hakkı kullanıldı mı?
+  stealTeamIndex: -1, // Çalma hakkı olan takım
+  firstTeamRoundPoints: 0, // İlk takımın bu elden aldığı puanlar
+  allAnswersRevealed: false, // Tüm cevaplar gösterildi mi?
 };
 
 // Yardımcılar
@@ -88,6 +93,42 @@ function updateUIAll() {
   renderTurn();
   renderWrongBoxes();
   renderQuestion();
+  
+  // Eğer 5 cevap bulunduysa "Yeni Ele Geç" butonunu yanıp sönen ve nefes alan yap
+  if (state.revealedCount >= 5) {
+    const nextBtn = document.getElementById('next-question');
+    if (nextBtn) {
+      nextBtn.classList.add('breathing');
+    }
+    
+    // 5 cevap bulunduğunda "Tüm Cevapları Gör" butonundan nefes efektini kaldır
+    const showAllAnswersBtn = document.getElementById('show-all-answers');
+    if (showAllAnswersBtn) {
+      showAllAnswersBtn.classList.remove('breathing');
+    }
+  }
+  
+  // "Diğer Cevapları Gör" butonunu sadece çalma hakkı kullanıldıktan sonra göster
+  const showAnswersBtn = document.getElementById('show-answers');
+  if (showAnswersBtn) {
+    if (state.stealAttempted && state.revealedCount < 5) {
+      showAnswersBtn.style.display = 'inline-block';
+    } else {
+      showAnswersBtn.style.display = 'none';
+    }
+  }
+  
+  // "Tüm Cevapları Gör" butonunu her zaman göster (5 cevap bulunmadıysa)
+  const showAllAnswersBtn = document.getElementById('show-all-answers');
+  if (showAllAnswersBtn) {
+    if (state.revealedCount < 5) {
+      showAllAnswersBtn.style.display = 'inline-block';
+    } else {
+      showAllAnswersBtn.style.display = 'none';
+    }
+  }
+  
+
 }
 
 // Oyun akışı
@@ -130,11 +171,39 @@ async function loadRandomQuestion() {
   const parsed = parseQuestionFile(text);
   state.currentQuestion = parsed;
   state.wrongCount = 0;
-  state.revealedCount = parsed.answers.filter((a) => a.revealed).length;
+  state.revealedCount = 0; // Yeni soru için 0 olmalı
 
   setHidden('round-controls', false);
   setHidden('steal-section', true);
   setHidden('answer-input-area', false);
+
+  // "Diğer Cevapları Gör" butonunu gizle
+  const showAnswersBtn = document.getElementById('show-answers');
+  if (showAnswersBtn) {
+    showAnswersBtn.style.display = 'none';
+  }
+
+  // "Tüm Cevapları Gör" butonunu gizle
+  const showAllAnswersBtn = document.getElementById('show-all-answers');
+  if (showAllAnswersBtn) {
+    showAllAnswersBtn.style.display = 'none';
+  }
+
+  // Cevapla butonunu aktif hale getir
+  const answerBtn = document.querySelector('#answer-form button[type="submit"]');
+  if (answerBtn) {
+    answerBtn.disabled = false;
+    answerBtn.style.opacity = '1';
+    answerBtn.style.cursor = 'pointer';
+  }
+
+  // Çal butonunu deaktif yap (3 yanlış yapılana kadar)
+  const stealBtn = document.querySelector('#steal-form button[type="submit"]');
+  if (stealBtn) {
+    stealBtn.disabled = true;
+    stealBtn.style.opacity = '0.5';
+    stealBtn.style.cursor = 'not-allowed';
+  }
 
   updateUIAll();
 }
@@ -187,7 +256,16 @@ function tryRevealAnswer(guessRaw, awardTeamIndex = state.currentTeamIndex) {
     if (normalize(ans.text) === guess) {
       ans.revealed = true;
       state.revealedCount += 1;
-      state.teams[awardTeamIndex].score += ans.points;
+      
+      // Eğer çalma hakkı kullanılıyorsa puanı roundPoints'e ekle
+      if (state.stealAttempted && state.stealTeamIndex === awardTeamIndex) {
+        state.roundPoints += ans.points;
+      } else {
+        // Normal oyun - puanı direkt takıma ekle ve firstTeamRoundPoints'e de ekle
+        state.teams[awardTeamIndex].score += ans.points;
+        state.firstTeamRoundPoints += ans.points;
+      }
+      
       found = true;
       break;
     }
@@ -206,13 +284,34 @@ function isRoundComplete() {
 function handleWrongAnswer() {
   state.wrongCount += 1;
   renderWrongBoxes();
-  if (state.wrongCount >= 3) {
+  
+  // 3 yanlış yapıldığında ve henüz çalma hakkı kullanılmadıysa
+  if (state.wrongCount >= 3 && !state.stealAttempted) {
     // Çalma hakkı diğer takıma
     const other = state.currentTeamIndex === 0 ? 1 : 0;
+    state.stealTeamIndex = other;
+    state.stealAttempted = true;
+    
     $('#steal-team-name').textContent = state.teams[other].name;
     setHidden('answer-input-area', true);
     setHidden('steal-section', false);
     $('#steal-input').focus();
+    
+    // Cevapla butonunu deaktif yap
+    const answerBtn = document.querySelector('#answer-form button[type="submit"]');
+    if (answerBtn) {
+      answerBtn.disabled = true;
+      answerBtn.style.opacity = '0.5';
+      answerBtn.style.cursor = 'not-allowed';
+    }
+    
+    // Çal butonunu aktif hale getir (3 yanlış yapıldığında)
+    const stealBtn = document.querySelector('#steal-form button[type="submit"]');
+    if (stealBtn) {
+      stealBtn.disabled = false;
+      stealBtn.style.opacity = '1';
+      stealBtn.style.cursor = 'pointer';
+    }
   }
 }
 
@@ -225,17 +324,110 @@ function showStarterSelection() {
   setHidden('choose-starter', false);
 }
 
+
+
+function showAllAnswers() {
+  // Tüm cevapları göster
+  state.currentQuestion.answers.forEach(ans => {
+    if (!ans.revealed) {
+      ans.revealed = true;
+    }
+  });
+  state.revealedCount = 5; // Tüm cevaplar gösterildi
+  state.allAnswersRevealed = true;
+  
+  // UI'ı güncelle
+  renderQuestion();
+  
+  // "Yeni Ele Geç" butonunu yanıp sönen ve nefes alan yap
+  const nextBtn = document.getElementById('next-question');
+  if (nextBtn) {
+    nextBtn.classList.add('breathing');
+  }
+  
+  // "Tüm Cevapları Gör" butonundan nefes efektini kaldır (artık gerekli değil)
+  const showAllAnswersBtn = document.getElementById('show-all-answers');
+  if (showAllAnswersBtn) {
+    showAllAnswersBtn.classList.remove('breathing');
+  }
+}
+
+
+
 function endRound() {
+  // Eğer çalma hakkı kullanıldıysa ve puan toplandıysa
+  if (state.stealAttempted && state.roundPoints > 0) {
+    // Çalan takıma tüm el puanlarını ekle (önceki + yeni bulunan)
+    const totalRoundPoints = state.roundPoints + state.firstTeamRoundPoints;
+    state.teams[state.stealTeamIndex].score += totalRoundPoints;
+    
+    // İlk takımın o elden aldığı puanları geri al
+    if (state.firstTeamRoundPoints > 0) {
+      state.teams[state.currentTeamIndex].score -= state.firstTeamRoundPoints;
+    }
+    
+    renderScoreboard();
+  }
+  
+  // Round state'ini sıfırla
+  state.roundPoints = 0;
+  state.firstTeamRoundPoints = 0;
+  state.stealAttempted = false;
+  state.stealTeamIndex = -1;
+  state.allAnswersRevealed = false;
+  
+  // Breathing animasyonunu kaldır
+  const nextBtn = document.getElementById('next-question');
+  if (nextBtn) {
+    nextBtn.classList.remove('breathing');
+  }
+  
   setHidden('answer-input-area', true);
   setHidden('steal-section', true);
   setHidden('round-controls', true);
+  
+  // "Diğer Cevapları Gör" butonunu gizle
+  const showAnswersBtn = document.getElementById('show-answers');
+  if (showAnswersBtn) {
+    showAnswersBtn.style.display = 'none';
+  }
+
+  // "Tüm Cevapları Gör" butonunu gizle
+  const showAllAnswersBtn = document.getElementById('show-all-answers');
+  if (showAllAnswersBtn) {
+    showAllAnswersBtn.style.display = 'none';
+  }
+  
   showStarterSelection();
 }
 
 function changeQuestionInRound() {
   // Aynı tur içinde yeni rastgele soru getirir, önceki soru "kullanıldı" olarak kalır
+  // Round state'ini sıfırla
+  state.roundPoints = 0;
+  state.firstTeamRoundPoints = 0;
+  state.stealAttempted = false;
+  state.stealTeamIndex = -1;
+  state.allAnswersRevealed = false;
+  
   loadRandomQuestion();
   $('#answer-input').focus();
+  
+  // Cevapla butonunu aktif hale getir
+  const answerBtn = document.querySelector('#answer-form button[type="submit"]');
+  if (answerBtn) {
+    answerBtn.disabled = false;
+    answerBtn.style.opacity = '1';
+    answerBtn.style.cursor = 'pointer';
+  }
+
+  // Çal butonunu deaktif yap (3 yanlış yapılana kadar)
+  const stealBtn = document.querySelector('#steal-form button[type="submit"]');
+  if (stealBtn) {
+    stealBtn.disabled = true;
+    stealBtn.style.opacity = '0.5';
+    stealBtn.style.cursor = 'not-allowed';
+  }
 }
 
 function endGameAndRestart() {
@@ -309,7 +501,8 @@ function wireEvents() {
     if (!ok) {
       handleWrongAnswer();
     } else if (isRoundComplete()) {
-      endRound();
+      // 5 cevap bulundu, "Yeni El" butonunu yanıp sönen yap
+      updateUIAll();
     }
   });
 
@@ -323,17 +516,71 @@ function wireEvents() {
     const other = state.currentTeamIndex === 0 ? 1 : 0;
     const ok = tryRevealAnswer(guess, other);
 
-    endRound();
+    // Çal butonunu deaktif yap (bir kere kullanıldı)
+    const stealBtn = document.querySelector('#steal-form button[type="submit"]');
+    if (stealBtn) {
+      stealBtn.disabled = true;
+      stealBtn.style.opacity = '0.5';
+      stealBtn.style.cursor = 'not-allowed';
+    }
+
+    // Çalma hakkı kullanıldı
+    if (ok) {
+      // Doğru cevap verildi
+      if (state.revealedCount >= 5) {
+        // 5 cevap bulundu, "Yeni Ele Geç" butonunu yanıp sönen yap
+        updateUIAll();
+      } else {
+        // 5 cevap bulunmadıysa "Tüm Cevapları Gör" ve "Yeni Ele Geç" butonlarına nefes efekti ekle
+        const showAllAnswersBtn = document.getElementById('show-all-answers');
+        const nextBtn = document.getElementById('next-question');
+        
+        if (showAllAnswersBtn) {
+          showAllAnswersBtn.classList.add('breathing');
+        }
+        if (nextBtn) {
+          nextBtn.classList.add('breathing');
+        }
+      }
+    } else {
+      // Yanlış cevap verildiyse "Tüm Cevapları Gör" ve "Yeni Ele Geç" butonlarına nefes efekti ekle
+      const showAllAnswersBtn = document.getElementById('show-all-answers');
+      const nextBtn = document.getElementById('next-question');
+      
+      if (showAllAnswersBtn) {
+        showAllAnswersBtn.classList.add('breathing');
+      }
+      if (nextBtn) {
+        nextBtn.classList.add('breathing');
+      }
+    }
   });
 
+  // Diğer cevapları gör butonu
+  const showAnswersBtn = document.getElementById('show-answers');
+  if (showAnswersBtn) {
+    showAnswersBtn.addEventListener('click', () => {
+      showAllAnswers();
+    });
+  }
+
+  // Tüm cevapları gör butonu
+  const showAllAnswersBtn = document.getElementById('show-all-answers');
+  if (showAllAnswersBtn) {
+    showAllAnswersBtn.addEventListener('click', () => {
+      showAllAnswers();
+    });
+  }
+
   $('#next-question').addEventListener('click', async () => {
-    // Artık yeni soru için başlangıç takımı tekrar sorulacak
+    // Yeni el için başlangıç takımı tekrar sorulacak
     endRound();
   });
 
   const changeBtn = document.getElementById('change-question');
   if (changeBtn) {
     changeBtn.addEventListener('click', () => {
+      // Soru değiştir butonu sadece soru değiştirmek için
       changeQuestionInRound();
     });
   }
@@ -357,6 +604,11 @@ function wireEvents() {
       state.wrongCount = 0;
       state.currentQuestion = null;
       state.revealedCount = 0;
+      state.roundPoints = 0;
+      state.firstTeamRoundPoints = 0;
+      state.stealAttempted = false;
+      state.stealTeamIndex = -1;
+      state.allAnswersRevealed = false;
       renderScoreboard();
 
       // Ekranları düzenle
@@ -364,6 +616,34 @@ function wireEvents() {
       setHidden('choose-starter', true);
       setHidden('game', true);
       setHidden('setup-names', false);
+      
+      // "Diğer Cevapları Gör" butonunu gizle
+      const showAnswersBtn = document.getElementById('show-answers');
+      if (showAnswersBtn) {
+        showAnswersBtn.style.display = 'none';
+      }
+
+      // "Tüm Cevapları Gör" butonunu gizle
+      const showAllAnswersBtn = document.getElementById('show-all-answers');
+      if (showAllAnswersBtn) {
+        showAllAnswersBtn.style.display = 'none';
+      }
+
+      // Cevapla butonunu aktif hale getir
+      const answerBtn = document.querySelector('#answer-form button[type="submit"]');
+      if (answerBtn) {
+        answerBtn.disabled = false;
+        answerBtn.style.opacity = '1';
+        answerBtn.style.cursor = 'pointer';
+      }
+
+      // Çal butonunu deaktif yap (3 yanlış yapılana kadar)
+      const stealBtn = document.querySelector('#steal-form button[type="submit"]');
+      if (stealBtn) {
+        stealBtn.disabled = true;
+        stealBtn.style.opacity = '0.5';
+        stealBtn.style.cursor = 'not-allowed';
+      }
 
       // isim inputlarını temizle
       const a = $('#team-a-input');
@@ -372,6 +652,33 @@ function wireEvents() {
       if (b) b.value = '';
     });
   }
+}
+
+// Nasıl Oynanır butonu için fonksiyon
+function showHowToPlay() {
+  const rules = `
+🎯 Aileler Yarışıyor Oyun Kuralları
+
+📝 Oynanış:
+• Her el için 5 doğru cevap bulunmalı
+• Her takım sırayla cevap vermeye çalışır
+• 3 yanlış yapıldığında çalma hakkı diğer takıma geçer
+• Çalma hakkında doğru cevap verilirse, o elin TÜM puanları çalınır
+
+⚠️ Dikkat Edilmesi Gerekenler:
+• Cevaplar tam olarak yazılmalı (büyük-küçük harf önemli değil)
+• Çalma hakkı sadece 3 yanlıştan sonra aktif olur
+• Çalma hakkı bir kez kullanılabilir
+• Puanlar el sonunda eklenir, çalma durumunda tüm puanlar çalınır
+
+🔍 Sıkça Sorulan Sorular:
+• Soru değiştir ne için? Aynı soru gelirse yarışma esnasında değiştirmek için
+• Çalma hakkı ne zaman gelir? 3 yanlış yapıldığında otomatik olarak
+• Puanlar ne zaman eklenir? El bittiğinde, çalma durumunda tüm puanlar çalınır
+• 5 cevap bulunamazsa ne olur? "Tüm Cevapları Gör" butonu ile tüm cevaplar açılır
+  `;
+  
+  alert(rules);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

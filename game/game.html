@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oyunlar | Yahya Haliloğlu</title>
+    <link rel="stylesheet" href="game.css">
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h2>Yahya Haliloğlu</h2>
+            </div>
+            <div class="nav-menu" id="nav-menu">
+                <ul class="nav-list">
+                    <li><a href="../index.html" class="nav-link">Ana Sayfa</a></li>
+                    <li><a href="../projects/projects.html" class="nav-link">Projeler</a></li>
+                    <li><a href="../contact/contact.html" class="nav-link">İletişim</a></li>
+                    <li><a href="game.html" class="nav-link active">Oyunlar</a></li>
+                </ul>
+            </div>
+            <div class="nav-toggle" id="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="game-hero">
+        <div class="container">
+            <h1>🎮 Oyunlar</h1>
+            <p>Burada kendi geliştirdiğim veya oynanabilir hale getirdiğim tüm oyunları bulabilirsiniz. Yeni oyunlar eklendikçe buradan ulaşabilirsiniz.</p>
+        </div>
+    </section>
+
+    <!-- GAME LIST -->
+    <section class="game-list container">
+        <!-- Örnek Oyun Kartı -->
+        <div class="game-card">
+            <div class="game-icon">
+                <i class="fas fa-scale-balanced"></i>
+            </div>
+            <h3>Aileler Yarışıyor</h3>
+            <p>Bilgi yarışması formatında, ailece veya arkadaşlarla oynayabileceğiniz keyifli bir oyun.</p>
+            <a href="ailelerYarisiyor/ailelerYarisiyor.html" target="_blank" class="btn btn-primary">Oyna</a>
+        </div>
+        <!-- HMGS Sınav Takip Sistemi-->
+        <div class="game-card">
+            <div class="game-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <h3>HMGS Sınav Başarı Takip Sistemi</h3>
+            <p>HMGS sınavına hazılanan Esra için yapılmıştır. Herkes kullanabilir.</p>
+            <a href="hmgsSınavTakipSistemi/index.html" target="_blank" class="btn btn-primary">Oyna</a>
+        </div>
+
+        <!-- Gelecekte buraya yeni oyun kartları eklenecek -->
+        <div class="game-card">
+            <div class="game-icon">
+                <i class="fas fa-chess-knight"></i>
+            </div>
+            <h3>Yeni Oyun (Yakında)</h3>
+            <p>Çok yakında yeni bir oyun burada olacak.</p>
+            <button class="btn btn-outline" disabled>Yakında</button>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Yahya Haliloğlu</h3>
+                    <p>Software Engineer & Full-Stack Developer</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Hızlı Linkler</h4>
+                    <ul>
+                        <li><a href="../index.html">Ana Sayfa</a></li>
+                        <li><a href="../projects/projects.html">Projeler</a></li>
+                        <li><a href="../contact/contact.html">İletişim</a></li>
+                        <li><a href="game.html">Oyunlar</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Sosyal Medya</h4>
+                    <div class="social-links">
+                        <a href="https://www.linkedin.com/in/yahya-haliloglu/" class="social-link"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://github.com/YahyaLom" class="social-link"><i class="fab fa-github"></i></a>
+                        <a href="mailto:halilogluyahya@gmail.com" class="social-link"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Yahya Haliloğlu. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="gameScript.js"></script>
+</body>
+</html>

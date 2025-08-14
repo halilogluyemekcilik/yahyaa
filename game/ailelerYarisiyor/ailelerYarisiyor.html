@@ -22,20 +22,63 @@
     </header>
 
     <main class="container">
-      <section id="setup-names" class="card">
-        <h2>Takım isimleri</h2>
-        <form id="names-form">
-          <label>
-            Takım 1 adı
-            <input type="text" id="team-a-input" placeholder="Örn: Maviler" required />
-          </label>
-          <label>
-            Takım 2 adı
-            <input type="text" id="team-b-input" placeholder="Örn: Kırmızılar" required />
-          </label>
-          <button type="submit" class="btn primary">Devam</button>
-        </form>
-      </section>
+             <section id="setup-names" class="card">
+         <h2>Takım isimleri</h2>
+         <form id="names-form">
+           <label>
+             Takım 1 adı
+             <input type="text" id="team-a-input" placeholder="Örn: Maviler" required />
+           </label>
+           <label>
+             Takım 2 adı
+             <input type="text" id="team-b-input" placeholder="Örn: Kırmızılar" required />
+           </label>
+           <button type="submit" class="btn primary">Devam</button>
+         </form>
+         
+         <div class="game-rules">
+           <h3>🎯 Oyun Kuralları</h3>
+           <div class="rules-content">
+             <div class="rule-section">
+               <h4>📝 Oynanış:</h4>
+               <ul>
+                 <li>Her el için 5 doğru cevap bulunmalı</li>
+                 <li>Her takım sırayla cevap vermeye çalışır</li>
+                 <li>3 yanlış yapıldığında çalma hakkı diğer takıma geçer</li>
+                 <li>Çalma hakkında doğru cevap verilirse, o elin TÜM puanları çalınır</li>
+               </ul>
+             </div>
+             
+             <div class="rule-section">
+               <h4>⚠️ Dikkat Edilmesi Gerekenler:</h4>
+               <ul>
+                 <li>Cevaplar tam olarak yazılmalı (büyük-küçük harf önemli değil)</li>
+                 <li>Çalma hakkı sadece 3 yanlıştan sonra aktif olur</li>
+                 <li>Çalma hakkı bir kez kullanılabilir</li>
+                 <li>Puanlar el sonunda eklenir, çalma durumunda tüm puanlar çalınır</li>
+               </ul>
+             </div>
+             
+             <div class="rule-section">
+               <h4>🔍 Sıkça Sorulan Sorular:</h4>
+               <ul>
+                 <li><strong>Soru değiştir ne için?</strong> Aynı soru gelirse yarışma esnasında değiştirmek için</li>
+                 <li><strong>Çalma hakkı ne zaman gelir?</strong> 3 yanlış yapıldığında otomatik olarak</li>
+                 <li><strong>Puanlar ne zaman eklenir?</strong> El bittiğinde, çalma durumunda tüm puanlar çalınır</li>
+                 <li><strong>5 cevap bulunamazsa ne olur?</strong> "Tüm Cevapları Gör" butonu ile tüm cevaplar açılır</li>
+               </ul>
+             </div>
+             
+             <div class="rule-section">
+               <h4>📋 Ek Bilgiler:</h4>
+               <div class="info-buttons">
+                 <button class="btn info" onclick="window.open('https://yahyahaliloglu.com.tr', '_blank')">YahyaHaliloglu.com.tr'ye Git</button>
+                 <button class="btn info" onclick="showHowToPlay()">Nasıl Oynanır?</button>
+               </div>
+             </div>
+           </div>
+         </div>
+       </section>
 
       <section id="choose-starter" class="card hidden">
         <h2>Yarışmaya kim başlayacak?</h2>
@@ -79,7 +122,7 @@
             />
             <button type="submit" class="btn">Cevapla</button>
           </form>
-          <p class="hint">Toplam 5 doğru cevabı bulun ya da 3 yanlışta çalma hakkı diğer takıma geçer.</p>
+          <p class="hint">Toplam 5 doğru cevabı bulun ya da 3 yanlışta çalma hakkı diğer takıma geçer. Çalma hakkında doğru cevap verilirse, o elin TÜM puanları çalınır ve ilk takım o elden hiç puan alamaz.</p>
         </div>
 
         <div id="steal-section" class="steal-area hidden">
@@ -93,10 +136,19 @@
         </div>
 
         <div id="round-controls" class="round-controls hidden">
-          <button id="change-question" class="btn">Soru Değiştir</button>
-          <button id="next-question" class="btn secondary">Yeni Soru</button>
-          <button id="end-game" class="btn danger">Oyunu Bitir</button>
+          <div class="left-controls">
+            <button id="show-answers" class="btn primary">Cevapları Gör</button>
+            <button id="show-all-answers" class="btn warning">Tüm Cevapları Gör</button>
+          </div>
+          <div class="center-controls">
+            <button id="change-question" class="btn">Soru Değiştir</button>
+          </div>
+          <div class="right-controls">
+            <button id="next-question" class="btn secondary">Yeni Ele Geç</button>
+            <button id="end-game" class="btn danger">Oyunu Bitir</button>
+          </div>
         </div>
+
       </section>
 
       <section id="end-screen" class="card hidden">
@@ -117,9 +169,40 @@
       </section>
     </main>
 
-    <footer class="footer">
-      <small>Yalnızca HTML, CSS ve JS ile hazırlanmıştır.</small>
-    </footer>
+         <footer class="footer">
+       <div class="footer-content">
+        <div class="footer-section">
+          <h4>🐛 Hata Bildirimi</h4>
+          <p>Oyunda karşılaştığınız mantık hataları, bug'lar veya teknik sorunları lütfen bildirin. En kısa sürede çözüm üretmeye çalışacağız.</p>
+        </div>
+          
+         <div class="footer-section">
+           <h4>ℹ️ Önemli Bilgilendirme</h4>
+           <p>Bu oyun tamamen tarayıcı tabanlıdır. Backend bulunmamaktadır ve hiçbir veri kayıt edilmemektedir. Yahya Haliloğlu tarafından geliştirilmiştir, sorular direkt Aileler Yarışıyor programından alınmıştır.</p>
+         </div>
+         
+         <div class="footer-section">
+           <h4>📞 İletişim & Destek</h4>
+           <p>Oyun ile ilgili herhangi bir sorun, öneri veya soru için bizimle iletişime geçebilirsiniz:</p>
+           <div class="contact-methods">
+             <div class="contact-item">
+               <span class="contact-icon">💬</span>
+               <span class="contact-text">WhatsApp: <a href="https://wa.me/905389242500" target="_blank" rel="noopener">0538 924 25 00</a></span>
+             </div>
+             <div class="contact-item">
+               <span class="contact-icon">📧</span>
+               <span class="contact-text">E-posta: <a href="mailto:halilogluyahya@gmail.com">halilogluyahya@gmail.com</a></span>
+             </div>
+           </div>
+         </div>
+         
+         
+       </div>
+       
+       <div class="footer-bottom">
+         <small>© 2024 Yahya Haliloğlu - Tüm hakları saklıdır</small>
+       </div>
+     </footer>
 
     <script defer src="ailelerYarisiyor.js"></script>
   </body>

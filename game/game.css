@@ -1,0 +1,57 @@
+/* Game Hero */
+.game-hero {
+    padding: 120px 0 60px;
+    text-align: center;
+    background: var(--gradient-primary);
+}
+
+.game-hero h1 {
+    font-size: var(--font-size-lg);
+    color: var(--neon-green);
+    margin-bottom: 1rem;
+}
+
+.game-hero p {
+    color: var(--gray-text);
+    max-width: 600px;
+    margin: auto;
+}
+
+/* Game List */
+.game-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    padding: 60px 0;
+}
+
+.game-card {
+    background: var(--gradient-card);
+    padding: 2rem;
+    border-radius: 15px;
+    border: 1px solid rgba(0, 255, 136, 0.1);
+    text-align: center;
+    box-shadow: var(--shadow-medium);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.game-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--glow-neon);
+}
+
+.game-icon {
+    font-size: 2.5rem;
+    color: var(--neon-green);
+    margin-bottom: 1rem;
+}
+
+.game-card h3 {
+    color: var(--light-text);
+    margin-bottom: 1rem;
+}
+
+.game-card p {
+    color: var(--gray-text);
+    margin-bottom: 1.5rem;
+}
