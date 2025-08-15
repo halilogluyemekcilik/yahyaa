@@ -1,0 +1,931 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Tavşan Sayma — Gelişmiş (Puan + Ses + İleri Hareketler)</title>
+<style>
+  :root{
+    --bg:#041225; --panel:#0b1626; --accent:#ff7b7b; --muted:#9fb3d6; --glass: rgba(255,255,255,0.03);
+    --text:#e6eef8;
+  }
+  *{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Arial;}
+  body{margin:0; min-height:100vh; background:linear-gradient(180deg,#02121a,#07182a); color:var(--text); display:flex; align-items:center; justify-content:center; padding:18px;}
+  .app{width:100%; max-width:1280px;}
+  .card{background:var(--panel); border-radius:12px; padding:18px; box-shadow:0 12px 40px rgba(0,0,0,0.6);}
+  header{display:flex; justify-content:space-between; align-items:center;}
+  h1{margin:0; font-size:20px;}
+  p.small{margin:6px 0 0; color:var(--muted); font-size:13px;}
+
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap;}
+  select, button{padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.04); background:var(--glass); color:var(--text); cursor:pointer;}
+  .players-setup{display:flex; gap:12px; margin-top:12px; flex-wrap:wrap;}
+  .player-card{background:rgba(255,255,255,0.02); padding:10px; border-radius:8px; width:calc(25% - 9px); min-width:160px;}
+  .key-box{min-width:70px; padding:8px; text-align:center; background:#071020; border-radius:6px; border:1px dashed rgba(255,255,255,0.03); cursor:pointer;}
+  .start-btn{margin-top:14px; background:linear-gradient(90deg,var(--accent),#ffafaf); border:none; font-weight:700;}
+  @media (max-width:900px){ .player-card{width:calc(50% - 9px);} }
+
+  /* Layout: left=game, right=scoreboard */
+  .main-row{display:flex; gap:12px; margin-top:12px;}
+  .left-col{flex:1;}
+  .right-col{width:260px;}
+
+  /* Game area */
+  .game-area{position:relative; height:560px; background:linear-gradient(180deg,#08182a,#052033); border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.03); outline:none;}
+  .hud{display:flex; gap:8px; margin-top:10px; align-items:center; flex-wrap:wrap;}
+  .player-hud{background:rgba(255,255,255,0.02); padding:8px 10px; border-radius:8px; display:flex; gap:10px; align-items:center; min-width:160px;}
+  .player-dot{width:14px;height:14px;border-radius:50%;}
+  .player-name{font-weight:700;}
+  .round-info{margin-left:auto; color:var(--muted);}
+
+  /* Scoreboard */
+  .scoreboard{background:rgba(255,255,255,0.02); padding:12px; border-radius:10px;}
+  .score-row{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed rgba(255,255,255,0.02); font-size:14px;}
+  .score-row:last-child{border-bottom:none;}
+  .score-title{font-weight:800; margin-bottom:8px;}
+
+  /* Rabbit */
+  .rabbit{position:absolute; width:56px; height:56px; border-radius:14px; display:flex; align-items:center; justify-content:center; transform:translateY(-50%); user-select:none; pointer-events:none; box-shadow:0 10px 22px rgba(0,0,0,0.5); transition:transform .12s;}
+  .rabbit .body{width:40px;height:40px;border-radius:10px; position:relative;}
+  .ear{position:absolute; top:-10px; width:10px; height:20px; border-radius:10px;}
+  .ear.r{right:6px; transform:rotate(12deg);}
+  .eye{position:absolute; width:5px; height:5px; border-radius:50%; top:12px; left:10px; background:#111;}
+  .rabbit.white .body{background:#fff;}
+  .rabbit.red .body{background:#ff6b6b;}
+  .rabbit.slow{filter:brightness(0.95) saturate(0.9) contrast(0.96); box-shadow:0 4px 14px rgba(0,0,0,0.5); transform:scale(0.98);}
+  .rabbit.reverse .body{outline:2px dashed rgba(0,0,0,0.06);}
+  .rabbit.fade{opacity:0; transition:opacity .18s;}
+
+  /* countdown overlay */
+  .overlay{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:linear-gradient(0deg, rgba(2,6,12,0.35), rgba(2,6,12,0.35)); font-size:84px; font-weight:900; z-index:50; pointer-events:none; color:#fff;}
+  .overlay.small{font-size:48px;}
+
+  /* touch guides */
+  .touch-guides{position:absolute; inset:0; z-index:60; pointer-events:none; display:flex;}
+  .touch-guide{flex:1; border-left:2px dashed rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.12); font-weight:800; font-size:18px;}
+
+  /* controls area */
+  .results{margin-top:10px; background:rgba(255,255,255,0.02); padding:10px; border-radius:8px;}
+  .muted{color:var(--muted); font-size:13px;}
+  footer{margin-top:10px; font-size:13px; color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="app card">
+  <header>
+    <div>
+      <h1>Tavşan Sayma — Gelişmiş</h1>
+      <p class="small">Beyaz tavşanları say. Yanlış olan elenir. Puan tablosu, ses efektleri ve ileri hareketler eklendi.</p>
+    </div>
+    <div class="muted">Yerel (aynı klavye / dokunmatik)</div>
+  </header>
+
+  <!-- START -->
+  <div id="startScreen" class="screen active">
+    <div class="row" style="margin-top:10px;">
+      <label>Kaç oyuncu?</label>
+      <select id="playerCount">
+        <option value="2">2</option><option value="3">3</option><option value="4">4</option>
+        <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+      </select>
+      <button id="defaultsBtn" class="btn">Varsayılan Tuşları Yükle</button>
+    </div>
+
+    <div class="players-setup" id="playersSetup"></div>
+
+    <div style="display:flex; gap:8px; align-items:center; margin-top:12px;">
+      <button id="startBtn" class="start-btn">Başla</button>
+      <button id="demoBtn" class="btn">Hemen Demo</button>
+      <div class="muted" style="margin-left:12px;">Her oyuncunun tuş kutusuna tıklayıp bir tuşa basın. Mobilde dokunmatik bölge otomatik atanır.</div>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div id="gameScreen" class="screen">
+    <div class="main-row">
+      <div class="left-col">
+        <div class="hud" id="hud"></div>
+
+        <div id="gameArea" class="game-area" tabindex="0"></div>
+
+        <div class="results" id="resultsPanel">
+          <div id="roundMsg" class="muted">Tur bekleniyor...</div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button id="nextRoundBtn" class="btn" style="display:none;">Sonraki Tur</button>
+            <button id="restartBtn" class="btn" style="display:none;">Yeniden Başlat</button>
+          </div>
+          <div id="postRoundInfo" style="margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <div class="right-col">
+        <div class="scoreboard" id="scoreboard">
+          <div class="score-title">Puan Tablosu</div>
+          <div id="scoreList"></div>
+        </div>
+        <div style="height:12px"></div>
+        <div class="muted">Not: Canlı tuş basımı ekranı görünmez — kopya önlemek için.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- END -->
+  <div id="endScreen" class="screen">
+    <h2 id="winnerText">Kazanan: —</h2>
+    <div id="finalTable"></div>
+    <div style="margin-top:10px;">
+      <button id="playAgainBtn" class="btn">Tekrar Oyna</button>
+    </div>
+  </div>
+
+  <footer>İpucu: Dokunmatik kullanıyorsanız başlangıçta görünen bölge çizgilerini kullanın; sonra gizlenecektir.</footer>
+</div>
+
+<script>
+/* İleri sürüm: puan tablosu, ses, mobil bölge çizgileri ilk elde gösterim, 15. elt + karmaşık hareketler. */
+/* Kaydet: index.html -> aç */
+
+/////////////////////
+// Ayarlar & state //
+/////////////////////
+const defaultKeys = ['W','ArrowUp',' ','P']; // 1..4 defaults (space char)
+let players = []; // tüm oyuncular {id,name,key,active,points}
+let survivors = []; // hayatta kalanlar each round {id,name,key,active,roundCount,points}
+let currentRoundSpawned = []; // {id,color,meta}
+let visibleRabbits = []; // {id,color,el,countedBy,meta,removeCb}
+let roundNum = 0;
+let baseRabbits = 5;
+let roundActive = false;
+let spawnTimers = [];
+let rabbitCounter = 0;
+let firstTouchGuidesShown = false; // gösterildi mi
+let audioCtx = null; // AudioContext
+let audioAllowed = false; // oluşturuldu mu
+let maxScaleRound = 15; // 15. tura kadar hızlanma
+let touchRegions = []; // for pointer mapping
+
+// DOM
+const startScreen = document.getElementById('startScreen');
+const gameScreen = document.getElementById('gameScreen');
+const endScreen = document.getElementById('endScreen');
+const playersSetup = document.getElementById('playersSetup');
+const playerCountSel = document.getElementById('playerCount');
+const defaultsBtn = document.getElementById('defaultsBtn');
+const startBtn = document.getElementById('startBtn');
+const demoBtn = document.getElementById('demoBtn');
+const hud = document.getElementById('hud');
+const gameArea = document.getElementById('gameArea');
+const roundMsg = document.getElementById('roundMsg');
+const nextRoundBtn = document.getElementById('nextRoundBtn');
+const restartBtn = document.getElementById('restartBtn');
+const postRoundInfo = document.getElementById('postRoundInfo');
+const scoreboardEl = document.getElementById('scoreList');
+const winnerText = document.getElementById('winnerText');
+const finalTable = document.getElementById('finalTable');
+const playAgainBtn = document.getElementById('playAgainBtn');
+
+//////////////////////
+// Audio utilities  //
+//////////////////////
+function ensureAudio(){
+  if(audioAllowed) return;
+  try{
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    audioAllowed = true;
+  }catch(e){
+    audioAllowed = false;
+  }
+}
+function playTone(freq=440, dur=0.08, type='sine', gainVal=0.08){
+  if(!audioAllowed) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = type;
+  o.frequency.value = freq;
+  g.gain.value = gainVal;
+  o.connect(g); g.connect(audioCtx.destination);
+  const now = audioCtx.currentTime;
+  o.start(now);
+  g.gain.setValueAtTime(g.gain.value, now);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+  o.stop(now + dur + 0.02);
+}
+function playClick(){ playTone(900, 0.05, 'square', 0.06); }
+function playSpawn(){ playTone(620, 0.06, 'sine', 0.05); }
+function playCount(){ playTone(980, 0.04, 'sine', 0.06); }
+function playSuccess(){ playTone(880, 0.18, 'sine', 0.08); playTone(1180, 0.12, 'sine', 0.06); }
+function playFail(){ playTone(220, 0.16, 'sawtooth', 0.09); }
+function playCountdown(num){ // different tones for 3-2-1-GO
+  if(num === '3') playTone(450, 0.12, 'sine', 0.08);
+  else if(num === '2') playTone(560, 0.12, 'sine', 0.08);
+  else if(num === '1') playTone(700, 0.12, 'sine', 0.08);
+  else playTone(980, 0.18, 'square', 0.12);
+}
+function playWinnerFanfare(){
+  if(!audioAllowed) return;
+  // simple arpeggio
+  const seq = [660, 820, 980, 1320];
+  let t = 0;
+  for(const f of seq){
+    setTimeout(()=> playTone(f, 0.12, 'sine', 0.09), t);
+    t += 140;
+  }
+}
+
+//////////////////////
+// UI: players setup //
+//////////////////////
+function keyLabel(k){
+  if(!k) return '—';
+  if(k === ' ') return 'Space';
+  return k.length>1 ? k : k.toUpperCase();
+}
+function colorForIndex(i){
+  const cols = ['#ffb86b','#7ee787','#7ad7ff','#ff7ac6','#ffd86b','#7affc2','#a89fff','#ff8fb0'];
+  return cols[i%cols.length];
+}
+
+function createPlayerSetup(n){
+  playersSetup.innerHTML='';
+  players = [];
+  for(let i=0;i<n;i++){
+    const id = i+1;
+    const card = document.createElement('div');
+    card.className='player-card';
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div><div style="font-weight:800">Oyuncu ${id}</div><div class="muted">Tuş atayın</div></div>
+        <div style="text-align:right"><div class="muted">Durum</div><div id="status-${id}">Hazır</div></div>
+      </div>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
+        <div class="key-box" id="keybox-${id}">—</div>
+        <div class="muted">Tıklayıp tuşa basın</div>
+      </div>
+      <div style="margin-top:8px;font-size:13px;" class="muted">Dokunmatik: oyun başladıktan sonra ekran bölgeniz otomatik atanır.</div>
+    `;
+    playersSetup.appendChild(card);
+    players.push({id, name:`Oyuncu ${id}`, key:'', active:true, points:0});
+    // key assignment
+    (function(pid){
+      const kb = document.getElementById(`keybox-${pid}`);
+      const st = document.getElementById(`status-${pid}`);
+      kb.addEventListener('click', ()=>{
+        kb.textContent = 'Bas...';
+        st.textContent = 'Tuş bekleniyor';
+        // ensure audio permission on first user gesture
+        ensureAudio(); if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        const handler = (ev)=>{
+          ev.preventDefault();
+          let k = ev.key;
+          if(k === ' ' || k === 'Spacebar') k = ' ';
+          players.find(p=>p.id===pid).key = k;
+          kb.textContent = keyLabel(k);
+          st.textContent = 'Hazır';
+          window.removeEventListener('keydown', handler);
+        };
+        window.addEventListener('keydown', handler);
+      });
+    })(id);
+  }
+}
+
+playerCountSel.addEventListener('change', ()=> createPlayerSetup(parseInt(playerCountSel.value)));
+defaultsBtn.addEventListener('click', ()=>{
+  createPlayerSetup(parseInt(playerCountSel.value));
+  // assign defaults
+  for(let i=0;i<players.length;i++){
+    if(i < defaultKeys.length) players[i].key = defaultKeys[i];
+    else players[i].key = '';
+    const kb = document.getElementById(`keybox-${players[i].id}`);
+    if(kb) kb.textContent = players[i].key ? keyLabel(players[i].key) : '—';
+  }
+});
+
+startBtn.addEventListener('click', ()=>{
+  ensureAudio();
+  if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  // validate
+  const n = players.length;
+  if(n < 2) { alert('En az 2 oyuncu seçin.'); return; }
+  // warn about empty keys
+  const assigned = players.map(p=>p.key);
+  if(assigned.filter(k=>k).length < players.length){
+    if(!confirm('Bazı oyuncuların tuşu atanmadı. Mobilde dokunmatik bölge kullanılabilir. Devam edilsin mi?')) return;
+  }
+  const dup = assigned.filter(k=>k).some((k,i,arr)=> k && arr.indexOf(k)!==i);
+  if(dup){
+    if(!confirm('Bazı tuşlar birden fazla oyuncuya atanmış. Karışıklık olabilir. Devam?')){}
+  }
+  // init survivors
+  survivors = players.map(p => ({...p, roundCount:0, points:p.points||0, active:true}));
+  startGame();
+});
+
+demoBtn.addEventListener('click', ()=>{
+  playerCountSel.value = '4';
+  createPlayerSetup(4);
+  defaultsBtn.click();
+  // auto-start (simulate press)
+  startBtn.click();
+});
+
+//////////////////////
+// HUD & Scoreboard //
+//////////////////////
+function updateHUD(showCounts=false){
+  hud.innerHTML = '';
+  survivors.forEach((p, idx)=>{
+    const el = document.createElement('div');
+    el.className='player-hud';
+    el.innerHTML = `<div style="width:12px;height:12px;border-radius:50%;background:${colorForIndex(idx)}"></div>
+      <div style="min-width:80px"><div class="player-name">${p.name}</div><div style="font-size:13px;color:var(--muted)">Tuş: <strong>${keyLabel(p.key)}</strong></div></div>
+      <div style="margin-left:auto; font-size:13px; color:var(--muted)">${p.active ? 'Aktif' : 'Elendi'}</div>`;
+    if(showCounts){
+      const c = document.createElement('div');
+      c.style.marginLeft='12px';
+      c.style.fontWeight='700';
+      c.textContent = `${p.roundCount||0} saydı`;
+      el.appendChild(c);
+    }
+    hud.appendChild(el);
+  });
+  const info = document.createElement('div');
+  info.className='round-info';
+  info.textContent = `Tur: ${roundNum} — Oyuncu sayısı: ${survivors.length}`;
+  hud.appendChild(info);
+  updateScoreboard();
+}
+function updateScoreboard(){
+  scoreboardEl.innerHTML = '';
+  // show points for all players (including eliminated)
+  const all = players.map(p => {
+    // merge with survivors info
+    const s = survivors.find(x=>x.id===p.id);
+    return {id:p.id, name:p.name, points: (s ? s.points : p.points || 0), active: s ? s.active : false};
+  });
+  // if survivors array doesn't include eliminated players, ensure they still appear with points
+  // better: take players list for full table and show current points by searching survivors + players points
+  players.forEach(p=>{
+    let pts = p.points || 0;
+    const s = survivors.find(x=>x.id===p.id);
+    if(s) pts = s.points || pts;
+    const row = document.createElement('div');
+    row.className='score-row';
+    row.innerHTML = `<div>${p.name}</div><div>${pts} pts</div>`;
+    scoreboardEl.appendChild(row);
+  });
+}
+
+//////////////////////
+// Touch regions UI //
+//////////////////////
+function showTouchGuidesOnce(){
+  if(firstTouchGuidesShown) return;
+  firstTouchGuidesShown = true;
+  const guides = document.createElement('div');
+  guides.className = 'touch-guides';
+  const N = survivors.length || players.length;
+  for(let i=0;i<N;i++){
+    const g = document.createElement('div');
+    g.className = 'touch-guide';
+    g.textContent = `Bölge ${i+1}`;
+    guides.appendChild(g);
+  }
+  gameArea.appendChild(guides);
+  // hide after 3.2s
+  setTimeout(()=> { if(guides.parentNode) guides.parentNode.removeChild(guides); }, 3200);
+}
+
+//////////////////////
+// Game flow & spawn//
+//////////////////////
+function startGame(){
+  startScreen.classList.remove('active');
+  endScreen.classList.remove('active');
+  gameScreen.classList.add('active');
+  roundNum = 0;
+  // show initial touch guides (first start)
+  showTouchGuidesOnce();
+  showMessage('Hazır! Başlamak için Sonraki Tur\'a basın.');
+  nextRoundBtn.style.display='inline-block';
+  restartBtn.style.display='inline-block';
+  nextRoundBtn.onclick = ()=> beginCountdownAndStart();
+  restartBtn.onclick = ()=> location.reload();
+  updateHUD(false);
+}
+
+function beginCountdownAndStart(){
+  nextRoundBtn.style.display = 'none';
+  // ensure audio ready
+  ensureAudio();
+  if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  showOverlayCountdown(['3','2','1','GO'], 700, ()=> {
+    // show touch guides only if firstTime shown earlier? they were shown on game start.
+    startRound();
+  });
+}
+
+function showOverlayCountdown(seq, msPer, callback){
+  const ov = document.createElement('div');
+  ov.className = 'overlay';
+  ov.style.zIndex = 120;
+  document.body.appendChild(ov);
+  let i=0;
+  function step(){
+    if(i>=seq.length){
+      document.body.removeChild(ov);
+      callback && callback();
+      return;
+    }
+    ov.textContent = seq[i];
+    playCountdown(seq[i]);
+    ov.style.opacity = '1';
+    ov.style.transform = 'scale(1.02)';
+    setTimeout(()=>{ ov.style.transform='scale(1)'; }, 80);
+    i++;
+    setTimeout(step, msPer);
+  }
+  step();
+}
+
+function startRound(){
+  if(survivors.length <= 1){ endGame(); return; }
+  clearRound();
+  roundNum++;
+  survivors.forEach(p=> p.roundCount = 0);
+  updateHUD(false);
+  showMessage(`Tur ${roundNum} başlıyor — dikkat!`, true);
+
+  // difficulty scaling up to maxScaleRound
+  const scale = Math.min(roundNum, maxScaleRound);
+  // durations decrease until scale reaches maxScaleRound, then fixed
+  const minDuration = Math.max(1200 - (scale-1)*60, 300);
+  const maxDuration = Math.max(2600 - (scale-1)*90, 700);
+  const interval = Math.max(520 - (scale-1)*22, 120);
+
+  roundActive = true;
+  computeTouchRegions(); // map screen regions to survivors order
+  // show touch guides on mobile only at start; we already showed earlier.
+
+  // spawn sequence
+  let spawned = 0;
+  const rabbitsCount = baseRabbits + (roundNum-1)*2 + Math.floor(Math.random()*2);
+  function spawnLoop(){
+    if(spawned >= rabbitsCount){
+      // finalize after delay to allow last rabbits leave
+      const t = setTimeout(()=> finalizeRound(), 900 + Math.random()*300);
+      spawnTimers.push(t);
+      return;
+    }
+    spawned++;
+    // choose color
+    const color = (Math.random() < 0.7) ? 'white' : 'red';
+    // meta flags
+    const isSlow = Math.random() < 0.14;
+    const canReverse = Math.random() < 0.28;
+    const meta = {isSlow, canReverse};
+    // choose motion type: before 15 mainly horizontal; after 15 mix in vertical/circle/zigzag
+    const motionType = pickMotionTypeForRound(roundNum);
+    spawnRabbit(color, minDuration, maxDuration, meta, motionType);
+    const t = setTimeout(spawnLoop, interval + Math.random()*260 - 120);
+    spawnTimers.push(t);
+  }
+  spawnLoop();
+}
+
+function pickMotionTypeForRound(r){
+  if(r <= maxScaleRound){
+    // earlier rounds: mainly horizontal with occasional sine
+    const rnd = Math.random();
+    if(rnd < 0.78) return 'h';
+    if(rnd < 0.9) return 'sine';
+    return 'zigzag';
+  } else {
+    // after maxScaleRound: complex moves
+    const options = ['h','v','diag','circle','zigzag','sine'];
+    const weights = [0.18,0.18,0.16,0.22,0.16,0.10]; // more circle/vertical
+    const total = weights.reduce((a,b)=>a+b,0);
+    let rnum = Math.random()*total;
+    for(let i=0;i<options.length;i++){
+      rnum -= weights[i];
+      if(rnum <= 0) return options[i];
+    }
+    return 'circle';
+  }
+}
+
+function clearRound(){
+  spawnTimers.forEach(t=> clearTimeout(t));
+  spawnTimers = [];
+  visibleRabbits.forEach(r=> { if(r.el && r.el.parentNode) r.el.remove(); if(r.removeCb) r.removeCb(); });
+  visibleRabbits = [];
+  currentRoundSpawned = [];
+  roundActive = false;
+}
+
+//////////////////////
+// Spawn & animate  //
+//////////////////////
+function spawnRabbit(color, minD, maxD, meta, motionType){
+  rabbitCounter++;
+  const id = rabbitCounter;
+  const el = document.createElement('div');
+  el.className = `rabbit ${color}` + (meta.isSlow ? ' slow' : '');
+  el.setAttribute('data-id', id);
+  const areaH = gameArea.clientHeight;
+  const areaW = gameArea.clientWidth;
+  const y = 30 + Math.random()*(areaH-60);
+  el.style.top = y + 'px';
+  el.innerHTML = `<div class="body"><div class="ear"></div><div class="ear r"></div><div class="eye"></div><div class="eye" style="left:19px"></div></div>`;
+  gameArea.appendChild(el);
+
+  currentRoundSpawned.push({id, color, meta, motionType});
+  const rObj = {id, color, el, countedBy: new Set(), meta, motionType, removeCb: null};
+  visibleRabbits.push(rObj);
+
+  playSpawn();
+
+  // durations scale until 15th round, then fixed
+  const scale = Math.min(roundNum, maxScaleRound);
+  let duration = minD + Math.random()*(maxD - minD);
+  if(meta.isSlow) duration *= 1.6;
+  // For advanced motions choose appropriate params
+  if(motionType === 'h' || motionType === 'sine' || motionType === 'zigzag'){
+    // horizontal baseline
+    const fromLeft = Math.random() > 0.5;
+    const startX = fromLeft ? -100 : (areaW + 100);
+    const endX = fromLeft ? (areaW + 100) : -100;
+    el.style.left = startX + 'px';
+    // animate linear with optional sine/zigzag offsets
+    const startTime = performance.now();
+    const willReverse = meta.canReverse && Math.random() < 0.85;
+    function animate(now){
+      const elapsed = now - startTime;
+      let t = Math.min(1, elapsed / duration);
+      // normal progress
+      let curX = startX + (endX - startX) * easeInOutQuad(t);
+      // vertical jitter for sine
+      if(motionType === 'sine'){
+        const amp = 18 + Math.random()*24;
+        const freq = 2 + Math.random()*3;
+        const offsetY = Math.sin(t * Math.PI * freq) * amp;
+        el.style.top = Math.min(areaH-30, Math.max(30, y + offsetY)) + 'px';
+      } else if(motionType === 'zigzag'){
+        const zig = Math.sin(t * Math.PI * (2 + Math.floor(Math.random()*3))) * (14 + Math.random()*22);
+        el.style.top = Math.min(areaH-30, Math.max(30, y + zig)) + 'px';
+      } else {
+        el.style.top = y + 'px';
+      }
+      el.style.left = curX + 'px';
+
+      // reverse behavior mid-run for linear types
+      if(willReverse && !rObj.meta._reversed && t > 0.35 + Math.random()*0.45){
+        rObj.meta._reversed = true;
+        el.classList.add('reverse');
+        // bounce back to start
+        const curLeft = parseFloat(el.style.left);
+        const targetX = startX;
+        const remainingDist = Math.abs(targetX - curLeft);
+        const remainingDuration = Math.max(220, (remainingDist / Math.abs(endX - startX)) * duration * 0.9);
+        const revStart = performance.now();
+        function rev(now2){
+          const tt = Math.min(1, (now2 - revStart) / remainingDuration);
+          const cur = curLeft + (targetX - curLeft) * easeInOutQuad(tt);
+          el.style.left = cur + 'px';
+          if(tt < 1) requestAnimationFrame(rev);
+          else {
+            el.classList.add('fade');
+            setTimeout(()=> removeRabbitById(id), 140);
+          }
+        }
+        requestAnimationFrame(rev);
+        return;
+      }
+
+      if(t < 1) requestAnimationFrame(animate);
+      else {
+        el.classList.add('fade');
+        setTimeout(()=> removeRabbitById(id), 140);
+      }
+    }
+    requestAnimationFrame(animate);
+  } else if(motionType === 'v' || motionType === 'diag'){
+    // vertical or diagonal moves
+    const fromTop = Math.random() > 0.5; // top->bottom or bottom->top
+    const startY = fromTop ? -80 : (areaH + 80);
+    const endY = fromTop ? (areaH + 80) : -80;
+    const startX = 40 + Math.random()*(areaW-80);
+    const endX = motionType === 'diag' ? (Math.random()>0.5 ? areaW+80 : -80) : startX;
+    el.style.left = startX + 'px';
+    el.style.top = startY + 'px';
+    const willReverse = meta.canReverse && Math.random() < 0.75;
+    const startTime = performance.now();
+    function animate(now){
+      const elapsed = now - startTime;
+      let t = Math.min(1, elapsed / duration);
+      const curY = startY + (endY - startY) * easeInOutQuad(t);
+      const curX = startX + (endX - startX) * easeInOutQuad(t);
+      el.style.left = curX + 'px';
+      el.style.top = curY + 'px';
+
+      if(willReverse && !rObj.meta._reversed && t > 0.25 + Math.random()*0.5){
+        rObj.meta._reversed = true;
+        el.classList.add('reverse');
+        const curTop = parseFloat(el.style.top);
+        const targetY = startY;
+        const remainingDist = Math.abs(targetY - curTop);
+        const remainingDuration = Math.max(260, (remainingDist / Math.abs(endY - startY)) * duration * 0.9);
+        const revStart = performance.now();
+        function rev(now2){
+          const tt = Math.min(1, (now2 - revStart) / remainingDuration);
+          const cy = curTop + (targetY - curTop) * easeInOutQuad(tt);
+          el.style.top = cy + 'px';
+          if(tt < 1) requestAnimationFrame(rev);
+          else {
+            el.classList.add('fade');
+            setTimeout(()=> removeRabbitById(id), 160);
+          }
+        }
+        requestAnimationFrame(rev);
+        return;
+      }
+
+      if(t < 1) requestAnimationFrame(animate);
+      else {
+        el.classList.add('fade');
+        setTimeout(()=> removeRabbitById(id), 140);
+      }
+    }
+    requestAnimationFrame(animate);
+  } else if(motionType === 'circle'){
+    // circular orbit path (harder): choose center and radius, rotate
+    const cx = 60 + Math.random() * (areaW - 120);
+    const cy = 80 + Math.random() * (areaH - 160);
+    const r = 40 + Math.random() * 80;
+    const startAngle = Math.random() * Math.PI * 2;
+    const clockwise = Math.random() > 0.5 ? 1 : -1;
+    const totalRot = (Math.PI * 2) * (1 + Math.random()*1.6) * (clockwise);
+    const startTime = performance.now();
+    const willReverse = meta.canReverse && Math.random() < 0.7;
+    function animate(now){
+      const elapsed = now - startTime;
+      let t = Math.min(1, elapsed / duration);
+      const angle = startAngle + totalRot * easeInOutQuad(t);
+      const x = cx + Math.cos(angle) * r;
+      const y2 = cy + Math.sin(angle) * r;
+      el.style.left = (x - 28) + 'px';
+      el.style.top = (y2 - 28) + 'px';
+
+      if(willReverse && !rObj.meta._reversed && t > 0.35 + Math.random()*0.4){
+        rObj.meta._reversed = true;
+        el.classList.add('reverse');
+        // slow down and spiral out: animate to fade
+        const curAngle = angle;
+        const endAngle = curAngle - totalRot * 0.6;
+        const revStart = performance.now();
+        const revDur = Math.max(300, duration * 0.45);
+        function rev(now2){
+          const tt = Math.min(1, (now2 - revStart)/revDur);
+          const a = curAngle + (endAngle - curAngle) * easeInOutQuad(tt);
+          const rr = r + 12 * tt;
+          const xx = cx + Math.cos(a)*rr;
+          const yy = cy + Math.sin(a)*rr;
+          el.style.left = (xx - 28) + 'px';
+          el.style.top = (yy - 28) + 'px';
+          if(tt < 1) requestAnimationFrame(rev);
+          else { el.classList.add('fade'); setTimeout(()=> removeRabbitById(id), 160); }
+        }
+        requestAnimationFrame(rev);
+        return;
+      }
+
+      if(t < 1) requestAnimationFrame(animate);
+      else { el.classList.add('fade'); setTimeout(()=> removeRabbitById(id), 140); }
+    }
+    requestAnimationFrame(animate);
+  } else {
+    // fallback linear horizontal
+    el.style.left = '-100px';
+    el.style.top = y + 'px';
+    const startTime = performance.now();
+    const endX = areaW + 100;
+    function animate(now){
+      const elapsed = now - startTime;
+      let t = Math.min(1, elapsed / duration);
+      const cur = -100 + (endX + 100) * easeInOutQuad(t);
+      el.style.left = cur + 'px';
+      if(t < 1) requestAnimationFrame(animate);
+      else { el.classList.add('fade'); setTimeout(()=> removeRabbitById(id), 140); }
+    }
+    requestAnimationFrame(animate);
+  }
+
+  // removal helper
+  rObj.removeCb = ()=> {
+    visibleRabbits = visibleRabbits.filter(v=>v.id !== id);
+    if(el.parentNode) el.parentNode.removeChild(el);
+  };
+}
+
+function removeRabbitById(id){
+  const idx = visibleRabbits.findIndex(r=>r.id===id);
+  if(idx !== -1){
+    const r = visibleRabbits[idx];
+    if(r.removeCb) r.removeCb();
+    visibleRabbits = visibleRabbits.filter(v=>v.id !== id);
+  } else {
+    // also try DOM removal fallback
+    const el = gameArea.querySelector(`.rabbit[data-id='${id}']`);
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+  }
+}
+
+function easeInOutQuad(x){ return x < 0.5 ? 2*x*x : 1 - Math.pow(-2*x+2,2)/2; }
+
+//////////////////////
+// Input handling   //
+//////////////////////
+// keyboard
+window.addEventListener('keydown', (ev)=>{
+  if(!roundActive) return;
+  let key = ev.key;
+  if(key === ' ' || key === 'Spacebar') key = ' ';
+  // resume audio on first gesture
+  ensureAudio(); if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  const player = survivors.find(p=> p.key && p.key === key && p.active);
+  if(!player) return;
+  playerCountForPlayer(player.id);
+});
+
+// pointer (touch/mouse)
+gameArea.addEventListener('pointerdown', (ev)=>{
+  if(!roundActive) return;
+  const rect = gameArea.getBoundingClientRect();
+  const x = ev.clientX - rect.left;
+  const playerId = getPlayerIdFromX(x);
+  if(!playerId) return;
+  const player = survivors.find(p=>p.id === playerId && p.active);
+  if(!player) return;
+  playerCountForPlayer(player.id);
+});
+
+// map x to player id by equal vertical strips of current survivors order
+function computeTouchRegions(){
+  touchRegions = [];
+  const N = survivors.length;
+  if(N === 0) return;
+  const W = gameArea.clientWidth;
+  for(let i=0;i<N;i++){
+    const x1 = Math.floor(i * W / N);
+    const x2 = Math.floor((i+1) * W / N);
+    touchRegions.push({x1, x2, playerId: survivors[i].id});
+  }
+}
+function getPlayerIdFromX(x){
+  for(const r of touchRegions) if(x >= r.x1 && x < r.x2) return r.playerId;
+  return touchRegions.length ? touchRegions[touchRegions.length-1].playerId : null;
+}
+
+function playerCountForPlayer(pid){
+  // find first visible white rabbit that this player hasn't counted
+  for(const r of visibleRabbits){
+    if(r.color === 'white' && !r.countedBy.has(pid)){
+      r.countedBy.add(pid);
+      const p = survivors.find(s=>s.id === pid);
+      if(p) p.roundCount = (p.roundCount||0) + 1;
+      playCount();
+      flashPlayer(pid);
+      return;
+    }
+  }
+  // no available white -> small fail tone
+  playFail();
+  return;
+}
+
+function flashPlayer(pid){
+  const nodes = hud.querySelectorAll('.player-hud');
+  nodes.forEach(node=>{
+    if(node.textContent.includes(`Oyuncu ${pid}`)){
+      node.style.transform='translateY(-8px)';
+      setTimeout(()=> node.style.transform = '', 160);
+    }
+  });
+}
+
+//////////////////////
+// Finalize Round   //
+//////////////////////
+function finalizeRound(){
+  roundActive = false;
+  // compute actual white count from currentRoundSpawned
+  const actualWhite = currentRoundSpawned.filter(s => s.color === 'white').length;
+
+  // reveal counts and update points
+  survivors.forEach(p => {
+    p.points = (p.points || 0) + (p.roundCount || 0);
+    // also sync main players array
+    const main = players.find(x=>x.id===p.id);
+    if(main) main.points = p.points;
+  });
+
+  // determine correct players
+  const correct = [];
+  const eliminated = [];
+  survivors.forEach(p=>{
+    if((p.roundCount || 0) === actualWhite) correct.push(p);
+    else eliminated.push(p);
+  });
+
+  let msg = `Gerçek beyaz tavşan sayısı: ${actualWhite}. `;
+  if(correct.length === 0){
+    msg += 'Kimse tam doğru saymadı. Hiç kimse elenmiyor; aynı oyuncularla bir sonraki tur (daha zor) devam edecek.';
+    // survivors unchanged
+    // update UI with points
+    updateHUD(true);
+    playFail();
+  } else if(correct.length === 1){
+    msg += `${correct[0].name} tam doğru bildi ve KAZANDI!`;
+    survivors = correct;
+    updateHUD(true);
+    playWinnerFanfare();
+    setTimeout(()=> endGame(), 900);
+    currentRoundSpawned = [];
+    return;
+  } else {
+    msg += `Doğru yapanlar: ${correct.map(p=>p.name).join(', ')}. Diğerleri elendi.`;
+    // set survivors = correct (copy)
+    survivors = correct.map(p => ({...p, active:true}));
+    // eliminated players: mark active false
+    eliminated.forEach(e => {
+      const s = survivors.find(x=>x.id===e.id);
+      // they are eliminated already; for players list, mark inactive if needed
+    });
+    updateHUD(true);
+    playSuccess();
+  }
+
+  showMessage(msg, false);
+
+  // post round info: show sorted players by points
+  postRoundInfo.innerHTML = '';
+  const sorted = players.slice().sort((a,b)=> (b.points||0) - (a.points||0));
+  sorted.forEach(p=>{
+    const d = document.createElement('div');
+    d.className = 'muted';
+    d.textContent = `${p.name} — ${p.points || 0} pts`;
+    postRoundInfo.appendChild(d);
+  });
+
+  // prepare for next round
+  currentRoundSpawned = [];
+  nextRoundBtn.style.display='inline-block';
+  nextRoundBtn.textContent = 'Sonraki Tur';
+  nextRoundBtn.onclick = ()=> beginCountdownAndStart();
+  updateHUD(false);
+}
+
+//////////////////////
+// End game         //
+//////////////////////
+function endGame(){
+  clearRound();
+  gameScreen.classList.remove('active');
+  endScreen.classList.add('active');
+  const winner = survivors[0];
+  winnerText.textContent = winner ? `Kazanan: ${winner.name}` : 'Kazanan yok';
+  finalTable.innerHTML = '<div class="muted">Sonuçlar (puanlar):</div>';
+  const sorted = players.slice().sort((a,b)=> (b.points||0) - (a.points||0));
+  sorted.forEach(p=>{
+    const d = document.createElement('div');
+    d.textContent = `${p.name} — ${p.points || 0} pts`;
+    finalTable.appendChild(d);
+  });
+  playWinnerFanfare();
+  playAgainBtn.onclick = ()=> location.reload();
+}
+
+//////////////////////
+// Init & helpers   //
+//////////////////////
+playerCountSel.addEventListener('change', ()=> createPlayerSetup(parseInt(playerCountSel.value)));
+createPlayerSetup(parseInt(playerCountSel.value));
+defaultsBtn.click();
+
+// ensure touchRegions recomputed on resize
+window.addEventListener('resize', ()=> { if(roundActive) computeTouchRegions(); });
+
+// Keep currentRoundSpawned in sync with spawnRabbit call (spawnRabbit pushes entries).
+// Note: currentRoundSpawned is appended in spawnRabbit so is already filled.
+
+showMessage = function(txt, hint=false){
+  roundMsg.textContent = txt;
+  roundMsg.style.color = hint ? '#dff3ff' : 'var(--muted)';
+};
+
+</script>
+</body>
+</html>
