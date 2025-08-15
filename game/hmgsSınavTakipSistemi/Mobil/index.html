@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hukuk sınav sonuçlarınızı takip edin ve analiz edin. Mobil uygulama gibi çalışır.">
+    <meta name="keywords" content="hukuk, sınav, takip, sonuç, analiz">
+    <meta name="author" content="Hukuk Takip Sistemi">
+    
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Hukuk Takip">
+    <meta name="msapplication-TileColor" content="#667eea">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+    
+    <link rel="manifest" href="/manifest.json">
+    
+    <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png">
+    
+    <title>Hukuk Sınav Takip Sistemi</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏛️ Hukuk Sınav Takip Sistemi</h1>
+            <p>Sınav sonuçlarınızı takip edin ve gelişiminizi analiz edin</p>
+        </header>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2>Yeni Sınav Sonucu Ekle</h2>
+                <form id="examForm">
+                    <div class="form-group">
+                        <label for="examName">Sınav Adı:</label>
+                        <input type="text" id="examName" placeholder="Örn: 1. Deneme Sınavı" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="examDate">Sınav Tarihi:</label>
+                        <input type="date" id="examDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="totalQuestions">Toplam Soru Sayısı (Opsiyonel):</label>
+                        <input type="number" id="totalQuestions" min="1" value="120">
+                        <small style="color: #718096; font-size: 0.9rem;">Boş bırakılabilir, sadece referans için</small>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Sınavı Başlat</button>
+                </form>
+
+                <div class="current-exam" id="currentExam" style="display: none;">
+                    <h3>Aktif Sınav: <span id="currentExamName"></span></h3>
+                    <p>Tarih: <span id="currentExamDate"></span></p>
+                    <p>Toplam Soru: <span id="currentExamTotal"></span></p>
+                    <button type="button" class="btn-finish" onclick="finishExam()">Sınavı Bitir ve Kaydet</button>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <h2>Sınav Sonuçları</h2>
+                
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <h3>Toplam Sınav</h3>
+                        <span id="totalExams">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Ortalama Başarı</h3>
+                        <span id="averageScore">%0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>En İyi Ders</h3>
+                        <span id="bestSubject">-</span>
+                    </div>
+                </div>
+
+                <div class="exam-table-container">
+                    <h3>Ders Bazında Sonuçlar</h3>
+                    <div class="table-wrapper">
+                        <table id="examTable" class="exam-table">
+                            <thead>
+                                <tr>
+                                    <th>Ders</th>
+                                    <th>Doğru</th>
+                                    <th>Yanlış</th>
+                                    <th>Başarı %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="examTableBody">
+                                </tbody>
+                            <tfoot>
+                                <tr class="total-row">
+                                    <td><strong>TOPLAM</strong></td>
+                                    <td id="totalCorrect">0</td>
+                                    <td id="totalWrong">0</td>
+                                    <td id="totalScore">%0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="recent-exams">
+                    <h3>Kaydedilen Sınavlar</h3>
+                    <div id="savedExams" class="exam-list">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pwaInstallPrompt" class="pwa-install-prompt" style="display: none;">
+        <div class="pwa-content">
+            <div class="pwa-icon">📱</div>
+            <div class="pwa-text">
+                <h4>Ana Ekrana Ekle</h4>
+                <p>Bu uygulamayı ana ekranınıza ekleyerek daha hızlı erişim sağlayın!</p>
+            </div>
+            <div class="pwa-actions">
+                <button id="pwaInstallBtn" class="btn btn-primary">Ekle</button>
+                <button id="pwaDismissBtn" class="btn btn-secondary">Sonra</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    
+    <script>
+        // Service Worker kaydı
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('Service Worker başarıyla kaydedildi:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker kaydı başarısız:', error);
+                    });
+            });
+        }
+
+        // PWA Kurulum Prompt
+        let deferredPrompt;
+        const pwaInstallPrompt = document.getElementById('pwaInstallPrompt');
+        const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+        const pwaDismissBtn = document.getElementById('pwaDismissBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            pwaInstallPrompt.style.display = 'block';
+        });
+
+        pwaInstallBtn.addEventListener('click', () => {
+            pwaInstallPrompt.style.display = 'none';
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Kullanıcı PWA kurulumunu kabul etti');
+                }
+                deferredPrompt = null;
+            });
+        });
+
+        pwaDismissBtn.addEventListener('click', () => {
+            pwaInstallPrompt.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

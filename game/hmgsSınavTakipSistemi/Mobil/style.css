@@ -1,0 +1,790 @@
+/* Genel stiller */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    color: white;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+header p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+/* Ana içerik düzeni */
+.main-content {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+/* Sol panel - Form */
+.input-section {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    height: fit-content;
+}
+
+.input-section h2 {
+    color: #4a5568;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group small {
+    display: block;
+    margin-top: 5px;
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+/* Aktif sınav bilgileri */
+.current-exam {
+    background: #f7fafc;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    border-left: 4px solid #667eea;
+}
+
+.current-exam h3 {
+    color: #4a5568;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+.current-exam p {
+    margin-bottom: 8px;
+    color: #718096;
+}
+
+.current-exam span {
+    font-weight: 600;
+    color: #667eea;
+}
+
+.btn-finish {
+    width: 100%;
+    padding: 12px;
+    background: #38a169;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-finish:hover {
+    background: #2f855a;
+}
+
+/* Sağ panel - Sonuçlar */
+.results-section {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.results-section h2 {
+    color: #4a5568;
+    margin-bottom: 25px;
+    font-size: 1.8rem;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 15px;
+}
+
+/* İstatistik kartları */
+.stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.stat-card h3 {
+    color: #718096;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.stat-card span {
+    color: #667eea;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+/* Tablo container */
+.exam-table-container {
+    margin-bottom: 30px;
+}
+
+.exam-table-container h3 {
+    color: #4a5568;
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Sınav tablosu */
+.exam-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.exam-table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.exam-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #4a5568;
+}
+
+.exam-table tbody tr:hover {
+    background: #f7fafc;
+}
+
+.exam-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.subject-name {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.subject-input {
+    width: 80px;
+    padding: 8px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.subject-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.score-cell {
+    text-align: center;
+    font-weight: 600;
+    color: #667eea;
+}
+
+.total-row {
+    background: #f7fafc;
+    font-weight: 600;
+}
+
+.total-row td {
+    color: #2d3748;
+    border-top: 2px solid #e2e8f0;
+}
+
+/* Kaydedilen sınavlar */
+.recent-exams h3 {
+    color: #4a5568;
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+}
+
+.exam-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.exam-item {
+    background: #f7fafc;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.exam-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.exam-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.exam-subject {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 1.1rem;
+}
+
+.exam-date {
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+.exam-details {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.detail-item {
+    color: #4a5568;
+    font-size: 0.9rem;
+}
+
+.detail-item strong {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.exam-scores {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.score-item {
+    background: #edf2f7;
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: #4a5568;
+    font-size: 0.9rem;
+}
+
+.score-item strong {
+    color: #38a169;
+    font-weight: 600;
+}
+
+.exam-actions {
+    margin-top: 15px;
+    text-align: right;
+}
+
+.delete-btn {
+    background: #e53e3e;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.delete-btn:hover {
+    background: #c53030;
+}
+
+/* PWA Kurulum Prompt Stilleri */
+.pwa-install-prompt {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    animation: slideUp 0.4s ease;
+}
+
+.pwa-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.pwa-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.pwa-text {
+    flex: 1;
+}
+
+.pwa-text h4 {
+    margin: 0 0 5px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.pwa-text p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.pwa-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.pwa-actions .btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.pwa-actions .btn-primary {
+    background: white;
+    color: #667eea;
+}
+
+.pwa-actions .btn-primary:hover {
+    background: #f8f9fa;
+    transform: translateY(-1px);
+}
+
+.pwa-actions .btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.pwa-actions .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Mobil cihazlar için PWA prompt düzenlemesi */
+@media (max-width: 768px) {
+    .pwa-install-prompt {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        padding: 15px;
+    }
+    
+    .pwa-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+    
+    .pwa-actions {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .pwa-actions .btn {
+        flex: 1;
+        max-width: 120px;
+    }
+}
+
+/* PWA Kurulum Sonrası Gizleme */
+.pwa-install-prompt.hidden {
+    display: none !important;
+}
+
+/* Sınav Detay Modal Stilleri */
+.exam-detail-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px 25px;
+    border-radius: 16px 16px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.exam-summary {
+    background: #f7fafc;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    border-left: 4px solid #667eea;
+}
+
+.exam-summary p {
+    margin: 8px 0;
+    color: #4a5568;
+    font-size: 1rem;
+}
+
+.exam-summary strong {
+    color: #2d3748;
+    font-weight: 600;
+}
+
+.subject-details h4 {
+    color: #4a5568;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+.subject-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.subject-detail-item {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.subject-detail-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.exam-detail-modal .subject-name {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.subject-results {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.subject-results span {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.subject-results .correct {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+.subject-results .wrong {
+    background: #fed7d7;
+    color: #742a2a;
+}
+
+.subject-results .score {
+    background: #bee3f8;
+    color: #2a4365;
+}
+
+/* Detay butonu stilleri */
+.detail-btn {
+    background: #4299e1;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+    margin-right: 10px;
+}
+
+.detail-btn:hover {
+    background: #3182ce;
+}
+
+/* Modal animasyonları */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Mobil uyumluluk - BURADAN İTİBAREN YENİ EKLEMELER BAŞLIYOR */
+@media (max-width: 900px) {
+    .main-content {
+        /* Yan yana duran 420px ve 1fr sütunları yerine, tek sütunlu bir yapı oluşturur. */
+        grid-template-columns: 1fr; 
+        gap: 20px;
+    }
+    
+    /* İstatistik kartlarını daha küçük ekranlara sığacak şekilde düzenler. */
+    .stats-overview {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+
+    /* Tablo taşmasını engellemek için yatay kaydırma çubuğu kullanır ve minimum genişlik belirler. */
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .exam-table {
+        min-width: 500px; 
+    }
+}
+
+/* Telefonlar İçin (768px ve daha küçük ekranlar) */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .input-section,
+    .results-section {
+        padding: 20px;
+    }
+    
+    .exam-table {
+        font-size: 0.9rem;
+    }
+    
+    .exam-table th,
+    .exam-table td {
+        padding: 10px 8px;
+    }
+    
+    .subject-input {
+        width: 60px;
+        padding: 6px;
+    }
+    
+    .exam-details,
+    .exam-scores {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .modal-content {
+        width: 95%;
+        max-height: 95vh;
+    }
+    
+    .modal-header {
+        padding: 15px 20px;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.2rem;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .subject-results {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .subject-results span {
+        text-align: center;
+    }
+}
+
+/* Küçük Telefonlar İçin (480px ve daha küçük ekranlar) */
+@media (max-width: 480px) {
+    .stats-overview {
+        grid-template-columns: 1fr;
+    }
+    
+    header h1 {
+        font-size: 1.8rem;
+    }
+}
