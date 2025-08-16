@@ -10,12 +10,15 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     color: #333;
+    /* Genel kaydırmayı önlemek için overflow-x gizlenir */
+    overflow-x: hidden; 
 }
 
 .container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
+    min-width: 620px;
 }
 
 /* Header */
@@ -226,6 +229,7 @@ header p {
 /* Sınav tablosu */
 .exam-table {
     width: 100%;
+    min-width: 500px; /* Tablonun minimum genişliği */
     border-collapse: collapse;
     background: white;
     border-radius: 10px;
@@ -239,6 +243,7 @@ header p {
     text-align: left;
     font-weight: 600;
     font-size: 1rem;
+    white-space: nowrap;
 }
 
 .exam-table td {
@@ -258,10 +263,11 @@ header p {
 .subject-name {
     font-weight: 600;
     color: #2d3748;
+    white-space: nowrap;
 }
 
 .subject-input {
-    width: 80px;
+    width: 65px;
     padding: 8px;
     border: 2px solid #e2e8f0;
     border-radius: 6px;
@@ -692,31 +698,27 @@ header p {
     }
 }
 
-/* Mobil uyumluluk - BURADAN İTİBAREN YENİ EKLEMELER BAŞLIYOR */
+/* Mobil uyumluluk */
 @media (max-width: 900px) {
     .main-content {
-        /* Yan yana duran 420px ve 1fr sütunları yerine, tek sütunlu bir yapı oluşturur. */
-        grid-template-columns: 1fr; 
+        grid-template-columns: 1fr;
         gap: 20px;
     }
     
-    /* İstatistik kartlarını daha küçük ekranlara sığacak şekilde düzenler. */
     .stats-overview {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 15px;
     }
 
-    /* Tablo taşmasını engellemek için yatay kaydırma çubuğu kullanır ve minimum genişlik belirler. */
     .table-wrapper {
         overflow-x: auto;
     }
 
     .exam-table {
-        min-width: 500px; 
+        min-width: 500px;
     }
 }
 
-/* Telefonlar İçin (768px ve daha küçük ekranlar) */
 @media (max-width: 768px) {
     .container {
         padding: 15px;
@@ -741,8 +743,8 @@ header p {
     }
     
     .subject-input {
-        width: 60px;
-        padding: 6px;
+        width: 55px;
+        padding: 5px;
     }
     
     .exam-details,
@@ -778,7 +780,6 @@ header p {
     }
 }
 
-/* Küçük Telefonlar İçin (480px ve daha küçük ekranlar) */
 @media (max-width: 480px) {
     .stats-overview {
         grid-template-columns: 1fr;
