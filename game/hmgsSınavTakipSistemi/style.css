@@ -226,6 +226,7 @@ header p {
 /* Sınav tablosu */
 .exam-table {
     width: 100%;
+    min-width: 500px;
     border-collapse: collapse;
     background: white;
     border-radius: 10px;
@@ -239,6 +240,7 @@ header p {
     text-align: left;
     font-weight: 600;
     font-size: 1rem;
+    white-space: nowrap;
 }
 
 .exam-table td {
@@ -258,10 +260,11 @@ header p {
 .subject-name {
     font-weight: 600;
     color: #2d3748;
+    white-space: nowrap;
 }
 
 .subject-input {
-    width: 80px;
+    width: 65px;
     padding: 8px;
     border: 2px solid #e2e8f0;
     border-radius: 6px;
@@ -693,7 +696,60 @@ header p {
 }
 
 /* Mobil uyumluluk */
+@media (max-width: 900px) {
+    .main-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .stats-overview {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .exam-table {
+        min-width: 500px;
+    }
+}
+
 @media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .input-section,
+    .results-section {
+        padding: 20px;
+    }
+    
+    .exam-table {
+        font-size: 0.9rem;
+    }
+    
+    .exam-table th,
+    .exam-table td {
+        padding: 10px 8px;
+    }
+    
+    .subject-input {
+        width: 55px;
+        padding: 5px;
+    }
+    
+    .exam-details,
+    .exam-scores {
+        flex-direction: column;
+        gap: 10px;
+    }
+
     .modal-content {
         width: 95%;
         max-height: 95vh;
@@ -721,63 +777,12 @@ header p {
     }
 }
 
-/* Responsive tasarım */
-@media (max-width: 900px) {
-    .main-content {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    
-    .stats-overview {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    }
-}
-
-@media (max-width: 768px) {
-    .container {
-        padding: 15px;
-    }
-    
-    header h1 {
-        font-size: 2rem;
-    }
-    
-    .input-section,
-    .results-section {
-        padding: 20px;
-    }
-    
-    .exam-table {
-        font-size: 0.9rem;
-    }
-    
-    .exam-table th,
-    .exam-table td {
-        padding: 10px 8px;
-    }
-    
-    .subject-input {
-        width: 60px;
-        padding: 6px;
-    }
-    
-    .exam-details,
-    .exam-scores {
-        flex-direction: column;
-        gap: 10px;
-    }
-}
-
 @media (max-width: 480px) {
     .stats-overview {
         grid-template-columns: 1fr;
     }
     
-    .exam-table-container {
-        overflow-x: auto;
-    }
-    
-    .exam-table {
-        min-width: 500px;
+    header h1 {
+        font-size: 1.8rem;
     }
 }

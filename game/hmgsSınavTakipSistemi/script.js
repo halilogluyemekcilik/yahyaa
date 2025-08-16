@@ -41,49 +41,14 @@ const currentExamName = document.getElementById('currentExamName');
 const currentExamDate = document.getElementById('currentExamDate');
 const currentExamTotal = document.getElementById('currentExamTotal');
 
-// Test için basit sınav ekle
-// Not: addTestExam() fonksiyonu kaldırıldı
-
-// Basit ikon oluşturma fonksiyonu
-function generateSimpleIcons() {
-    const sizes = [16, 32, 72, 96, 128, 144, 152, 180, 192, 384, 512];
-    
-    sizes.forEach(size => {
-        const canvas = document.createElement('canvas');
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext('2d');
-        
-        // Arka plan
-        ctx.fillStyle = '#667eea';
-        ctx.fillRect(0, 0, size, size);
-        
-        // Metin
-        ctx.fillStyle = 'white';
-        ctx.font = `bold ${size * 0.4}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('H', size/2, size/2);
-        
-        // PNG olarak indir
-        const link = document.createElement('a');
-        link.download = `icon-${size}x${size}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-    });
-    
-    showSuccessMessage('İkonlar oluşturuldu ve indirildi!');
-}
-
 // Sayfa yüklendiğinde mevcut sonuçları göster
 document.addEventListener('DOMContentLoaded', function() {
-	createExamTable();
-	updateDisplay();
-	setDefaultDate();
-	
-	// Debug için localStorage'daki verileri kontrol et
-	console.log('LocalStorage verileri:', examResults);
-	console.log('Kaydedilen sınav sayısı:', examResults.length);
+    createExamTable();
+    updateDisplay();
+    setDefaultDate();
+    
+    console.log('LocalStorage verileri:', examResults);
+    console.log('Kaydedilen sınav sayısı:', examResults.length);
 });
 
 // Form gönderildiğinde yeni sınavı başlat
@@ -99,7 +64,6 @@ examForm.addEventListener('submit', function(e) {
         return;
     }
     
-    // Yeni sınavı başlat
     currentExam = {
         id: Date.now(),
         name: examName,
@@ -109,7 +73,6 @@ examForm.addEventListener('submit', function(e) {
         timestamp: new Date().toISOString()
     };
     
-    // Her ders için başlangıç değerleri
     LAW_SUBJECTS.forEach(subject => {
         currentExam.subjects[subject.name] = {
             correct: 0,
@@ -118,16 +81,13 @@ examForm.addEventListener('submit', function(e) {
         };
     });
     
-    // Aktif sınav bilgilerini göster
     currentExamName.textContent = examName;
     currentExamDate.textContent = new Date(examDate).toLocaleDateString('tr-TR');
     currentExamTotal.textContent = totalQuestions > 0 ? totalQuestions : 'Belirtilmemiş';
     currentExamDiv.style.display = 'block';
     
-    // Formu gizle
     examForm.style.display = 'none';
     
-    // Tabloyu güncelle
     updateExamTable();
     
     showSuccessMessage('Sınav başlatıldı! Şimdi her ders için doğru/yanlış sayılarını girebilirsiniz.');
@@ -143,13 +103,13 @@ function createExamTable() {
             <td class="subject-name">${subject.name} (${subject.questionCount})</td>
             <td>
                 <input type="number" class="subject-input correct-input" 
-                       data-subject="${subject.name}" min="0" max="${subject.questionCount}" value="0" 
-                       onchange="updateTotals()" oninput="updateTotals()">
+                        data-subject="${subject.name}" min="0" max="${subject.questionCount}" value="0" 
+                        onchange="updateTotals()" oninput="updateTotals()">
             </td>
             <td>
                 <input type="number" class="subject-input wrong-input" 
-                       data-subject="${subject.name}" min="0" max="${subject.questionCount}" value="0" 
-                       onchange="updateTotals()" oninput="updateTotals()">
+                        data-subject="${subject.name}" min="0" max="${subject.questionCount}" value="0" 
+                        onchange="updateTotals()" oninput="updateTotals()">
             </td>
             <td class="score-cell" id="score-${subject.name.replace(/\s+/g, '-')}">%0</td>
         `;
@@ -170,7 +130,6 @@ function updateExamTable() {
             correctInput.value = currentExam.subjects[subject.name].correct;
             wrongInput.value = currentExam.subjects[subject.name].wrong;
             
-            // Ders özelinde başarı yüzdesi hesapla
             const score = calculateSubjectScore(subject.name);
             scoreCell.textContent = `%${score}`;
         }
@@ -219,21 +178,17 @@ function updateTotals() {
     totalCorrect.textContent = totalCorrectCount;
     totalWrong.textContent = totalWrongCount;
     
-    // Toplam başarı yüzdesi hesapla (100 puan üzerinden)
     const totalScorePercent = calculateTotalScore(totalCorrectCount);
     totalScore.textContent = `%${totalScorePercent}`;
     
-    // Tabloyu güncelle
     updateSubjectScores();
 }
 
 // Toplam başarı yüzdesi hesapla (100 puan üzerinden)
 function calculateTotalScore(correctCount) {
-    // Toplam 120 soruya göre hesapla
     const totalQuestions = 120;
     if (totalQuestions === 0) return 0;
     
-    // 100 puan üzerinden hesapla
     return Math.round((correctCount / totalQuestions) * 100);
 }
 
@@ -252,39 +207,31 @@ function updateSubjectScores() {
 function finishExam() {
     if (!currentExam) return;
     
-    // Veri doğrulama - artık toplam soru sayısı kontrolü yok
     const totalCorrectCount = parseInt(totalCorrect.textContent);
     const totalWrongCount = parseInt(totalWrong.textContent);
     const totalAnswered = totalCorrectCount + totalWrongCount;
     
-    // Sadece en az bir soru cevaplanmış mı kontrol et
     if (totalAnswered === 0) {
         alert('En az bir soru cevaplanmalı!');
         return;
     }
     
-    // Sınavı kaydet
     examResults.push(currentExam);
     saveToLocalStorage();
     
-    // Başarı mesajı göster
     showSuccessMessage('Sınav başarıyla kaydedildi!');
     
-    // Formu sıfırla ve göster
     examForm.reset();
-    document.getElementById('totalQuestions').value = 120; // Varsayılan değeri geri yükle
+    document.getElementById('totalQuestions').value = 120;
     examForm.style.display = 'block';
     currentExamDiv.style.display = 'none';
     currentExam = null;
     
-    // Tabloyu sıfırla
     createExamTable();
     
-    // Ekranı güncelle
     updateDisplay();
     setDefaultDate();
     
-    // Kaydedilen sınavları hemen göster
     updateSavedExams();
 }
 
@@ -309,12 +256,10 @@ function updateStats() {
         return;
     }
     
-    // Ortalama başarı yüzdesini hesapla (100 puan üzerinden)
     let totalScore = 0;
     let totalQuestions = 0;
     
     examResults.forEach(exam => {
-        // subjects alanının var olduğundan emin ol
         if (exam && exam.subjects && typeof exam.subjects === 'object') {
             let examCorrect = 0;
             let examWrong = 0;
@@ -334,11 +279,9 @@ function updateStats() {
     const avgScore = totalQuestions > 0 ? Math.round((totalScore / totalQuestions) * 100) : 0;
     averageScore.textContent = `%${avgScore}`;
     
-    // En iyi dersi bul
     const subjectScores = {};
     
     examResults.forEach(exam => {
-        // subjects alanının var olduğundan emin ol
         if (exam && exam.subjects && typeof exam.subjects === 'object') {
             Object.keys(exam.subjects).forEach(subjectName => {
                 if (!subjectScores[subjectName]) {
@@ -377,92 +320,64 @@ function updateStats() {
 
 // Kaydedilen sınavları güncelle
 function updateSavedExams() {
-	if (examResults.length === 0) {
-		savedExams.innerHTML = '<p style="text-align: center; color: #718096;">Henüz sınav kaydedilmemiş.</p>';
-		return;
-	}
-	
-	// Sınavları tarihe göre sırala (en yeni önce)
-	const sortedExams = examResults.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-	
-	savedExams.innerHTML = '';
-	sortedExams.forEach(exam => {
-		// subjects alanının var olduğundan emin ol
-		if (!exam || !exam.subjects || typeof exam.subjects !== 'object') {
-			console.warn('Geçersiz sınav verisi:', exam);
-			return;
-		}
-		
-		let examCorrect = 0;
-		let examWrong = 0;
-		let totalQuestions = 0;
-		
-		// Her ders için toplam soru sayısını hesapla
-		LAW_SUBJECTS.forEach(subject => {
-			if (exam.subjects[subject.name]) {
-				const subjectData = exam.subjects[subject.name];
-				if (subjectData && typeof subjectData === 'object') {
-					examCorrect += subjectData.correct || 0;
-					examWrong += subjectData.wrong || 0;
-					totalQuestions += subject.questionCount;
-				}
-			}
-		});
-		
-		// Puan hesapla (120 soruda yüzde kaçı doğru)
-		const score = Math.round((examCorrect / 120) * 100);
-		
-		const examDate = new Date(exam.date).toLocaleDateString('tr-TR');
-		
-		const examItem = document.createElement('div');
-		examItem.className = 'exam-item';
-		examItem.innerHTML = `
-			<div class="exam-info">
-				<div class="exam-subject">${exam.name}</div>
-				<div class="exam-date">${examDate}</div>
-				<div class="exam-details">
-					<span class="detail-item">Doğru: <strong>${examCorrect}</strong></span>
-					<span class="detail-item">Yanlış: <strong>${examWrong}</strong></span>
-					<span class="detail-item">Toplam Soru: <strong>${totalQuestions}</strong></span>
-				</div>
-				<div class="exam-scores">
-					<span class="score-item">Puan: <strong>${score}</strong></span>
-				</div>
-			</div>
-			<div class="exam-actions">
-				<button class="detail-btn" onclick="toggleExamDetails(${exam.id})">📋 Detay</button>
-				<button class="delete-btn" onclick="deleteExam(${exam.id})">Sil</button>
-			</div>
-		`;
-		
-		// Düz metin detaylarını oluştur ve ekle (başta gizli)
-		let detailsHtml = '';
-		LAW_SUBJECTS.forEach(subject => {
-			const sd = exam.subjects[subject.name] || { correct: 0, wrong: 0 };
-			detailsHtml += `<div>${subject.name}: doğru ${sd.correct || 0}, yanlış ${sd.wrong || 0}</div>`;
-		});
-		const plainDetails = document.createElement('div');
-		plainDetails.id = `exam-details-${exam.id}`;
-		plainDetails.className = 'exam-detail-plain';
-		plainDetails.style.display = 'none';
-		plainDetails.style.marginTop = '10px';
-		plainDetails.style.color = '#4a5568';
-		plainDetails.innerHTML = detailsHtml;
-		examItem.appendChild(plainDetails);
-		
-		savedExams.appendChild(examItem);
-	});
+    if (examResults.length === 0) {
+        savedExams.innerHTML = '<p style="text-align: center; color: #718096;">Henüz sınav kaydedilmemiş.</p>';
+        return;
+    }
+    
+    const sortedExams = examResults.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    savedExams.innerHTML = '';
+    sortedExams.forEach(exam => {
+        if (!exam || !exam.subjects || typeof exam.subjects !== 'object') {
+            console.warn('Geçersiz sınav verisi:', exam);
+            return;
+        }
+        
+        let examCorrect = 0;
+        let examWrong = 0;
+        let totalQuestions = 0;
+        
+        LAW_SUBJECTS.forEach(subject => {
+            if (exam.subjects[subject.name]) {
+                const subjectData = exam.subjects[subject.name];
+                if (subjectData && typeof subjectData === 'object') {
+                    examCorrect += subjectData.correct || 0;
+                    examWrong += subjectData.wrong || 0;
+                    totalQuestions += subject.questionCount;
+                }
+            }
+        });
+        
+        const score = Math.round((examCorrect / 120) * 100);
+        const examDate = new Date(exam.date).toLocaleDateString('tr-TR');
+        
+        const examItem = document.createElement('div');
+        examItem.className = 'exam-item';
+        examItem.innerHTML = `
+            <div class="exam-info">
+                <div class="exam-subject">${exam.name}</div>
+                <div class="exam-date">${examDate}</div>
+                <div class="exam-details">
+                    <span class="detail-item">Doğru: <strong>${examCorrect}</strong></span>
+                    <span class="detail-item">Yanlış: <strong>${examWrong}</strong></span>
+                    <span class="detail-item">Toplam Soru: <strong>${totalQuestions}</strong></span>
+                </div>
+                <div class="exam-scores">
+                    <span class="score-item">Puan: <strong>${score}</strong></span>
+                </div>
+            </div>
+            <div class="exam-actions">
+                <button class="detail-btn" onclick="showExamDetails(${exam.id})">📋 Detay</button>
+                <button class="delete-btn" onclick="deleteExam(${exam.id})">Sil</button>
+            </div>
+        `;
+        
+        savedExams.appendChild(examItem);
+    });
 }
 
-// Düz metin sınav detaylarını aç/kapa
-function toggleExamDetails(examId) {
-	const el = document.getElementById(`exam-details-${examId}`);
-	if (!el) return;
-	const willShow = el.style.display === 'none' || el.style.display === '';
-	el.style.display = willShow ? 'block' : 'none';
-}
-
-// Sınav detaylarını göster
+// Sınav detaylarını göster (modal)
 function showExamDetails(examId) {
     const exam = examResults.find(e => e.id === examId);
     if (!exam) return;
@@ -471,7 +386,6 @@ function showExamDetails(examId) {
     let examWrong = 0;
     let totalQuestions = 0;
     
-    // Her ders için toplam soru sayısını hesapla
     LAW_SUBJECTS.forEach(subject => {
         if (exam.subjects[subject.name]) {
             const subjectData = exam.subjects[subject.name];
@@ -486,14 +400,13 @@ function showExamDetails(examId) {
     const score = Math.round((examCorrect / 120) * 100);
     const examDate = new Date(exam.date).toLocaleDateString('tr-TR');
     
-    // Detay modal'ı oluştur
     const modal = document.createElement('div');
     modal.className = 'exam-detail-modal';
     modal.innerHTML = `
         <div class="modal-content">
             <div class="modal-header">
                 <h3>📋 ${exam.name} - Sınav Detayları</h3>
-                <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">✕</button>
+                <button class="close-btn">✕</button>
             </div>
             <div class="modal-body">
                 <div class="exam-summary">
@@ -532,7 +445,11 @@ function showExamDetails(examId) {
     
     document.body.appendChild(modal);
     
-    // Modal'a tıklandığında kapat
+    const closeBtn = modal.querySelector('.close-btn');
+    closeBtn.addEventListener('click', () => {
+        modal.remove();
+    });
+    
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
             modal.remove();
@@ -578,7 +495,6 @@ function showSuccessMessage(message) {
     
     document.body.appendChild(successDiv);
     
-    // 3 saniye sonra mesajı kaldır
     setTimeout(() => {
         successDiv.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => {
