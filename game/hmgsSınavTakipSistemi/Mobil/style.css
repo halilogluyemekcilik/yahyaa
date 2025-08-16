@@ -12,6 +12,7 @@ body {
     color: #333;
     /* Genel kaydırmayı önlemek için overflow-x gizlenir */
     overflow-x: hidden; 
+    min-width: 620px;
 }
 
 .container {
