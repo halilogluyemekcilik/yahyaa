@@ -10,12 +10,15 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     color: #333;
+    /* Genel kaydırmayı önlemek için overflow-x gizlenir */
+    overflow-x: hidden; 
 }
 
 .container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
+    overflow-x: hidden;
 }
 
 /* Header */
@@ -118,7 +121,7 @@ header p {
     padding: 20px;
     border-radius: 10px;
     margin-top: 20px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid #ea9666;
 }
 
 .current-exam h3 {
@@ -221,12 +224,13 @@ header p {
     overflow-x: auto;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Sınav tablosu */
 .exam-table {
     width: 100%;
-    min-width: 500px;
+    min-width: 100%;
     border-collapse: collapse;
     background: white;
     border-radius: 10px;
@@ -264,12 +268,12 @@ header p {
 }
 
 .subject-input {
-    width: 65px;
-    padding: 8px;
+    width: 50px;
+    padding: 6px 4px;
     border: 2px solid #e2e8f0;
     border-radius: 6px;
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .subject-input:focus {
@@ -712,7 +716,7 @@ header p {
     }
 
     .exam-table {
-        min-width: 500px;
+        min-width: 100%;
     }
 }
 
@@ -736,12 +740,22 @@ header p {
     
     .exam-table th,
     .exam-table td {
-        padding: 10px 8px;
+        padding: 10px 6px;
+    }
+    
+    .exam-table th {
+        font-size: 0.8rem;
     }
     
     .subject-input {
-        width: 55px;
-        padding: 5px;
+        width: 45px;
+        padding: 4px 2px;
+        font-size: 0.8rem;
+    }
+    
+    .subject-name {
+        font-size: 0.85rem;
+        line-height: 1.2;
     }
     
     .exam-details,
@@ -784,5 +798,61 @@ header p {
     
     header h1 {
         font-size: 1.8rem;
+    }
+    
+    .container {
+        padding: 10px;
+    }
+    
+    .exam-table th,
+    .exam-table td {
+        padding: 6px 4px;
+        font-size: 0.75rem;
+    }
+    
+    .subject-input {
+        width: 40px;
+        padding: 3px 1px;
+        font-size: 0.75rem;
+    }
+    
+    /* Tablo başlıklarını mobilde kısalt */
+    .exam-table th:nth-child(2) { 
+        position: relative;
+        font-size: 0;
+    }
+    .exam-table th:nth-child(2)::after { 
+        content: "D"; 
+        font-size: 0.75rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    
+    .exam-table th:nth-child(3) { 
+        position: relative;
+        font-size: 0;
+    }
+    .exam-table th:nth-child(3)::after { 
+        content: "Y"; 
+        font-size: 0.75rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    
+    .exam-table th:nth-child(4) { 
+        position: relative;
+        font-size: 0;
+    }
+    .exam-table th:nth-child(4)::after { 
+        content: "%"; 
+        font-size: 0.75rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
 }

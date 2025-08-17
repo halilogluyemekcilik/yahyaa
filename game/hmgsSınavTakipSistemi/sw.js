@@ -1,10 +1,12 @@
 const CACHE_NAME = 'hukuk-takip-v1.0.2';
 const CORE_ASSETS = [
-  './',
+  './', // Bu, '.../hmgsSinavTakipSistemi/' URL'sini temsil eder
   './index.html',
   './style.css',
   './script.js',
-  './manifest.json'
+  './manifest.json',
+  './icons/icon-192x192.png', // İkonlarınızı da ekleyin
+  './icons/icon-512x512.png'
 ];
 
 // Service Worker kurulumu (hata toleranslı)
