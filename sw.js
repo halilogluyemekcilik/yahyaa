@@ -22,6 +22,13 @@ self.addEventListener('install', function(event) {
 
 // Fetch olayları - çevrimdışı çalışma
 self.addEventListener('fetch', function(event) {
+  // *** BURADA EKLEME YAPILDI ***
+  // hmgsSinavTakipSistemi klasörüne ait istekleri ana SW'nin dışında tut
+  if (event.request.url.includes('/game/hmgsSinavTakipSistemi/')) {
+    return; // Bu istekleri atla, ana SW'nin işi değil
+  }
+  // *** EKLEME SONU ***
+
   event.respondWith(
     caches.match(event.request)
       .then(function(response) {
@@ -50,7 +57,7 @@ self.addEventListener('fetch', function(event) {
           }
         );
       })
-    );
+  );
 });
 
 // Eski cache'leri temizle
