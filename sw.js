@@ -22,12 +22,16 @@ self.addEventListener('install', function(event) {
 
 // Fetch olayları - çevrimdışı çalışma
 self.addEventListener('fetch', function(event) {
-  // *** BURADA EKLEME YAPILDI ***
-  // hmgsSinavTakipSistemi klasörüne ait istekleri ana SW'nin dışında tut
+  // *** HUKUK UYGULAMASINI TAMAMEN DIŞLA ***
   if (event.request.url.includes('/game/hmgsSinavTakipSistemi/')) {
-    return; // Bu istekleri atla, ana SW'nin işi değil
+    return; // Bu istekleri atla, kendi SW'si halletsin
   }
-  // *** EKLEME SONU ***
+  
+  // *** PWA KURULUM İSTEKLERİNİ DIŞLA ***
+  if (event.request.url.includes('manifest.json') && 
+      event.request.url.includes('/game/hmgsSinavTakipSistemi/')) {
+    return; // Hukuk uygulamasının manifest'ini ana SW karışmasın
+  }
 
   event.respondWith(
     caches.match(event.request)
@@ -66,7 +70,8 @@ self.addEventListener('activate', function(event) {
     caches.keys().then(function(cacheNames) {
       return Promise.all(
         cacheNames.map(function(cacheName) {
-          if (cacheName !== CACHE_NAME) {
+          // Hukuk uygulamasının cache'ini silme!
+          if (cacheName !== CACHE_NAME && !cacheName.includes('hukuk-takip')) {
             console.log('Eski cache siliniyor:', cacheName);
             return caches.delete(cacheName);
           }

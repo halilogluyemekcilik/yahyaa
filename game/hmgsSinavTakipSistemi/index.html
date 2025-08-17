@@ -12,16 +12,17 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Hukuk Takip">
     <meta name="msapplication-TileColor" content="#667eea">
-    <meta name="msapplication-config" content="/browserconfig.xml">
     
-    <link rel="manifest" href="/manifest.json">
+    <!-- ✅ DOĞRU MANIFEST PATH -->
+    <link rel="manifest" href="./manifest.json">
     
-    <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png">
+    <!-- ✅ DOĞRU İKON PATH'LERİ -->
+    <link rel="apple-touch-icon" href="./icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="./icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180x180.png">
     
-    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./icons/icon-16x16.png">
     
     <title>Hukuk Sınav Takip Sistemi</title>
     <link rel="stylesheet" href="style.css">
@@ -136,47 +137,62 @@
     <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-        // Service Worker'ın dosya yolunu ve kapsamını (scope) doğru dizinle sınırlayın.
-        // Unutmayın, scope, sonuna '/' konulduğunda klasörü belirtir.
-        // Bu sayede PWA, sadece bu klasör ve altındaki sayfalar için geçerli olur.
-        navigator.serviceWorker.register('/game/hmgsSinavTakipSistemi/sw.js', { 
-            scope: '/game/hmgsSinavTakipSistemi/' 
-        })
-        .then(registration => {
-            console.log('Hukuk Takip SW kaydı başarılı. Kapsam:', registration.scope);
-        })
-        .catch(error => {
-            console.error('Hukuk Takip SW kaydı başarısız:', error);
-        });
+            // ✅ DOĞRU SERVICE WORKER KAYDI
+            navigator.serviceWorker.register('./sw.js', { 
+                scope: './' // Sadece bu klasör için
+            })
+            .then(registration => {
+                console.log('Hukuk Takip SW kaydı başarılı. Kapsam:', registration.scope);
+            })
+            .catch(error => {
+                console.error('Hukuk Takip SW kaydı başarısız:', error);
+            });
         });
     }
 
-        // PWA Kurulum Prompt
-        let deferredPrompt;
-        const pwaInstallPrompt = document.getElementById('pwaInstallPrompt');
-        const pwaInstallBtn = document.getElementById('pwaInstallBtn');
-        const pwaDismissBtn = document.getElementById('pwaDismissBtn');
+    // PWA Kurulum Prompt
+    let deferredPrompt;
+    const pwaInstallPrompt = document.getElementById('pwaInstallPrompt');
+    const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+    const pwaDismissBtn = document.getElementById('pwaDismissBtn');
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('🎯 Hukuk PWA install prompt tetiklendi!');
+        e.preventDefault();
+        deferredPrompt = e;
+        if (pwaInstallPrompt) {
             pwaInstallPrompt.style.display = 'block';
-        });
+        }
+    });
 
+    if (pwaInstallBtn) {
         pwaInstallBtn.addEventListener('click', () => {
-            pwaInstallPrompt.style.display = 'none';
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('Kullanıcı PWA kurulumunu kabul etti');
-                }
-                deferredPrompt = null;
-            });
+            if (pwaInstallPrompt) pwaInstallPrompt.style.display = 'none';
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('✅ Hukuk PWA kurulumu kabul edildi');
+                    } else {
+                        console.log('❌ Hukuk PWA kurulumu reddedildi');
+                    }
+                    deferredPrompt = null;
+                });
+            }
         });
+    }
 
+    if (pwaDismissBtn) {
         pwaDismissBtn.addEventListener('click', () => {
-            pwaInstallPrompt.style.display = 'none';
+            if (pwaInstallPrompt) pwaInstallPrompt.style.display = 'none';
         });
-    </script>
+    }
+
+    // PWA kurulumu tamamlandığında
+    window.addEventListener('appinstalled', (evt) => {
+        console.log('🎉 Hukuk PWA başarıyla kuruldu!');
+        if (pwaInstallPrompt) pwaInstallPrompt.style.display = 'none';
+    });
+</script>
 </body>
 </html>
