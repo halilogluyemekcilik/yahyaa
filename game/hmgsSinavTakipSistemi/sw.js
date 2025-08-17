@@ -1,10 +1,10 @@
 const CACHE_NAME = 'hukuk-takip-v1.0.2';
 const CORE_ASSETS = [
-  './', // Bu, '.../hmgsSinavTakipSistemi/' URL'sini temsil eder
-  './index.html',
-  './style.css',
-  './script.js',
-  './manifest.json',
+  './game/hmgsSinavTakipSistemi/', // Bu, '.../hmgsSinavTakipSistemi/' URL'sini temsil eder
+  './game/hmgsSinavTakipSistemi/index.html',
+  './game/hmgsSinavTakipSistemi/style.css',
+  './game/hmgsSinavTakipSistemi/script.js',
+  './game/hmgsSinavTakipSistemi/manifest.json',
   './icons/icon-192x192.png', // İkonlarınızı da ekleyin
   './icons/icon-512x512.png'
 ];
