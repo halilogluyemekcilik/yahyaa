@@ -117,7 +117,7 @@ self.addEventListener('activate', function(event) {
                     // Sadece TYT-AYT, hukuk-takip ve deneme-sinav-takip cache'lerini koru
                     if (cacheName !== CACHE_NAME && 
                         !cacheName.includes('hukuk-takip') &&
-                        !cacheName.includes('deneme-sinav-takip')) {
+                        !cacheName.includes('tyt-ayt-takip')) {
                         console.log('Eski cache siliniyor:', cacheName);
                         return caches.delete(cacheName);
                     }
