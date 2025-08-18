@@ -14,7 +14,7 @@
     <meta name="msapplication-TileColor" content="#667eea">
     <meta name="msapplication-config" content="/browserconfig.xml">
     
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="manifest.json">
     
     <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
     <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
@@ -162,10 +162,10 @@
                 scope: './' // Sadece bu klasör için
             })
             .then(registration => {
-                console.log('Hukuk Takip SW kaydı başarılı. Kapsam:', registration.scope);
+                console.log('Tyt Takip SW kaydı başarılı. Kapsam:', registration.scope);
             })
             .catch(error => {
-                console.error('Hukuk Takip SW kaydı başarısız:', error);
+                console.error('Tyt Takip SW kaydı başarısız:', error);
             });
         });
     }
@@ -177,7 +177,7 @@
     const pwaDismissBtn = document.getElementById('pwaDismissBtn');
 
     window.addEventListener('beforeinstallprompt', (e) => {
-        console.log('🎯 Hukuk PWA install prompt tetiklendi!');
+        console.log('🎯 Tyt PWA install prompt tetiklendi!');
         e.preventDefault();
         deferredPrompt = e;
         if (pwaInstallPrompt) {
@@ -192,9 +192,9 @@
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        console.log('✅ Hukuk PWA kurulumu kabul edildi');
+                        console.log('✅ Tyt PWA kurulumu kabul edildi');
                     } else {
-                        console.log('❌ Hukuk PWA kurulumu reddedildi');
+                        console.log('❌ Tyt PWA kurulumu reddedildi');
                     }
                     deferredPrompt = null;
                 });
@@ -210,7 +210,7 @@
 
     // PWA kurulumu tamamlandığında
     window.addEventListener('appinstalled', (evt) => {
-        console.log('🎉 Hukuk PWA başarıyla kuruldu!');
+        console.log('🎉 Tyt PWA başarıyla kuruldu!');
         if (pwaInstallPrompt) pwaInstallPrompt.style.display = 'none';
     });
 </script>
