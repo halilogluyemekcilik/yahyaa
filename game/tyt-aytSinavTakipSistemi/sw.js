@@ -1,99 +1,90 @@
-// TYT-AYT özel cache adı (versiyon numarası ekleyin güncellemelerde)
-const CACHE_NAME = 'tytAyt-takip-v2.1';
-const CORE_ASSETS = [
-  '/game/tyt-aytSinavTakipSistemi/index.html',
-  '/game/tyt-aytSinavTakipSistemi/style.css',
-  '/game/tyt-aytSinavTakipSistemi/script.js',
-  '/game/tyt-aytSinavTakipSistemi/manifest.json',
-  '/game/tyt-aytSinavTakipSistemi/icons/icon-192x192.png',
-  '/game/tyt-aytSinavTakipSistemi/icons/icon-512x512.png',
-  // Diğer kritik dosyalar
+const CACHE_NAME = 'yahya-haliloglu-v2';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/css/style.css',
+  '/js/script.js',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
+  // Diğer önemli dosyalarınızı buraya ekleyin
 ];
 
-// Kurulum
-self.addEventListener('install', event => {
-  self.skipWaiting(); // Hızlı aktivasyon için
-  console.log('[TYT-AYT SW] Kurulum başladı');
-  
+// Service Worker kurulumu
+self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => {
-        return cache.addAll(CORE_ASSETS)
-          .then(() => console.log('[TYT-AYT SW] Temel dosyalar cache\'lendi'))
-          .catch(err => console.error('[TYT-AYT SW] Cache hatası:', err));
+      .then(function(cache) {
+        console.log('Ana uygulama cache açıldı');
+        return cache.addAll(urlsToCache);
       })
   );
 });
 
-// Aktivasyon
-self.addEventListener('activate', event => {
-  console.log('[TYT-AYT SW] Aktif');
-  event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys.map(key => {
-          if (key !== CACHE_NAME && key.startsWith('tytAyt-takip-')) {
-            console.log('[TYT-AYT SW] Eski cache siliniyor:', key);
-            return caches.delete(key);
-          }
-        })
-      );
-    })
-  );
-});
-
-// Fetch İşlemleri
-self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url);
-  
-  // SADECE kendi scope'muzdaki istekleri işle
-  if (!url.pathname.startsWith('/game/tyt-aytSinavTakipSistemi/')) {
-    console.log('[TYT-AYT SW] İşlenmeyen istek:', url.pathname);
-    return;
+// Fetch olayları - çevrimdışı çalışma
+self.addEventListener('fetch', function(event) {
+  // *** HUKUK UYGULAMASINI TAMAMEN DIŞLA ***
+  if (event.request.url.includes('/game/hmgsSinavTakipSistemi/')) {
+    return; // Bu istekleri atla, kendi SW'si halletsin
   }
-
-  // API isteklerini doğrudan fetch et
-  if (url.pathname.includes('/api/')) {
-    event.respondWith(fetch(event.request));
-    return;
+  
+  // *** TYT UYGULAMASINI TAMAMEN DIŞLA ***
+  if (event.request.url.includes('/game/tyt-aytSinavTakipSistemi/')) {
+    return; // Bu istekleri atla, kendi SW'si halletsin
+  }
+  
+  // *** PWA KURULUM İSTEKLERİNİ DIŞLA ***
+  if ((event.request.url.includes('manifest.json') && 
+      (event.request.url.includes('/game/hmgsSinavTakipSistemi/') || 
+       event.request.url.includes('/game/tyt-aytSinavTakipSistemi/'))) {
+    return; // Alt uygulamaların manifest'lerini ana SW karışmasın
   }
 
   event.respondWith(
     caches.match(event.request)
-      .then(cached => {
-        // Ağ isteği yap (stale-while-revalidate stratejisi)
-        const fetchPromise = fetch(event.request)
-          .then(networkResponse => {
-            // Sadece geçerli response'ları cache'e ekle
-            if (networkResponse.ok && event.request.method === 'GET') {
-              const clone = networkResponse.clone();
-              caches.open(CACHE_NAME)
-                .then(cache => cache.put(event.request, clone));
-            }
-            return networkResponse;
-          })
-          .catch(() => cached || offlineResponse());
+      .then(function(response) {
+        // Cache'de varsa cache'den döndür
+        if (response) {
+          return response;
+        }
         
-        return cached || fetchPromise;
+        // Cache'de yoksa internetten getir
+        return fetch(event.request).then(
+          function(response) {
+            // Geçerli response kontrolü
+            if(!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
+            }
+
+            // Response'u klonla
+            var responseToCache = response.clone();
+
+            caches.open(CACHE_NAME)
+              .then(function(cache) {
+                cache.put(event.request, responseToCache);
+              });
+
+            return response;
+          }
+        );
       })
   );
 });
 
-function offlineResponse() {
-  return new Response(
-    JSON.stringify({ error: "Çevrimdışı moddasınız" }),
-    { headers: { 'Content-Type': 'application/json' } }
-  );
-}
-
-// Push bildirimleri
-self.addEventListener('push', event => {
-  const data = event.data?.json() || { title: 'TYT-AYT', body: 'Yeni güncelleme!' };
+// Eski cache'leri temizle
+self.addEventListener('activate', function(event) {
   event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body,
-      icon: '/game/tyt-aytSinavTakipSistemi/icons/icon-192x192.png',
-      badge: '/game/tyt-aytSinavTakipSistemi/icons/icon-72x72.png'
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          // Hukuk ve TYT uygulamalarının cache'lerini silme!
+          if (cacheName !== CACHE_NAME && 
+              !cacheName.includes('hukuk-takip') && 
+              !cacheName.includes('tyt-takip')) {
+            console.log('Eski cache siliniyor:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
     })
   );
 });

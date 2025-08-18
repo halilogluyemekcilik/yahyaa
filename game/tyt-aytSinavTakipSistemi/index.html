@@ -162,10 +162,10 @@
                 scope: './' // Sadece bu klasör için
             })
             .then(registration => {
-                console.log('tytAyt Takip SW kaydı başarılı. Kapsam:', registration.scope);
+                console.log('Hukuk Takip SW kaydı başarılı. Kapsam:', registration.scope);
             })
             .catch(error => {
-                console.error('tytAyt Takip SW kaydı başarısız:', error);
+                console.error('Hukuk Takip SW kaydı başarısız:', error);
             });
         });
     }
@@ -177,7 +177,7 @@
     const pwaDismissBtn = document.getElementById('pwaDismissBtn');
 
     window.addEventListener('beforeinstallprompt', (e) => {
-        console.log('🎯 tytAyt PWA install prompt tetiklendi!');
+        console.log('🎯 Hukuk PWA install prompt tetiklendi!');
         e.preventDefault();
         deferredPrompt = e;
         if (pwaInstallPrompt) {
@@ -192,9 +192,9 @@
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        console.log('✅ tytAyt PWA kurulumu kabul edildi');
+                        console.log('✅ Hukuk PWA kurulumu kabul edildi');
                     } else {
-                        console.log('❌ tytAyt PWA kurulumu reddedildi');
+                        console.log('❌ Hukuk PWA kurulumu reddedildi');
                     }
                     deferredPrompt = null;
                 });
@@ -210,7 +210,7 @@
 
     // PWA kurulumu tamamlandığında
     window.addEventListener('appinstalled', (evt) => {
-        console.log('🎉 tytAyt PWA başarıyla kuruldu!');
+        console.log('🎉 Hukuk PWA başarıyla kuruldu!');
         if (pwaInstallPrompt) pwaInstallPrompt.style.display = 'none';
     });
 </script>

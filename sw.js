@@ -1,84 +1,78 @@
-// Ana site için özel cache adı
-const CACHE_NAME = 'yahya-haliloglu-main-v2';
+const CACHE_NAME = 'yahya-haliloglu-v1';
 const urlsToCache = [
   '/',
   '/index.html',
   '/css/style.css',
   '/js/script.js',
-  '/manifest.json',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
-  // Diğer önemli dosyalar
+  // Diğer önemli dosyalarınızı buraya ekleyin
 ];
 
-// Kurulum
-self.addEventListener('install', event => {
+// Service Worker kurulumu
+self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('[Main SW] Cache açıldı:', CACHE_NAME);
+      .then(function(cache) {
+        console.log('Cache açıldı');
         return cache.addAll(urlsToCache);
       })
   );
 });
 
-// Fetch İşlemleri
-self.addEventListener('fetch', event => {
-  const requestUrl = new URL(event.request.url);
-  
-  // Alt uygulamaların isteklerini kesinlikle engelle
-  if (requestUrl.pathname.startsWith('/game/')) {
-    console.log('[Main SW] Alt uygulama isteği engellendi:', requestUrl.pathname);
-    return;
+// Fetch olayları - çevrimdışı çalışma
+self.addEventListener('fetch', function(event) {
+  // *** HUKUK UYGULAMASINI TAMAMEN DIŞLA ***
+  if (event.request.url.includes('/game/hmgsSinavTakipSistemi/')) {
+    return; // Bu istekleri atla, kendi SW'si halletsin
   }
   
-  // Sadece aynı origin'den gelen istekleri işle
-  if (requestUrl.origin !== location.origin) return;
+  // *** PWA KURULUM İSTEKLERİNİ DIŞLA ***
+  if (event.request.url.includes('manifest.json') && 
+      event.request.url.includes('/game/hmgsSinavTakipSistemi/')) {
+    return; // Hukuk uygulamasının manifest'ini ana SW karışmasın
+  }
 
   event.respondWith(
     caches.match(event.request)
-      .then(response => {
-        // Cache'te varsa
+      .then(function(response) {
+        // Cache'de varsa cache'den döndür
         if (response) {
-          console.log('[Main SW] Cache\'den servis ediliyor:', requestUrl.pathname);
           return response;
         }
         
-        // Network'ten getir ve cache'e ekle
-        return fetch(event.request)
-          .then(networkResponse => {
-            if (!networkResponse || networkResponse.status !== 200) {
-              return networkResponse;
+        // Cache'de yoksa internetten getir
+        return fetch(event.request).then(
+          function(response) {
+            // Geçerli response kontrolü
+            if(!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
             }
-            
-            const responseToCache = networkResponse.clone();
+
+            // Response'u klonla
+            var responseToCache = response.clone();
+
             caches.open(CACHE_NAME)
-              .then(cache => {
+              .then(function(cache) {
                 cache.put(event.request, responseToCache);
               });
-            
-            return networkResponse;
-          })
-          .catch(() => {
-            // Offline fallback
-            return new Response('<h1>Çevrimdışı Mod</h1>', {
-              headers: { 'Content-Type': 'text/html' }
-            });
-          });
+
+            return response;
+          }
+        );
       })
   );
 });
 
-// Eski Cache'leri Temizle
-self.addEventListener('activate', event => {
+// Eski cache'leri temizle
+self.addEventListener('activate', function(event) {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then(function(cacheNames) {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME && 
-              !cacheName.startsWith('tytAyt-takip-') && 
-              !cacheName.startsWith('hmgs-takip-')) {
-            console.log('[Main SW] Eski cache siliniyor:', cacheName);
+        cacheNames.map(function(cacheName) {
+          // Hukuk uygulamasının cache'ini silme!
+          if (cacheName !== CACHE_NAME && !cacheName.includes('hukuk-takip')) {
+            console.log('Eski cache siliniyor:', cacheName);
             return caches.delete(cacheName);
           }
         })

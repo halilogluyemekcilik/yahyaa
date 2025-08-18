@@ -1,13 +1,13 @@
 {
-  "name": "TYT-AYT Sınav Takip Sistemi",
-  "short_name": "TYT-AYT Takip",
-  "description": "TYT-AYT sınav sonuçlarınızı takip edin ve analiz edin",
-  "start_url": "/game/tyt-aytSinavTakipSistemi/index.html",
+  "name": "Tyt Sınav Takip Sistemi",
+  "short_name": "Tyt Takip",
+  "description": "Tyt sınav sonuçlarınızı takip edin ve analiz edin",
+  "start_url": "./game/tyt-aytSinavTakipSistemi/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#667eea",
   "orientation": "portrait-primary",
-  "scope": "/game/tyt-aytSinavTakipSistemi/",
+  "scope": "./game/tyt-aytSinavTakipSistemi/",
   "lang": "tr",
   "categories": ["education", "productivity"],
   "icons": [
@@ -65,7 +65,7 @@
       "name": "Yeni Sınav",
       "short_name": "Yeni Sınav",
       "description": "Yeni bir sınav başlat",
-      "url": "/game/tyt-aytSinavTakipSistemi/index.html?action=new",
+      "url": "/game/tyt-aytSinavTakipSistemi/?action=new",
       "icons": [
         {
           "src": "/game/tyt-aytSinavTakipSistemi/icons/icon-96x96.png",
@@ -77,7 +77,7 @@
       "name": "Sonuçlar",
       "short_name": "Sonuçlar",
       "description": "Kaydedilen sınav sonuçlarını görüntüle",
-      "url": "/game/tyt-aytSinavTakipSistemi/index.html?action=results",
+      "url": "/game/tyt-aytSinavTakipSistemi/?action=results",
       "icons": [
         {
           "src": "/game/tyt-aytSinavTakipSistemi/icons/icon-96x96.png",
