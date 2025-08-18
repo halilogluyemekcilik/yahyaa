@@ -703,6 +703,62 @@ header p {
     }
 }
 
+/* Grafik bölümü stilleri - GÜNCELLENDİ */
+.graphs-section {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.graphs-section h3 {
+    color: #4a5568;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+.chart-container {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-bottom: 25px;
+    width: 100%;
+    position: relative;
+    height: auto;
+}
+
+/* Grafikler için özel mobil ayarları */
+@media (max-width: 768px) {
+    .chart-container {
+        padding: 10px;
+        height: 350px !important;
+        overflow: hidden;
+    }
+    
+    .chart-container canvas {
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 300px;
+    }
+    
+    .chartjs-size-monitor,
+    .chartjs-render-monitor {
+        font-size: 12px !important;
+    }
+}
+
+/* Çok küçük ekranlar için ek ayarlar */
+@media (max-width: 480px) {
+    .chart-container {
+        height: 400px !important;
+    }
+    
+    .graphs-section h3 {
+        font-size: 1.2rem;
+    }
+}
+
 /* Mobil uyumluluk */
 @media (max-width: 900px) {
     .main-content {
@@ -871,34 +927,5 @@ header p {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-    }
-}
-
-/* Grafik bölümü stilleri */
-.graphs-section {
-    margin-top: 30px;
-    margin-bottom: 30px;
-}
-
-.graphs-section h3 {
-    color: #4a5568;
-    font-size: 1.4rem;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 10px;
-}
-
-.chart-container {
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    margin-bottom: 25px;
-}
-
-/* Mobil için küçük ekran düzenlemesi */
-@media (max-width: 768px) {
-    .chart-container {
-        padding: 15px;
     }
 }

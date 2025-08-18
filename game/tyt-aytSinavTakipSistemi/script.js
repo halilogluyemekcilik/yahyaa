@@ -247,7 +247,7 @@ function saveToLocalStorage() {
 function updateDisplay() {
     updateStats();
     updateSavedExams();
-    renderCharts(examTypeSelect.value); // Başlangıçta seçili olan türe göre grafik çiz
+    renderCharts(examTypeSelect.value);
 }
 
 // İstatistikleri güncelle
@@ -292,7 +292,7 @@ function updateStats() {
     
     Object.keys(allSubjectScores).forEach(subjectName => {
         const stats = allSubjectScores[subjectName];
-        if (stats.count > 0 && stats.totalQuestions > 0) { // Sadece en az bir sınavda olan dersleri kontrol et
+        if (stats.count > 0 && stats.totalQuestions > 0) {
             const avg = Math.round((stats.totalNet / stats.totalQuestions) * 100);
             if (avg > bestSubjectAvg) {
                 bestSubjectAvg = avg;
@@ -451,7 +451,7 @@ function showSuccessMessage(message) {
     }, 3000);
 }
 
-// Grafik oluşturma ve güncelleme fonksiyonu
+// Grafik oluşturma ve güncelleme fonksiyonu - GÜNCELLENDİ
 function renderCharts(examType = 'tyt') {
     const netChartCtx = document.getElementById('netChart').getContext('2d');
     const subjectChartCtx = document.getElementById('subjectChart').getContext('2d');
@@ -467,7 +467,7 @@ function renderCharts(examType = 'tyt') {
 
     // --- 1. Net Gelişim Grafiği (Çizgi Grafik) ---
     const sortedExams = [...filteredExams].sort((a, b) => new Date(a.date) - new Date(b.date));
-    const examLabels = sortedExams.map(e => `${e.name} (${e.date})`);
+    const examLabels = sortedExams.map(e => `${e.name.split(' ')[0]}\n${e.date}`); // Mobilde daha kısa etiketler
     const examNets = sortedExams.map(e => e.totalNet);
 
     if (netChart) netChart.destroy();
@@ -482,18 +482,38 @@ function renderCharts(examType = 'tyt') {
                 backgroundColor: 'rgba(102, 126, 234, 0.2)',
                 borderWidth: 2,
                 tension: 0.4,
-                fill: true
+                fill: true,
+                pointBackgroundColor: '#667eea',
+                pointRadius: 4,
+                pointHoverRadius: 6
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 title: {
                     display: true,
-                    text: `${examType.toUpperCase()} Toplam Net Gelişimi`,
-                    font: { size: 16 }
+                    text: `${examType.toUpperCase()} Net Gelişimi`,
+                    font: { 
+                        size: window.innerWidth < 768 ? 14 : 16
+                    }
+                },
+                legend: {
+                    labels: {
+                        boxWidth: 12,
+                        font: {
+                            size: window.innerWidth < 768 ? 12 : 14
+                        }
+                    }
                 },
                 tooltip: {
+                    bodyFont: {
+                        size: window.innerWidth < 768 ? 12 : 14
+                    },
+                    titleFont: {
+                        size: window.innerWidth < 768 ? 14 : 16
+                    },
                     callbacks: {
                         label: function(context) {
                             return `Net: ${context.raw.toFixed(2)}`;
@@ -506,13 +526,31 @@ function renderCharts(examType = 'tyt') {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Net Sayısı'
+                        text: 'Net Sayısı',
+                        font: {
+                            size: window.innerWidth < 768 ? 12 : 14
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: window.innerWidth < 768 ? 10 : 12
+                        }
                     }
                 },
                 x: {
                     title: {
                         display: true,
-                        text: 'Sınav Adı'
+                        text: 'Sınavlar',
+                        font: {
+                            size: window.innerWidth < 768 ? 12 : 14
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: window.innerWidth < 768 ? 10 : 12
+                        },
+                        maxRotation: 45,
+                        minRotation: 45
                     }
                 }
             }
@@ -550,11 +588,25 @@ function renderCharts(examType = 'tyt') {
         const stats = subjectStats[subjectName];
         if (stats.totalQuestionCount > 0) {
             const avgScore = (stats.totalNet / stats.totalQuestionCount) * 100;
-            subjectLabels.push(subjectName);
+            // Mobilde daha kısa ders adları
+            const shortName = window.innerWidth < 768 ? 
+                subjectName.replace('Türk Dili ve Edebiyatı', 'TDE')
+                          .replace('Matematik', 'Mat')
+                          .replace('Felsefe Grubu', 'Felsefe')
+                          .replace('Din Kültürü', 'Din')
+                          .replace('Coğrafya', 'Coğ') :
+                subjectName;
+            subjectLabels.push(shortName);
             subjectScores.push(Math.max(0, avgScore));
         } else if (stats.totalExamCount > 0) {
-             // Soru sayısı sıfır olan durumlar için, en azından boş bir değer ekle
-             subjectLabels.push(subjectName);
+             const shortName = window.innerWidth < 768 ? 
+                subjectName.replace('Türk Dili ve Edebiyatı', 'TDE')
+                          .replace('Matematik', 'Mat')
+                          .replace('Felsefe Grubu', 'Felsefe')
+                          .replace('Din Kültürü', 'Din')
+                          .replace('Coğrafya', 'Coğ') :
+                subjectName;
+             subjectLabels.push(shortName);
              subjectScores.push(0);
         }
     });
@@ -565,7 +617,7 @@ function renderCharts(examType = 'tyt') {
         data: {
             labels: subjectLabels,
             datasets: [{
-                label: 'Ortalama Başarı Yüzdesi (%)',
+                label: 'Ortalama Başarı (%)',
                 data: subjectScores,
                 backgroundColor: '#38a169',
                 borderColor: '#2f855a',
@@ -574,13 +626,31 @@ function renderCharts(examType = 'tyt') {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: window.innerWidth < 768 ? 'y' : 'x', // Mobilde yatay çubuklar
             plugins: {
                 title: {
                     display: true,
-                    text: `${examType.toUpperCase()} Derslere Göre Ortalama Başarı`,
-                    font: { size: 16 }
+                    text: `${examType.toUpperCase()} Ders Başarıları`,
+                    font: { 
+                        size: window.innerWidth < 768 ? 14 : 16
+                    }
+                },
+                legend: {
+                    labels: {
+                        boxWidth: 12,
+                        font: {
+                            size: window.innerWidth < 768 ? 12 : 14
+                        }
+                    }
                 },
                 tooltip: {
+                    bodyFont: {
+                        size: window.innerWidth < 768 ? 12 : 14
+                    },
+                    titleFont: {
+                        size: window.innerWidth < 768 ? 14 : 16
+                    },
                     callbacks: {
                         label: function(context) {
                             return `Başarı: %${context.raw.toFixed(1)}`;
@@ -589,12 +659,28 @@ function renderCharts(examType = 'tyt') {
                 }
             },
             scales: {
-                y: {
+                x: {
                     beginAtZero: true,
                     max: 100,
                     title: {
                         display: true,
-                        text: 'Başarı Yüzdesi (%)'
+                        text: 'Başarı (%)',
+                        font: {
+                            size: window.innerWidth < 768 ? 12 : 14
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: window.innerWidth < 768 ? 10 : 12
+                        }
+                    }
+                },
+                y: {
+                    ticks: {
+                        font: {
+                            size: window.innerWidth < 768 ? 10 : 12
+                        },
+                        autoSkip: false
                     }
                 }
             }

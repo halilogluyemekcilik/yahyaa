@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="TYT ve AYT sınav sonuçlarınızı takip edin ve analiz edin. Mobil uygulama gibi çalışır.">
     <meta name="keywords" content="tyt, ayt, sınav, takip, sonuç, analiz, puan, net, gelişim">
     <meta name="author" content="Sınav Takip Sistemi">
@@ -157,9 +157,8 @@
     <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            // ✅ DOĞRU SERVICE WORKER KAYDI
             navigator.serviceWorker.register('./sw.js', { 
-                scope: './' // Sadece bu klasör için
+                scope: './'
             })
             .then(registration => {
                 console.log('Tyt Takip SW kaydı başarılı. Kapsam:', registration.scope);
@@ -170,7 +169,6 @@
         });
     }
 
-    // PWA Kurulum Prompt
     let deferredPrompt;
     const pwaInstallPrompt = document.getElementById('pwaInstallPrompt');
     const pwaInstallBtn = document.getElementById('pwaInstallBtn');
@@ -208,7 +206,6 @@
         });
     }
 
-    // PWA kurulumu tamamlandığında
     window.addEventListener('appinstalled', (evt) => {
         console.log('🎉 Tyt PWA başarıyla kuruldu!');
         if (pwaInstallPrompt) pwaInstallPrompt.style.display = 'none';
