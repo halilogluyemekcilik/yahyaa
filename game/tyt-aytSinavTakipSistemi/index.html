@@ -155,43 +155,64 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(registration => {
-                        console.log('Service Worker başarıyla kaydedildi:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Service Worker kaydı başarısız:', error);
-                    });
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            // ✅ DOĞRU SERVICE WORKER KAYDI
+            navigator.serviceWorker.register('./sw.js', { 
+                scope: './' // Sadece bu klasör için
+            })
+            .then(registration => {
+                console.log('tytAyt Takip SW kaydı başarılı. Kapsam:', registration.scope);
+            })
+            .catch(error => {
+                console.error('tytAyt Takip SW kaydı başarısız:', error);
             });
-        }
+        });
+    }
 
-        let deferredPrompt;
-        const pwaInstallPrompt = document.getElementById('pwaInstallPrompt');
-        const pwaInstallBtn = document.getElementById('pwaInstallBtn');
-        const pwaDismissBtn = document.getElementById('pwaDismissBtn');
+    // PWA Kurulum Prompt
+    let deferredPrompt;
+    const pwaInstallPrompt = document.getElementById('pwaInstallPrompt');
+    const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+    const pwaDismissBtn = document.getElementById('pwaDismissBtn');
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('🎯 tytAyt PWA install prompt tetiklendi!');
+        e.preventDefault();
+        deferredPrompt = e;
+        if (pwaInstallPrompt) {
             pwaInstallPrompt.style.display = 'block';
-        });
+        }
+    });
 
+    if (pwaInstallBtn) {
         pwaInstallBtn.addEventListener('click', () => {
-            pwaInstallPrompt.style.display = 'none';
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('Kullanıcı PWA kurulumunu kabul etti');
-                }
-                deferredPrompt = null;
-            });
+            if (pwaInstallPrompt) pwaInstallPrompt.style.display = 'none';
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('✅ tytAyt PWA kurulumu kabul edildi');
+                    } else {
+                        console.log('❌ tytAyt PWA kurulumu reddedildi');
+                    }
+                    deferredPrompt = null;
+                });
+            }
         });
+    }
 
+    if (pwaDismissBtn) {
         pwaDismissBtn.addEventListener('click', () => {
-            pwaInstallPrompt.style.display = 'none';
+            if (pwaInstallPrompt) pwaInstallPrompt.style.display = 'none';
         });
-    </script>
+    }
+
+    // PWA kurulumu tamamlandığında
+    window.addEventListener('appinstalled', (evt) => {
+        console.log('🎉 tytAyt PWA başarıyla kuruldu!');
+        if (pwaInstallPrompt) pwaInstallPrompt.style.display = 'none';
+    });
+</script>
 </body>
 </html>
