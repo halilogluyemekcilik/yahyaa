@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yahya-haliloglu-v1';
+const CACHE_NAME = 'yahya-haliloglu-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -14,7 +14,7 @@ self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(function(cache) {
-        console.log('Cache açıldı');
+        console.log('Ana uygulama cache açıldı');
         return cache.addAll(urlsToCache);
       })
   );
@@ -27,11 +27,20 @@ self.addEventListener('fetch', function(event) {
     return; // Bu istekleri atla, kendi SW'si halletsin
   }
   
-  // *** PWA KURULUM İSTEKLERİNİ DIŞLA ***
-  if (event.request.url.includes('manifest.json') && 
-      event.request.url.includes('/game/hmgsSinavTakipSistemi/')) {
-    return; // Hukuk uygulamasının manifest'ini ana SW karışmasın
+  // *** TYT UYGULAMASINI TAMAMEN DIŞLA ***
+  if (event.request.url.includes('/game/tyt-aytSinavTakipSistemi/')) {
+    return; // Bu istekleri atla, kendi SW'si halletsin
   }
+  
+// *** ALT UYGULAMALARIN MANIFEST VE KAYNAKLARINI DIŞLA ***
+const excludedPaths = [
+  '/game/hmgsSinavTakipSistemi/',
+  '/game/tyt-aytSinavTakipSistemi/'
+];
+
+if (excludedPaths.some(path => event.request.url.includes(path))) {
+  return;
+}
 
   event.respondWith(
     caches.match(event.request)
@@ -70,8 +79,10 @@ self.addEventListener('activate', function(event) {
     caches.keys().then(function(cacheNames) {
       return Promise.all(
         cacheNames.map(function(cacheName) {
-          // Hukuk uygulamasının cache'ini silme!
-          if (cacheName !== CACHE_NAME && !cacheName.includes('hukuk-takip')) {
+          // Hukuk ve TYT uygulamalarının cache'lerini silme!
+          if (cacheName !== CACHE_NAME && 
+              !cacheName.includes('hukuk-takip') && 
+              !cacheName.includes('tyt-takip')) {
             console.log('Eski cache siliniyor:', cacheName);
             return caches.delete(cacheName);
           }
