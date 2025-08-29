@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ofset Yerleşim Hesaplama Mantığı</title>
+    <!-- Font Awesome (ikon için) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .explanation {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .formula {
+            background-color: #f1f8ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 16px;
+        }
+        
+        .calculation-steps {
+            margin: 20px 0;
+        }
+        
+        .step {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .comparison {
+            display: flex;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .method {
+            flex: 1;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f1f8ff;
+        }
+        
+        .method h3 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        canvas {
+            border: 1px solid #ddd;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin: 15px 0;
+        }
+        
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        /* --- Alt Buton Stilleri --- */
+        .footer-actions {
+            text-align: center;
+            margin: 10px 0 40px;
+        }
+        .navigate-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            background-color: #3498db; /* site ile uyumlu mavi */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.25);
+            transition: background-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+        }
+        .navigate-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(41, 128, 185, 0.25);
+        }
+        .navigate-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 16px rgba(41, 128, 185, 0.25);
+        }
+        .navigate-btn i {
+            font-size: 18px; /* ikon boyutu */
+        }
+        
+        @media (max-width: 768px) {
+            .comparison {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ofset Yerleşim Hesaplama Mantığı</h1>
+        
+        <div class="explanation">
+            <h2>Ofset (Damalı) Yerleşim Nedir?</h2>
+            <p>Ofset yerleşimde, silindirler düzgün sıralar halinde değil, bir sırada diğer sıraların boşluklarına denk gelecek şekilde kaydırılarak yerleştirilir. Bu yöntemde, sıralar arasındaki boşluklar daha verimli kullanılarak daha fazla silindir sığdırılabilir.</p>
+        </div>
+        
+        <div class="comparison">
+            <div class="method">
+                <h3>Düz Yerleşim</h3>
+                <p>Silindirler düzgün sıralar halinde, her sıra aynı hizada yerleştirilir.</p>
+                <div class="canvas-container">
+                    <canvas id="simpleCanvas" width="250" height="150"></canvas>
+                    <p>Düz yerleşimde 12 silindir</p>
+                </div>
+            </div>
+            
+            <div class="method">
+                <h3>Ofset Yerleşim</h3>
+                <p>Her diğer sıra, bir önceki sıranın boşluklarına denk gelecek şekilde kaydırılır.</p>
+                <div class="canvas-container">
+                    <canvas id="offsetCanvas" width="250" height="150"></canvas>
+                    <p>Ofset yerleşimde 14 silindir</p>
+                </div>
+            </div>
+        </div>
+        
+        <h2>Ofset Yerleşim Hesaplama Formülleri</h2>
+        
+        <div class="formula">
+            X yönündeki sıra sayısı = floor(Genişlik / Çap)
+        </div>
+        
+        <div class="formula">
+            Y yönündeki sıra sayısı = floor(Yükseklik / (Çap × √3 / 2)) + 1
+        </div>
+        
+        <div class="formula">
+            Toplam silindir sayısı = (X sıra sayısı × Y sıra sayısı) - düzeltme
+        </div>
+        
+        <div class="calculation-steps">
+            <h3>Hesaplama Adımları</h3>
+            
+            <div class="step">
+                <h4>1. Adım: X Yönünde Hesaplama</h4>
+                <p>X ekseninde (genişlik) kaç sıra sığacağını hesaplıyoruz:</p>
+                <p class="formula">X_sayısı = floor(KüpGenişliği / SilindirÇapı)</p>
+            </div>
+            
+            <div class="step">
+                <h4>2. Adım: Y Yönünde Hesaplama</h4>
+                <p>Y ekseninde (yükseklik) kaç sıra sığacağını hesaplıyoruz. Ofset yerleşimde sıralar arası dikey mesafe çapın √3/2 katıdır:</p>
+                <p class="formula">Y_sayısı = floor(KüpYüksekliği / (SilindirÇapı × √3 / 2)) + 1</p>
+            </div>
+            
+            <div class="step">
+                <h4>3. Adım: Toplam Silindir Sayısı</h4>
+                <p>Toplam silindir sayısını hesaplıyoruz. Çift sıralarda tam sıra sayısı kadar, tek sıralarda ise bir eksik silindir olabilir:</p>
+                <p class="formula">Toplam = (X_sayısı × Y_sayısı) - floor(Y_sayısı / 2)</p>
+            </div>
+        </div>
+        
+        <div class="note">
+            <p><strong>Not:</strong> Ofset yerleşimde, Y yönündeki sıra sayısını hesaplarken √3/2 (yaklaşık 0.866) çarpanını kullanıyoruz çünkü silindirler birbirine daha yakın yerleştirilebilir. Bu, eşkenar üçgenin yüksekliğinden kaynaklanır.</p>
+        </div>
+        
+        <h2>Örnek Hesaplama</h2>
+        
+        <div class="formula">
+            Küp: 10×10 birim<br>
+            Silindir çapı: 2 birim<br>
+            Düz yerleşim: floor(10/2) × floor(10/2) = 5 × 5 = 25 silindir<br>
+            Ofset yerleşim: X = floor(10/2) = 5 sıra<br>
+            Y = floor(10 / (2 × 0.866)) + 1 = floor(10 / 1.732) + 1 = floor(5.77) + 1 = 5 + 1 = 6 sıra<br>
+            Toplam = (5 × 6) - floor(6/2) = 30 - 3 = 27 silindir
+        </div>
+        
+        <div class="canvas-container">
+            <canvas id="exampleCanvas" width="300" height="300"></canvas>
+            <p>Örnek: 10×10 birim küpte 2 birim çapında silindirler</p>
+        </div>
+    </div>
+
+    <!-- Alt buton -->
+    <div class="footer-actions">
+        <button class="navigate-btn" onclick="window.location.href='pilHesaplama.html'">
+            <i class="fa-solid fa-carrot"></i> Pil Hesaplama Sayfasına Git
+        </button>
+    </div>
+
+    <script>
+        // Düz yerleşim çizimi
+        function drawSimplePlacement() {
+            const canvas = document.getElementById('simpleCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(52, 152, 219, 0.7)';
+            ctx.strokeStyle = 'rgba(41, 128, 185, 0.9)';
+            ctx.lineWidth = 1;
+            const radius = 10;
+            const spacing = radius * 2;
+            for (let y = 0; y < 3; y++) {
+                for (let x = 0; x < 4; x++) {
+                    const xPos = 30 + x * spacing;
+                    const yPos = 30 + y * spacing;
+                    ctx.beginPath();
+                    ctx.arc(xPos, yPos, radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+            }
+        }
+        
+        // Ofset yerleşim çizimi
+        function drawOffsetPlacement() {
+            const canvas = document.getElementById('offsetCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(52, 152, 219, 0.7)';
+            ctx.strokeStyle = 'rgba(41, 128, 185, 0.9)';
+            ctx.lineWidth = 1;
+            const radius = 10;
+            const spacingX = radius * 2;
+            const spacingY = radius * Math.sqrt(3);
+            for (let y = 0; y < 4; y++) {
+                const offset = y % 2 === 0 ? 0 : radius;
+                for (let x = 0; x < 4; x++) {
+                    const xPos = 30 + offset + x * spacingX;
+                    const yPos = 20 + y * spacingY;
+                    if (xPos - radius > 0 && xPos + radius < canvas.width && 
+                        yPos - radius > 0 && yPos + radius < canvas.height) {
+                        ctx.beginPath();
+                        ctx.arc(xPos, yPos, radius, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+        
+        // Örnek çizim
+        function drawExample() {
+            const canvas = document.getElementById('exampleCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(50, 50, 200, 200);
+            // Düz yerleşim (kırmızı)
+            ctx.fillStyle = 'rgba(231, 76, 60, 0.3)';
+            ctx.strokeStyle = 'rgba(192, 57, 43, 0.5)';
+            ctx.lineWidth = 1;
+            const radius = 20;
+            const spacing = radius * 2;
+            for (let y = 0; y < 5; y++) {
+                for (let x = 0; x < 5; x++) {
+                    const xPos = 50 + radius + x * spacing;
+                    const yPos = 50 + radius + y * spacing;
+                    ctx.beginPath();
+                    ctx.arc(xPos, yPos, radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+            }
+            // Ofset yerleşim (mavi)
+            ctx.fillStyle = 'rgba(52, 152, 219, 0.5)';
+            ctx.strokeStyle = 'rgba(41, 128, 185, 0.8)';
+            const spacingY = radius * Math.sqrt(3);
+            for (let y = 0; y < 6; y++) {
+                const offset = y % 2 === 0 ? 0 : radius;
+                for (let x = 0; x < 5; x++) {
+                    const xPos = 50 + offset + radius + x * spacing;
+                    const yPos = 50 + radius + y * spacingY;
+                    ctx.beginPath();
+                    ctx.arc(xPos, yPos, radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+            }
+            // Açıklamalar
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.fillText('Kırmızı: Düz yerleşim (25 silindir)', 70, 280);
+            ctx.fillText('Mavi: Ofset yerleşim (27 silindir)', 70, 300);
+        }
+        
+        // Sayfa yüklendiğinde çizimleri yap
+        window.onload = function() {
+            drawSimplePlacement();
+            drawOffsetPlacement();
+            drawExample();
+        };
+    </script>
+</body>
+</html>

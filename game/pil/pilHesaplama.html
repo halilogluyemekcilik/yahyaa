@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Küpe Sığacak Silindir Hesaplama (Gelişmiş)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .result h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .result p {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .highlight {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        
+        .dimension {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        
+        .dimension > div {
+            flex: 1;
+        }
+        
+        .method-comparison {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 20px;
+        }
+        
+        .method {
+            flex: 1;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f1f8ff;
+        }
+        
+        .best-method {
+            border: 2px solid #27ae60;
+            background-color: #e8f6ef;
+        }
+        
+        .method-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .visualization {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        canvas {
+            border: 1px solid #ddd;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .calculation-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        
+        @media (max-width: 768px) {
+            .dimension, .method-comparison, .canvas-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Küpe Sığacak Silindir Hesaplama (Gelişmiş)</h1>
+        
+        <div class="input-group">
+            <label for="cylinderDiameter">Silindir Çapı (birim):</label>
+            <input type="number" id="cylinderDiameter" min="0.01" step="0.01" required>
+        </div>
+        
+        <div class="input-group">
+            <label for="cylinderLength">Silindir Uzunluğu (birim):</label>
+            <input type="number" id="cylinderLength" min="0.01" step="0.01" required>
+        </div>
+        
+        <div class="dimension">
+            <div class="input-group">
+                <label for="cubeWidth">Küp Genişliği (birim):</label>
+                <input type="number" id="cubeWidth" min="0.01" step="0.01" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="cubeHeight">Küp Yüksekliği (birim):</label>
+                <input type="number" id="cubeHeight" min="0.01" step="0.01" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="cubeLength">Küp Uzunluğu (birim):</label>
+                <input type="number" id="cubeLength" min="0.01" step="0.01" required>
+            </div>
+        </div>
+        
+        <button id="calculateBtn">Hesapla</button>
+        
+        <div id="result" class="result">
+            <h2>Hesaplama Sonuçları</h2>
+            
+            <div class="method-comparison">
+                <div id="simpleMethod" class="method">
+                    <div class="method-title">Düz Yerleşim</div>
+                    <p>Toplam: <span id="simpleTotal" class="highlight">0</span> silindir</p>
+                    <p>X (genişlik): <span id="simpleX" class="highlight">0</span></p>
+                    <p>Y (yükseklik): <span id="simpleY" class="highlight">0</span></p>
+                    <p>Z (derinlik): <span id="simpleZ" class="highlight">0</span></p>
+                </div>
+                
+                <div id="offsetMethod" class="method">
+                    <div class="method-title">Ofset Yerleşim</div>
+                    <p>Toplam: <span id="offsetTotal" class="highlight">0</span> silindir</p>
+                    <p>X (genişlik): <span id="offsetX" class="highlight">0</span></p>
+                    <p>Y (yükseklik): <span id="offsetY" class="highlight">0</span></p>
+                    <p>Z (derinlik): <span id="offsetZ" class="highlight">0</span></p>
+                </div>
+            </div>
+            
+            <div id="bestResult">
+                <p style="margin-top: 20px; text-align: center; font-weight: bold;">
+                    Önerilen yerleşim: <span id="bestMethod" class="highlight">Düz yerleşim</span> ile 
+                    <span id="bestTotal" class="highlight">0</span> silindir
+                </p>
+            </div>
+            
+            <div class="calculation-info">
+                <p><strong>Hesaplama Detayları:</strong></p>
+                <p>Düz yerleşim: X = floor(Genişlik/Çap), Y = floor(Yükseklik/Çap), Z = floor(Uzunluk/SilindirUzunluğu)</p>
+                <p>Ofset yerleşim: X = floor(Genişlik/Çap), Y = floor((Yükseklik - Çap/2) / (Çap × √3/2)) + 1, Z = floor(Uzunluk/SilindirUzunluğu)</p>
+            </div>
+            
+            <div class="visualization">
+                <h3>Yerleşim Görünümü (X-Y Düzlemi)</h3>
+                <div class="canvas-container">
+                    <div>
+                        <div class="method-title">Düz Yerleşim</div>
+                        <canvas id="simpleCanvas" width="250" height="250"></canvas>
+                    </div>
+                    <div>
+                        <div class="method-title">Ofset Yerleşim</div>
+                        <canvas id="offsetCanvas" width="250" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            // Kullanıcı girdilerini al
+            const cylinderDiameter = parseFloat(document.getElementById('cylinderDiameter').value);
+            const cylinderLength = parseFloat(document.getElementById('cylinderLength').value);
+            const cubeWidth = parseFloat(document.getElementById('cubeWidth').value);
+            const cubeHeight = parseFloat(document.getElementById('cubeHeight').value);
+            const cubeLength = parseFloat(document.getElementById('cubeLength').value);
+            
+            // Geçerli değerler kontrolü
+            if (isNaN(cylinderDiameter) || isNaN(cylinderLength) || 
+                isNaN(cubeWidth) || isNaN(cubeHeight) || isNaN(cubeLength) ||
+                cylinderDiameter <= 0 || cylinderLength <= 0 || 
+                cubeWidth <= 0 || cubeHeight <= 0 || cubeLength <= 0) {
+                alert('Lütfen tüm alanlara 0\'dan büyük geçerli sayılar girin.');
+                return;
+            }
+            
+            // 1. Düz yerleşim hesaplaması
+            const simpleX = Math.floor(cubeWidth / cylinderDiameter);
+            const simpleY = Math.floor(cubeHeight / cylinderDiameter);
+            const simpleZ = Math.floor(cubeLength / cylinderLength);
+            const simpleTotal = simpleX * simpleY * simpleZ;
+            
+            // 2. Ofset (damalı) yerleşim hesaplaması
+            // X yönünde düz yerleşim
+            const offsetX = Math.floor(cubeWidth / cylinderDiameter);
+            
+            // Y yönünde ofset yerleşim
+            // Ofset yerleşimde dikey mesafe: çap × √3/2
+            const verticalSpacing = cylinderDiameter * Math.sqrt(3) / 2;
+            
+            // İlk sıra için yer var mı?
+            let offsetY;
+            if (cubeHeight >= cylinderDiameter) {
+                offsetY = 1; // İlk sıra
+                // Kalan yükseklikten kaç sıra daha sığar?
+                const remainingHeight = cubeHeight - cylinderDiameter;
+                if (remainingHeight >= verticalSpacing) {
+                    offsetY += Math.floor(remainingHeight / verticalSpacing);
+                }
+            } else {
+                offsetY = 0;
+            }
+            
+            // Z yönü düz olarak kalıyor
+            const offsetZ = Math.floor(cubeLength / cylinderLength);
+            
+            // Toplam silindir sayısı
+            let offsetTotal = 0;
+            for (let y = 0; y < offsetY; y++) {
+                // Çift sıralarda tam sayıda, tek sıralarda (ofset) bir eksik silindir olabilir
+                if (y % 2 === 0) {
+                    offsetTotal += offsetX;
+                } else {
+                    // Ofset sıralarda genişlikten bir silindir çapı çıkarıyoruz
+                    if (cubeWidth >= cylinderDiameter * (offsetX - 1) + cylinderDiameter/2) {
+                        offsetTotal += offsetX;
+                    } else {
+                        offsetTotal += offsetX - 1;
+                    }
+                }
+            }
+            offsetTotal *= offsetZ;
+            
+            // Sonuçları göster
+            document.getElementById('simpleX').textContent = simpleX;
+            document.getElementById('simpleY').textContent = simpleY;
+            document.getElementById('simpleZ').textContent = simpleZ;
+            document.getElementById('simpleTotal').textContent = simpleTotal;
+            
+            document.getElementById('offsetX').textContent = offsetX;
+            document.getElementById('offsetY').textContent = offsetY;
+            document.getElementById('offsetZ').textContent = offsetZ;
+            document.getElementById('offsetTotal').textContent = offsetTotal;
+            
+            // Hangi yöntemin daha iyi olduğunu belirle
+            const simpleMethod = document.getElementById('simpleMethod');
+            const offsetMethod = document.getElementById('offsetMethod');
+            
+            simpleMethod.classList.remove('best-method');
+            offsetMethod.classList.remove('best-method');
+            
+            if (simpleTotal >= offsetTotal) {
+                simpleMethod.classList.add('best-method');
+                document.getElementById('bestMethod').textContent = 'düz yerleşim';
+                document.getElementById('bestTotal').textContent = simpleTotal;
+            } else {
+                offsetMethod.classList.add('best-method');
+                document.getElementById('bestMethod').textContent = 'ofset yerleşim';
+                document.getElementById('bestTotal').textContent = offsetTotal;
+            }
+            
+            // Görselleştirmeyi çiz
+            drawPlacement('simpleCanvas', simpleX, simpleY, cylinderDiameter, cubeWidth, cubeHeight, false);
+            drawPlacement('offsetCanvas', offsetX, offsetY, cylinderDiameter, cubeWidth, cubeHeight, true);
+            
+            // Sonuç bölümünü görünür yap
+            document.getElementById('result').style.display = 'block';
+        });
+        
+        function drawPlacement(canvasId, cols, rows, diameter, width, height, isOffset) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Canvas'ı temizle
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Küp sınırlarını çiz
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
+            
+            // Ölçek faktörünü hesapla
+            const scaleX = (canvas.width - 20) / width;
+            const scaleY = (canvas.height - 20) / height;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // Silindir yarıçapı (ölçekli)
+            const radius = (diameter / 2) * scale;
+            
+            // X ve Y offset'leri hesapla
+            const offsetX = (canvas.width - width * scale) / 2;
+            const offsetY = (canvas.height - height * scale) / 2;
+            
+            // Silindirleri çiz
+            ctx.fillStyle = 'rgba(52, 152, 219, 0.7)';
+            ctx.strokeStyle = 'rgba(41, 128, 185, 0.9)';
+            ctx.lineWidth = 1;
+            
+            if (isOffset) {
+                // Ofset yerleşim
+                const verticalSpacing = diameter * Math.sqrt(3) / 2 * scale;
+                
+                for (let y = 0; y < rows; y++) {
+                    const rowOffset = y % 2 === 1 ? radius : 0;
+                    const circlesInRow = y % 2 === 1 && (width - diameter/2) < (cols * diameter) ? cols - 1 : cols;
+                    
+                    for (let x = 0; x < circlesInRow; x++) {
+                        const xPos = offsetX + rowOffset + radius + (x * diameter * scale);
+                        const yPos = offsetY + radius + (y * verticalSpacing);
+                        
+                        // Sadece görünür alandaki silindirleri çiz
+                        if (xPos - radius > 0 && xPos + radius < canvas.width && 
+                            yPos - radius > 0 && yPos + radius < canvas.height) {
+                            ctx.beginPath();
+                            ctx.arc(xPos, yPos, radius, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.stroke();
+                        }
+                    }
+                }
+            } else {
+                // Düz yerleşim
+                for (let y = 0; y < rows; y++) {
+                    for (let x = 0; x < cols; x++) {
+                        const xPos = offsetX + radius + (x * diameter * scale);
+                        const yPos = offsetY + radius + (y * diameter * scale);
+                        
+                        // Sadece görünür alandaki silindirleri çiz
+                        if (xPos - radius > 0 && xPos + radius < canvas.width && 
+                            yPos - radius > 0 && yPos + radius < canvas.height) {
+                            ctx.beginPath();
+                            ctx.arc(xPos, yPos, radius, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
