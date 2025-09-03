@@ -116,7 +116,11 @@
       <button id="startBtn" class="start-btn">Başla</button>
       <button id="demoBtn" class="btn">Hemen Demo</button>
       <button id="fsBtn" class="btn">Tam Ekran</button>
-      <div class="muted" style="margin-left:12px;">Her oyuncunun tuş kutusuna tıklayıp bir tuşa basın. Mobilde alttaki dokunmatik tuşları kullanabilirsiniz.</div>
+      <div class="muted" style="margin-left:12px; font-weight:bold; color:#ffb;">
+  Oyuna başlamadan önce her oyuncunun kendine özel bir tuş seçmesi zorunludur. 
+  Tuş seçmeden oyuna başlanamaz. 
+  Mobilde alttaki dokunmatik tuşları kullanabilirsiniz.
+</div>
     </div>
   </div>
 
@@ -176,6 +180,13 @@
 /////////////////////
 const clamp = (a,b,v) => Math.max(a, Math.min(b, v));
 function easeInOutQuad(x){ return x < 0.5 ? 2*x*x : 1 - Math.pow(-2*x+2,2)/2; }
+function normalizeKey(k){
+  if(!k) return '';
+  // tarayıcılar farklı isimler gönderebilir -> normalize et
+  if(k === ' ' || k === 'Spacebar' || k === 'Space') return ' ';
+  // Tek karakterse (harf vs) küçük harfe çevir (karşılaştırma küçük harf ile yapılacak)
+  return k.length === 1 ? k.toLowerCase() : k;
+}
 function setPos(objOrEl, x, y){
   // objOrEl: ya rObj ya da DOM el'i olabilir
   if(typeof objOrEl === 'object' && objOrEl.el){
@@ -285,14 +296,21 @@ function createPlayerSetup(n){
       kb.addEventListener('click', ()=>{
         kb.textContent = 'Bas...'; st.textContent = 'Tuş bekleniyor';
         ensureAudio(); if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-        const handler = (ev)=>{
-          ev.preventDefault();
-          let k = ev.key; if(k===' '||k==='Spacebar') k=' ';
-          players.find(p=>p.id===pid).key = k;
-          kb.textContent = keyLabel(k); st.textContent = 'Hazır';
-          window.removeEventListener('keydown', handler);
-        };
-        window.addEventListener('keydown', handler);
+        const handler = (ev) => {
+  ev.preventDefault();
+  let k = normalizeKey(ev.key);
+  // atamayı normalize edilmiş değer olarak sakla
+  const pl = players.find(p => p.id === pid);
+  if(pl){
+    pl.key = k;
+  }
+  // görsel gösterim (keyLabel büyük harf gösterir)
+  kb.textContent = keyLabel(k);
+  st.textContent = 'Hazır';
+  window.removeEventListener('keydown', handler);
+};
+window.addEventListener('keydown', handler);
+
       });
     })(id);
   }
@@ -301,11 +319,23 @@ playerCountSel.addEventListener('change', ()=> createPlayerSetup(parseInt(player
 defaultsBtn.addEventListener('click', ()=>{
   createPlayerSetup(parseInt(playerCountSel.value));
   for(let i=0;i<players.length;i++){
-    players[i].key = i < defaultKeys.length ? defaultKeys[i] : '';
+    // normalize etmeden saklama
+    const assigned = i < defaultKeys.length ? defaultKeys[i] : '';
+    players[i].key = normalizeKey(assigned);
     const kb = document.getElementById(`keybox-${players[i].id}`);
-    if(kb) kb.textContent = players[i].key ? keyLabel(players[i].key) : '—';
+    const st = document.getElementById(`status-${players[i].id}`);
+    if(players[i].key){
+      if(kb) kb.textContent = keyLabel(players[i].key);
+      if(st) st.textContent = 'Hazır';
+    } else {
+      if(kb) kb.textContent = '—';
+      if(st) st.textContent = 'Tuş bekleniyor';
+    }
   }
+  // Debug (geçici): konsolda atamaları görmek isterseniz açın
+  // console.log('defaults assigned:', players.map(p=>p.key));
 });
+
 
 /////////////////////
 // HUD & Tap bar   //
@@ -386,10 +416,13 @@ startBtn.addEventListener('click', ()=>{
   ensureAudio(); if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
   const n = players.length;
   if(n < 2) { alert('En az 2 oyuncu seçin.'); return; }
-  const assigned = players.map(p=>p.key);
-  if(assigned.filter(k=>k).length < players.length){
-    if(!confirm('Bazı oyuncuların tuşu atanmadı. Mobilde alttaki dokunmatik düğmeleri kullanabilirsiniz. Devam edilsin mi?')) return;
-  }
+const assigned = players.map(p=>p.key);
+
+// Eğer masaüstündeysek ve bazı oyuncuların tuşu yoksa hata ver
+if (!isSmall() && assigned.filter(k=>k).length < players.length) {
+    alert('Her oyuncu için mutlaka bir tuş seçilmelidir.');
+    return;
+}
   survivors = players.map(p => ({...p, roundCount:0, points:p.points||0, active:true}));
   startGame();
 });
@@ -662,7 +695,11 @@ function spawnRabbit(color, minD, maxD, meta, motionType){
           const tt = Math.min(1, (now2 - revStart)/revDur);
           const a = curAngle + (endAngle - curAngle) * easeInOutQuad(tt);
           const rr = r + 12 * tt;
-          const xx = cx + Math.cos(a)*rr;
+          const xx = cx + Math.cos(a)*rr;const assigned = players.map(p=>p.key);
+if(assigned.filter(k=>k).length < players.length){
+    alert('Her oyuncu için mutlaka bir tuş seçilmelidir.');
+    return;
+}
           const yy = cy + Math.sin(a)*rr;
           setPos(rObj, xx - 32, yy - 32);
           if(tt < 1) requestAnimationFrame(rev);
@@ -715,9 +752,11 @@ function removeRabbitById(id){
 //////////////////////
 window.addEventListener('keydown', (ev)=>{
   if(!roundActive) return;
-  let key = ev.key; if(key===' '||key==='Spacebar') key=' ';
+  const key = normalizeKey(ev.key);
   ensureAudio(); if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-  const player = survivors.find(p=> p.key && p.key === key && p.active);
+  // Debug (geçici): konsolda görebilirsiniz
+  // console.log('pressed=', key, 'survivorsKeys=', survivors.map(s=>s.key));
+  const player = survivors.find(p => p.key && p.key === key && p.active);
   if(!player) return;
   playerCountForPlayer(player.id);
 });
@@ -754,18 +793,12 @@ function getPlayerIdFromX(x){
 
 function playerCountForPlayer(pid){
   if(!roundActive) return;
-  // oyuncunun her sayımı, beyaz tavşanlardan sayılır (kesişim yok)
-  for(const r of visibleRabbits){
-    if(r.color === 'white' && !r.countedBy.has(pid)){
-      r.countedBy.add(pid);
-      const p = survivors.find(s=>s.id === pid);
-      if(p) p.roundCount = (p.roundCount||0) + 1;
-      playCount(); flashPlayer(pid);
-      return;
-    }
-  }
-  // eğer uygun beyaz yoksa hata sesi
-  playFail();
+  const p = survivors.find(s=>s.id === pid);
+  if(!p) return;
+  // Her basışta sadece sayacı arttır
+  p.roundCount = (p.roundCount||0) + 1;
+  playCount(); 
+  flashPlayer(pid);
 }
 
 function flashPlayer(pid){
@@ -851,8 +884,8 @@ function endGame(){
 //////////////////////
 playerCountSel.addEventListener('change', ()=> createPlayerSetup(parseInt(playerCountSel.value)));
 createPlayerSetup(parseInt(playerCountSel.value));
-defaultsBtn.click();
 
+defaultsBtn.click();
 window.addEventListener('resize', ()=> { if(roundActive) computeTouchRegions(); });
 
 function showMessage(txt, hint=false){
