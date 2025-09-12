@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Uygulaması</title>
+    <meta name="theme-color" content="#005CB9">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="img/Barikatlogo.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #003764 0%, #005CB9 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .screen {
+            text-align: center;
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #A1A8AD;
+        }
+
+        .logo {
+            display: block;
+            margin: 0 auto 1rem auto;
+            max-width: 180px;
+            width: 50%;
+            height: auto;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
+        }
+
+        /* Ana container için relative positioning */
+        .container {
+            position: relative;
+        }
+
+        /* Ayarlar ikonu */
+        .settings-icon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .settings-icon:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .settings-icon.disabled {
+            opacity: 0.35;
+            pointer-events: none;
+            filter: grayscale(40%);
+        }
+
+        /* Popup overlay */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .popup-overlay.active {
+            display: flex;
+        }
+
+        /* Popup içeriği */
+        .popup-content {
+            background: linear-gradient(135deg, #003764 0%, #005CB9 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .popup-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .popup-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .popup-option label {
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: #4CAF50;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(30px);
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .start-btn,
+        .option-btn,
+        .next-btn,
+        .restart-btn {
+            background: linear-gradient(45deg, #005CB9, #003764);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+            box-shadow: 0 5px 15px rgba(0, 91, 185, 0.3);
+        }
+
+        /* Sonraki Soru dikkat animasyonu */
+        .next-btn.attention {
+            animation: nextPulse 0.8s ease-in-out infinite;
+            box-shadow: 0 0 0 rgba(0, 91, 185, 0.6);
+        }
+
+        @keyframes nextPulse {
+            0% {
+                transform: translateX(-50%) scale(1);
+                box-shadow: 0 0 0 0 rgba(0, 91, 185, 0.6);
+            }
+
+            50% {
+                transform: translateX(-50%) scale(1.04);
+                box-shadow: 0 0 20px 6px rgba(0, 91, 185, 0.45);
+            }
+
+            100% {
+                transform: translateX(-50%) scale(1);
+                box-shadow: 0 0 0 0 rgba(0, 91, 185, 0.6);
+            }
+        }
+
+        .start-btn:hover,
+        .next-btn:hover,
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 91, 185, 0.4);
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            margin: 0.8rem 0;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(161, 168, 173, 0.3);
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #A1A8AD;
+        }
+
+        .option-btn.correct {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            border-color: #4CAF50;
+        }
+
+        .option-btn.wrong {
+            background: linear-gradient(45deg, #f44336, #da190b);
+            border-color: #f44336;
+        }
+
+        .option-btn.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .timer {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #A1A8AD;
+            font-weight: bold;
+        }
+
+        .timer.warning {
+            color: #ff6b6b;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* Kritik süre için daha hızlı ve belirgin uyarı */
+        .timer.critical {
+            color: #ff3b3b;
+            animation: flash 0.4s steps(2, start) infinite;
+            text-shadow: 0 0 10px rgba(255, 59, 59, 0.8);
+        }
+
+        @keyframes flash {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.2;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* Süre azaldığında soru alanında hafif yanıp sönme efekti */
+        .question.low-blink {
+            animation: subtleBlink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes subtleBlink {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.85;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .progress {
+            background: rgba(255, 255, 255, 0.2);
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(45deg, #A1A8AD, #005CB9);
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        .question-container {
+            margin: 2rem 0;
+        }
+
+        .question {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: white;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            margin: 1rem 0;
+            color: #A1A8AD;
+            font-weight: bold;
+        }
+
+        .score-text {
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            color: white;
+        }
+
+        /* Son ekrandaki süper kahraman adı daha büyük ve belirgin */
+        #score-hero {
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin: 0.5rem 0 0.75rem 0;
+            color: #ffffff;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+        }
+
+        .loading {
+            font-size: 1.2rem;
+            color: #A1A8AD;
+            margin: 2rem 0;
+        }
+
+        .error {
+            color: #ff6b6b;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+        }
+
+        /* Sonraki Soru butonunu ekranın en alt ortasında konumlandır */
+        #quiz-screen {
+            position: relative;
+            min-height: 60vh;
+            padding-bottom: 4rem;
+            /* buton için alt boşluk */
+        }
+
+        #next-btn {
+            position: absolute;
+            left: 50%;
+            bottom: 1.5rem;
+            transform: translateX(-50%);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+                margin: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .option-btn {
+                font-size: 1rem;
+                padding: 0.8rem 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Global Logo (her ekranda göster) -->
+        <img src="img/Barikatlogo.png" alt="Barikat Logo" class="logo" id="global-logo">
+
+        <!-- Ayarlar İkonu -->
+        <button class="settings-icon" id="settings-button" onclick="openSettings()" title="Ayarlar"
+            style="display: none;">
+            ⚙️
+        </button>
+
+        <!-- Ana Ekran -->
+        <div class="screen active" id="home-screen">
+            <h1>Siber Güvenlik Bilgine Göre Hangi Süper Kahramansın</h1>
+            <p style="font-size: 1.2rem; margin: 2rem 0; color: #A1A8AD;">
+
+
+            </p>
+            <button class="start-btn" onclick="startQuiz()">Test Et</button>
+        </div>
+
+        <!-- Quiz Ekranı -->
+        <div class="screen" id="quiz-screen">
+            <div class="timer" id="timer">30</div>
+            <div class="progress">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+
+            <div class="question-container">
+                <div class="question" id="question">Soru yükleniyor...</div>
+                <div id="options"></div>
+            </div>
+
+            <button class="next-btn" id="next-btn" onclick="nextQuestion()" style="display: none;">
+                Sonraki Soru
+            </button>
+        </div>
+
+        <!-- Sonuç Ekranı -->
+        <div class="screen" id="result-screen">
+            <h2>🎊 Test Tamamlandı!</h2>
+
+            <!-- Puan -->
+            <div class="score-display" id="final-score">0</div>
+
+            <!-- Kahraman adı ve ikonu -->
+            <div class="score-hero" id="score-hero"></div>
+
+            <!-- Kahraman mesajı -->
+            <div class="score-text" id="score-text"></div>
+
+            <div style="margin: 2rem 0;">
+                <div>Doğru Cevaplar: <span id="correct-count">0</span>/5</div>
+                <div>Yanlış Cevaplar: <span id="wrong-count">0</span>/5</div>
+            </div>
+
+            <button class="restart-btn" onclick="restartQuiz()">Tekrar Oyna</button>
+        </div>
+
+        <!-- Yükleme Ekranı -->
+        <div class="screen" id="loading-screen">
+            <div class="loading">Sorular yükleniyor...</div>
+        </div>
+    </div>
+
+    <!-- Ayarlar Popup -->
+    <div class="popup-overlay" id="settings-popup">
+        <div class="popup-content">
+            <button class="popup-close" onclick="closeSettings()">×</button>
+            <h3 class="popup-title">⚙️ Ayarlar</h3>
+
+            <div class="popup-option">
+                <label for="fullscreen-toggle">Tam Ekran</label>
+                <div class="toggle-switch" id="fullscreen-toggle" onclick="toggleFullscreen()"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Quiz verileri ve durumu
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let timer = 30;
+        let timerInterval = null;
+        let selectedQuestions = [];
+        let postTimeUpTimeout = null;
+        let resultAutoReturnTimeout = null;
+        let nextBtnAttentionTimeout = null;
+
+        function scheduleNextBtnAttention() {
+            const nextBtn = document.getElementById('next-btn');
+            // Temizle
+            if (nextBtnAttentionTimeout) {
+                clearTimeout(nextBtnAttentionTimeout);
+                nextBtnAttentionTimeout = null;
+            }
+            nextBtn.classList.remove('attention');
+            // 10 sn sonra dikkat animasyonu
+            nextBtnAttentionTimeout = setTimeout(() => {
+                nextBtn.classList.add('attention');
+            }, 10000);
+        }
+
+        // Örnek sorular (gerçek uygulamada dosyalardan okunacak)
+        const sampleQuestions = [
+            {
+                question: "Güvenlik duvarının temel görevi nedir?",
+                options: [
+                    "Gelen ve giden ağ trafiğini kontrol etmek",
+                    "Virüs taraması yapmak",
+                    "Kullanıcı kimlik doğrulaması yapmak",
+                    "Yedekleme işlemlerini gerçekleştirmek"
+                ],
+                correct: 0
+            },
+            {
+                question: "Antivirüs yazılımı neyi engellemeyi amaçlar?",
+                options: [
+                    "Spam e-postaları",
+                    "Zararlı yazılımları",
+                    "Ağ trafiğini",
+                    "Şifre kırmayı"
+                ],
+                correct: 1
+            },
+            {
+                question: "Oltalama saldırısının amacı nedir?",
+                options: [
+                    "Fiziksel saldırı düzenlemek",
+                    "Sunucuları yeniden başlatmak",
+                    "Kullanıcıların şifrelerini veya bilgilerini kandırarak elde etmek",
+                    "Yedekleme dosyalarını silmek"
+                ],
+                correct: 2
+            },
+            {
+                question: "Sanal özel ağ (VPN) ne sağlar?",
+                options: [
+                    "Daha hızlı internet bağlantısı",
+                    "Antivirüs koruması",
+                    "Yedekleme imkanı",
+                    "Güvenli ve şifreli iletişim",
+                ],
+                correct: 3
+            },
+            {
+                question: "En yaygın kullanılan kimlik doğrulama yöntemi hangisidir?",
+                options: [
+                    "Şifre",
+                    "Parmak izi",
+                    "Akıllı kart",
+                    "Retina taraması"
+                ],
+                correct: 0
+            },
+            {
+                question: "DDOS (Distributed Denial of Service) saldırısının amacı nedir?",
+                options: [
+                    "Veritabanını şifrelemek",
+                    "Sistemi hizmet veremez hale getirmek",
+                    "Verileri yedeklemek",
+                    "Kimlik doğrulama bypass etmek"
+                ],
+                correct: 1
+            },
+            {
+                question: "“Malware” terimi neyi ifade eder?",
+                options: [
+                    "Güvenlik duvarı",
+                    "Yedekleme programı",
+                    "Zararlı yazılım",
+                    "Ağ protokolü"
+                ],
+                correct: 2
+            },
+            {
+                question: "HTTPS ile HTTP arasındaki temel fark nedir?",
+                options: [
+                    "HTTPS daha hızlıdır",
+                    "HTTP daha güvenlidir",
+                    "HTTPS yalnızca mobilde çalışır",
+                    "HTTPS şifreli iletişim sağlar"
+                ],
+                correct: 3
+            },
+            {
+                question: "“Sosyal mühendislik” saldırıları genelde neye dayanır?",
+                options: [
+                    "İnsan zaaflarına",
+                    "Teknik zafiyetlere",
+                    "Yazılım açıklarına",
+                    "Donanım hatalarına"
+                ],
+                correct: 0
+            },
+            {
+                question: "Kaba kuvvet saldırısı hangi amacı taşır?",
+                options: [
+                    "Veritabanını yedeklemek",
+                    "Şifreleri deneme-yanılma yoluyla kırmak",
+                    "Sistem kaynaklarını izlemek",
+                    "Trafiği şifrelemek"
+                ],
+                correct: 1
+            },
+            {
+                question: "Saldırı tespit sistemi ne işe yarar?",
+                options: [
+                    "Sisteme saldırı düzenler",
+                    "Veritabanı yönetir",
+                    "Saldırıları tespit eder",
+                    "Saldırıları önler"
+                ],
+                correct: 2
+            },
+            {
+                question: "Siber güvenlikte “CIA üçgeni” hangi kavramlardan oluşur?",
+                options: [
+                    "Güvenlik, iletişim, erişim",
+                    "Güvenlik, iletişim, antivirüs",
+                    "Gizlilik, bilgi, deneyim",
+                    "Gizlilik, bütünlük, erişilebilirlik"
+                ],
+                correct: 3
+            },
+            {
+                question: "Sıfırıncı gün açığı nedir?",
+                options: [
+                    "Henüz üretici tarafından kapatılmamış güvenlik açığı",
+                    "Sistem güncellemesi",
+                    "Virüs taraması",
+                    "Donanım arızası"
+                ],
+                correct: 0
+            },
+            {
+                question: "Fidye zararlı yazılım saldırısı nedir?",
+                options: [
+                    "Ağ trafiğinin hızlandırılması",
+                    "Verilerin çalınıp karşılığında maddi karşılık istenmesi",
+                    "Yedekleme yapılması",
+                    "Sistem güncellemesi"
+                ],
+                correct: 1
+            },
+            {
+                question: "Çok faktörlü kimlik doğrulama (MFA) ne sağlar?",
+                options: [
+                    "Daha kolay giriş",
+                    "İnterneti hızlandırır",
+                    "Birden fazla doğrulama yöntemiyle güvenliği artırır",
+                    "Parola yönetimini kaldırır"
+                ],
+                correct: 2
+            },
+            {
+                question: "Siber güvenlikte yama (patch) ne anlama gelir?",
+                options: [
+                    "Güvenlik güncellemesi",
+                    "Yedekleme dosyası",
+                    "Donanım yükseltmesi",
+                    "Antivirüs taraması"
+                ],
+                correct: 0
+            },
+            {
+                question: "“Ortadaki adam” saldırısı nedir?",
+                options: [
+                    "Şifre kırma denemesi yapmak",
+                    "İki sistem arasındaki iletişimi gizlice dinlemek",
+                    "Veritabanını silmek",
+                    "Antivirüs yüklemek"
+                ],
+                correct: 1
+            },
+            {
+                question: "Güvenlik bilgi ve olay yönetim sisteminin (SIEM) görevi nedir?",
+                options: [
+                    "E-postaları depolamak",
+                    "Yedekleme yapmak",
+                    "Güvenlik olaylarını toplamak ve analiz etmek",
+                    "Ağ trafiğini hızlandırmak"
+                ],
+                correct: 2
+            },
+            {
+                question: "En sık kullanılan saldırı türlerinden “SQL Injection” hangi katmanda gerçekleşir?",
+                options: [
+                    "Fiziksel katman",
+                    "Ağ katmanı",
+                    "Donanım katmanı",
+                    "Uygulama katmanı"
+                ],
+                correct: 3
+            },
+            {
+                question: "Güvenlik operasyon merkezi nedir?",
+                options: [
+                    "Güvenlik operasyonlarını izleyen ve yöneten merkez",
+                    "Yazılım geliştirme ekibi",
+                    "Veri depolama alanı",
+                    "Firewall cihazı"
+                ],
+                correct: 0
+            },
+            {
+                question: "\"Phishing\" nedir?",
+                options: [
+                    "Bir tür antivirüs yazılımı",
+                    "Sahte e-postalar veya mesajlarla kullanıcı bilgilerini çalmaya çalışma",
+                    "Counter Strike oyununda bir haritadır.",
+                    "İnternette güvenli gezinmek için kullanılan mobil uygulamadır."
+                ],
+                correct: 1
+            },
+            {
+                question: "Aşağıdakilerden hangisi Güçlü bir şifredir?",
+                options: [
+                    "Ad-Soyad birleşimi",
+                    "Doğum Tarihi",
+                    "Küçük büyük harf, rakam ve sembol kombinasyonlarından oluşan en az 10 karakter",
+                    "Çocukların veya evcil hayvanın ismi"
+
+                ],
+                correct: 3
+            },
+            {
+                question: "Aşağıdakilerden hangisi bir firewall işlevidir?",
+                options: [
+                    "Yetkisiz ağ trafiğini engellemek",
+                    "Bilgisayarda şifre girmeyi sağlamak",
+                    "Yangın söndürmek için kullanmak",
+                    "Wifi çekim kapasitesini artırmak"
+                ],
+                correct: 0
+            },
+            {
+                question: "Bir \"DDoS\" saldırısı neyi hedefler?",
+                options: [
+                    "Kullanıcı şifrelerini çalmak",
+                    "Bir sunucuyu aşırı yükleyerek hizmet dışı bırakmak",
+                    "Bilgisayar donanımını fiziksel olarak bozmak",
+                    "Kredi Kartı bilgilerini ele geçirmek"
+                ],
+                correct: 1
+            },
+            {
+                question: "Aşağıdakilerden hangisi Barikat’ın servislerinden birisidir?",
+                options: [
+                    "Bilgisayar donanımı üretmek",
+                    "Çağrı merkezi hizmeti vermek",
+                    "Ağları ve sistemleri güvenlik tehditlerine karşı korumak",
+                    "Web siteleri tasarlamak"
+                ],
+                correct: 2
+            }
+        ];
+
+        // Dosyalardan soruları yükleme fonksiyonu
+        async function loadQuestions() {
+            questions = [];
+            let successCount = 0;
+
+            for (let i = 1; i <= 25; i++) {
+                try {
+                    const response = await fetch(`sorular/soru${i}.txt`);
+                    if (response.ok) {
+                        const content = await response.text();
+                        const lines = content.trim().split('\n');
+
+                        if (lines.length >= 6) {
+                            const question = {
+                                question: lines[0],
+                                options: [lines[1], lines[2], lines[3], lines[4]],
+                                correct: parseInt(lines[5])
+                            };
+                            questions.push(question);
+                            successCount++;
+                        }
+                    }
+                } catch (error) {
+                    console.log(`soru${i}.txt okunamadı:`, error.message);
+                }
+            }
+
+            if (successCount < 5) {
+                console.log(`Sadece ${successCount} soru yüklendi. Örnek sorular kullanılıyor.`);
+                questions = [...sampleQuestions];
+                return true;
+            }
+
+            console.log(`${successCount} soru başarıyla yüklendi.`);
+            return true;
+        }
+
+        // Rastgele 5 soru seçme
+        function selectRandomQuestions() {
+            const shuffled = [...questions].sort(() => 0.5 - Math.random());
+            selectedQuestions = shuffled.slice(0, 5);
+        }
+
+        // Quiz başlatma
+        async function startQuiz() {
+            // Sonuç ekranı geri dönüş zamanlayıcısını temizle
+            if (resultAutoReturnTimeout) {
+                clearTimeout(resultAutoReturnTimeout);
+                resultAutoReturnTimeout = null;
+            }
+            showScreen('loading-screen');
+
+            const loaded = await loadQuestions();
+            if (!loaded) {
+                showError('Sorular yüklenemedi!');
+                return;
+            }
+
+            selectRandomQuestions();
+            currentQuestionIndex = 0;
+            score = 0;
+            correctAnswers = 0;
+
+            showScreen('quiz-screen');
+            displayQuestion();
+            startTimer();
+        }
+
+        // Ekran değiştirme
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // Hata gösterme
+        function showError(message) {
+            showScreen('home-screen');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            document.querySelector('#home-screen').appendChild(errorDiv);
+        }
+
+        // Soruyu gösterme
+        function displayQuestion() {
+            const question = selectedQuestions[currentQuestionIndex];
+            document.getElementById('question').textContent = question.question;
+
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = `${String.fromCharCode(65 + index)}. ${option}`;
+                button.onclick = () => selectOption(index);
+                optionsDiv.appendChild(button);
+            });
+
+            // Progress bar güncelleme
+            const progress = ((currentQuestionIndex) / 5) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('next-btn').classList.remove('attention');
+            if (nextBtnAttentionTimeout) {
+                clearTimeout(nextBtnAttentionTimeout);
+                nextBtnAttentionTimeout = null;
+            }
+            resetTimer();
+        }
+
+        // Seçenek seçme
+        function selectOption(selectedIndex) {
+            const question = selectedQuestions[currentQuestionIndex];
+            const options = document.querySelectorAll('.option-btn');
+
+            // Timer'ı durdur
+            clearInterval(timerInterval);
+
+            // Var olan otomatik geçiş zamanlayıcısını temizle
+            if (postTimeUpTimeout) {
+                clearTimeout(postTimeUpTimeout);
+                postTimeUpTimeout = null;
+            }
+
+            // Tüm seçenekleri deaktif et
+            options.forEach(option => option.classList.add('disabled'));
+
+            // Doğru ve yanlış cevapları göster
+            options.forEach((option, index) => {
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex) {
+                    option.classList.add('wrong');
+                }
+            });
+
+            // Puan hesaplama
+            if (selectedIndex === question.correct) {
+                score += 20;
+                correctAnswers++;
+            }
+
+            // Sonraki soru butonu göster
+            document.getElementById('next-btn').style.display = 'block';
+            scheduleNextBtnAttention();
+
+            // 30 saniye içinde geçilmezse otomatik olarak sonraki soruya geç
+            postTimeUpTimeout = setTimeout(() => {
+                nextQuestion();
+            }, 30000);
+        }
+
+        // Timer başlatma
+        function startTimer() {
+            timer = 30;
+            updateTimerDisplay();
+
+            timerInterval = setInterval(() => {
+                timer--;
+                updateTimerDisplay();
+
+                if (timer <= 10) {
+                    document.getElementById('timer').classList.add('warning');
+                    document.getElementById('question').classList.add('low-blink');
+                }
+
+                if (timer <= 5) {
+                    document.getElementById('timer').classList.add('critical');
+                }
+
+                if (timer <= 0) {
+                    clearInterval(timerInterval);
+                    timeUp();
+                }
+            }, 1000);
+        }
+
+        // Timer sıfırlama
+        function resetTimer() {
+            timer = 30;
+            document.getElementById('timer').classList.remove('warning');
+            document.getElementById('timer').classList.remove('critical');
+            document.getElementById('question').classList.remove('low-blink');
+            updateTimerDisplay();
+            if (postTimeUpTimeout) {
+                clearTimeout(postTimeUpTimeout);
+                postTimeUpTimeout = null;
+            }
+        }
+
+        // Timer görüntüsünü güncelleme
+        function updateTimerDisplay() {
+            document.getElementById('timer').textContent = `⏱️ ${timer}s`;
+        }
+
+        // Süre bittiğinde
+        function timeUp() {
+            const options = document.querySelectorAll('.option-btn');
+            const question = selectedQuestions[currentQuestionIndex];
+
+            // Tüm seçenekleri deaktif et
+            options.forEach(option => option.classList.add('disabled'));
+
+            // Doğru cevabı göster
+            options[question.correct].classList.add('correct');
+
+            // Sonraki soru butonu göster
+            document.getElementById('next-btn').style.display = 'block';
+            scheduleNextBtnAttention();
+
+            // Timer metnini güncelle
+            const timerDiv = document.getElementById('timer');
+            timerDiv.textContent = '⏱️ Süre bitti';
+
+            // 30 saniye sonra otomatik sonraki soruya geç
+            if (postTimeUpTimeout) {
+                clearTimeout(postTimeUpTimeout);
+            }
+            postTimeUpTimeout = setTimeout(() => {
+                nextQuestion();
+            }, 30000);
+        }
+
+        // Sonraki soruya geçme
+        function nextQuestion() {
+            // Otomatik geçiş zamanlayıcısını temizle
+            if (postTimeUpTimeout) {
+                clearTimeout(postTimeUpTimeout);
+                postTimeUpTimeout = null;
+            }
+            if (nextBtnAttentionTimeout) {
+                clearTimeout(nextBtnAttentionTimeout);
+                nextBtnAttentionTimeout = null;
+            }
+            document.getElementById('next-btn').classList.remove('attention');
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex >= 5) {
+                showResults();
+            } else {
+                displayQuestion();
+                startTimer();
+            }
+        }
+
+        function showResults() {
+            clearInterval(timerInterval);
+            showScreen('result-screen');
+
+            // Sonuç bilgileri
+            document.getElementById('final-score').textContent = score + ' Puan';
+            document.getElementById('correct-count').textContent = correctAnswers;
+            document.getElementById('wrong-count').textContent = 5 - correctAnswers;
+
+            // Kahraman ve mesaj
+            let hero = '';
+            let message = '';
+
+            if (score >= 100) {
+                hero = '🦾 Iron Man';
+                message = 'Demir bir zırh gibi korunuyorsun, teknoloji ve siber güvenlik senin işin!';
+            } else if (score >= 80) {
+                hero = '🦇 Batman';
+                message = 'Geceyi gözetleyen bir dedektif gibi gizlilik ve zekânla parlıyorsun!';
+            } else if (score >= 60) {
+                hero = '🕷️ Spider-Man';
+                message = 'Ağlarını sağlam örüyorsun, bağlantılarını çok iyi kurmuşsun!';
+            } else if (score >= 40) {
+                hero = '🦸 Superman';
+                message = 'Uçabiliyorsun ama biraz daha hız kazanabilirsin!';
+            } else if (score >= 20) {
+                hero = '⚡ Thor';
+                message = 'Şimşek gibi enerjiksin ama çekicini biraz daha ustaca kullanmalısın!';
+            } else {
+                hero = '⚡ Thor';
+                message = '💪 Bir Thor kadar güçlüsün ama biraz daha çalışmalısın!';
+            }
+
+            // HTML tarafında <span id="score-hero"></span> ve <span id="score-text"></span> olması gerekiyor
+            document.getElementById('score-hero').textContent = hero;
+            document.getElementById('score-text').textContent = message;
+
+            // 60 saniye içinde tekrar oyna tıklanmazsa ana ekrana dön
+            if (resultAutoReturnTimeout) {
+                clearTimeout(resultAutoReturnTimeout);
+            }
+            resultAutoReturnTimeout = setTimeout(() => {
+                restartQuiz();
+            }, 60000);
+        }
+
+
+        // Quiz'i yeniden başlatma
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            correctAnswers = 0;
+            clearInterval(timerInterval);
+            if (postTimeUpTimeout) {
+                clearTimeout(postTimeUpTimeout);
+                postTimeUpTimeout = null;
+            }
+            if (resultAutoReturnTimeout) {
+                clearTimeout(resultAutoReturnTimeout);
+                resultAutoReturnTimeout = null;
+            }
+            showScreen('home-screen');
+        }
+
+        // Ayarlar popup fonksiyonları
+        function openSettings() {
+            document.getElementById('settings-popup').classList.add('active');
+        }
+
+        function closeSettings() {
+            document.getElementById('settings-popup').classList.remove('active');
+        }
+
+        // Tam ekran fonksiyonları
+        function toggleFullscreen() {
+            const toggle = document.getElementById('fullscreen-toggle');
+
+            if (!document.fullscreenElement) {
+                // Tam ekrana geç
+                document.documentElement.requestFullscreen().then(() => {
+                    toggle.classList.add('active');
+                }).catch(err => {
+                    console.log('Tam ekran hatası:', err);
+                });
+            } else {
+                // Tam ekrandan çık
+                document.exitFullscreen().then(() => {
+                    toggle.classList.remove('active');
+                }).catch(err => {
+                    console.log('Tam ekran çıkış hatası:', err);
+                });
+            }
+        }
+
+        // Tam ekran durumu değişikliğini dinle
+        document.addEventListener('fullscreenchange', function () {
+            const toggle = document.getElementById('fullscreen-toggle');
+            if (document.fullscreenElement) {
+                toggle.classList.add('active');
+            } else {
+                toggle.classList.remove('active');
+            }
+        });
+
+        // Popup dışına tıklandığında kapat
+        document.getElementById('settings-popup').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeSettings();
+            }
+        });
+
+        // Ayarlar ikonu etkin/pasif
+        function applySettingsIconState(enabled) {
+            const btn = document.getElementById('settings-button');
+            if (!btn) return;
+            if (enabled) {
+                btn.classList.remove('disabled');
+            } else {
+                btn.classList.add('disabled');
+            }
+        }
+
+        // Ayarlar ikonunun görünürlüğü (göster/gizle)
+        function applySettingsIconVisibility(visible) {
+            const btn = document.getElementById('settings-button');
+            if (!btn) return;
+            btn.style.display = visible ? '' : 'none';
+        }
+
+        // Sayfa yüklendiğinde
+        window.addEventListener('load', function () {
+            // Ayarlar ikonu durumunu yükle (pasif/aktif)
+            const stored = localStorage.getItem('settingsIconEnabled');
+            const enabled = stored === null ? true : stored === 'true';
+            applySettingsIconState(enabled);
+
+            // Görünürlük durumunu yükle (logo ile toggle edilecek)
+            const visStored = localStorage.getItem('settingsIconVisible');
+            const visible = visStored === null ? false : visStored === 'true';
+            applySettingsIconVisibility(visible);
+
+            // Kısayol: S tuşu ile ayarları aç
+            document.addEventListener('keydown', function (e) {
+                if ((e.key === 's' || e.key === 'S')) {
+                    openSettings();
+                }
+            });
+
+            // Logo gizli buton: ayarlar ikonunu aktif/pasif yap
+            const logo = document.getElementById('global-logo');
+            if (logo) {
+                logo.style.cursor = 'pointer';
+                logo.addEventListener('click', function () {
+                    // Görünürlüğü toggle et
+                    const visStoredNow = localStorage.getItem('settingsIconVisible');
+                    const visibleNow = visStoredNow === null ? false : visStoredNow === 'true';
+                    const nextVisible = !visibleNow;
+                    localStorage.setItem('settingsIconVisible', String(nextVisible));
+                    applySettingsIconVisibility(nextVisible);
+                });
+            }
+
+            // Service Worker kaydı (PWA için)
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js').catch(err => {
+                    console.log('Service worker kayıt hatası:', err);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

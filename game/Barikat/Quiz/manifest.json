@@ -1,0 +1,21 @@
+{
+    "name": "Siber Güvenlik Quiz",
+    "short_name": "Quiz",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#003764",
+    "theme_color": "#005CB9",
+    "description": "Siber güvenlik bilginizi test edin - çevrimdışı da çalışır.",
+    "icons": [
+        {
+            "src": "img/Barikatlogo.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "img/Barikatlogo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

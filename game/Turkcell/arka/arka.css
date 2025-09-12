@@ -1,0 +1,88 @@
+:root {
+    --arka-bg: #0f1115;
+    --arka-fg: #f2f5f7;
+}
+
+/* Arka plan kök katman */
+#arka-root {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    /* Arkada kalsın */
+    overflow: hidden;
+    background: var(--arka-bg);
+    pointer-events: none;
+    /* Tıklamaları engelleme, hepsi ön plandaki UI'ya gitsin */
+}
+
+/* Çizim sahnesi */
+#arka-stage {
+    position: absolute;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.arka-piece {
+    position: absolute;
+    will-change: transform;
+    user-select: none;
+    pointer-events: none;
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .35));
+}
+
+.arka-comet {
+    position: absolute;
+    will-change: transform;
+    user-select: none;
+    pointer-events: none;
+    z-index: 1;
+    filter: drop-shadow(0 12px 22px rgba(0, 0, 0, .5));
+    animation: arkaCometPulse .9s ease-in-out infinite alternate;
+}
+
+.arka-trail {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center,
+            rgba(255, 255, 255, .28) 0%,
+            rgba(135, 206, 250, .22) 35%,
+            rgba(30, 144, 255, .12) 60%,
+            rgba(30, 144, 255, 0) 75%);
+    mix-blend-mode: screen;
+    transform: translate(-60px, -60px) scale(1);
+    opacity: .85;
+    animation: arkaTrailFade 600ms ease-out forwards;
+    z-index: 1;
+    filter: blur(2px);
+}
+
+@keyframes arkaCometPulse {
+    0% {
+        filter: drop-shadow(0 12px 22px rgba(0, 0, 0, .5)) saturate(1) brightness(1);
+        transform: translateZ(0) scale(1);
+    }
+
+    100% {
+        filter: drop-shadow(0 16px 30px rgba(0, 0, 0, .55)) saturate(1.25) brightness(1.15);
+        transform: translateZ(0) scale(1.05) rotate(1.5deg);
+    }
+}
+
+@keyframes arkaTrailFade {
+    0% {
+        opacity: .85;
+        transform: translate(-60px, -60px) scale(1);
+        filter: blur(2px);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-60px, -60px) scale(1.8);
+        filter: blur(6px);
+    }
+}
