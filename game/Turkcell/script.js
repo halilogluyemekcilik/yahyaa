@@ -25,7 +25,9 @@ const autoCloseToggle = document.getElementById('autoCloseToggle');
 const autoCloseContainer = document.getElementById('autoCloseContainer');
 const autoCloseFill = document.getElementById('autoCloseFill');
 const pointerEl = document.getElementById('pointer');
-const installBtn = document.getElementById('installBtn');
+const installModal = document.getElementById('installModal');
+const confirmInstall = document.getElementById('confirmInstall');
+const dismissInstall = document.getElementById('dismissInstall');
 let deferredPrompt = null;
 
 // Autoplay
@@ -525,28 +527,31 @@ if (pointerEl) {
 }
 
 
-// PWA Yükleme Akışı
+// PWA Yükleme Akışı (popup)
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    if (installBtn) installBtn.style.display = 'inline-block';
+    if (installModal) installModal.style.display = 'grid';
 });
 
-if (installBtn) {
-    installBtn.addEventListener('click', async () => {
-        if (!deferredPrompt) return;
-        installBtn.disabled = true;
+if (confirmInstall) {
+    confirmInstall.addEventListener('click', async () => {
+        if (!deferredPrompt) { if (installModal) installModal.style.display = 'none'; return; }
         try {
-            const choice = await deferredPrompt.prompt();
+            await deferredPrompt.prompt();
             await deferredPrompt.userChoice;
         } catch (e) { }
         deferredPrompt = null;
-        installBtn.style.display = 'none';
-        installBtn.disabled = false;
+        if (installModal) installModal.style.display = 'none';
+    });
+}
+if (dismissInstall) {
+    dismissInstall.addEventListener('click', () => {
+        if (installModal) installModal.style.display = 'none';
     });
 }
 
 window.addEventListener('appinstalled', () => {
-    if (installBtn) installBtn.style.display = 'none';
+    if (installModal) installModal.style.display = 'none';
 });
 

@@ -8,12 +8,12 @@
     "description": "Siber güvenlik bilginizi test edin - çevrimdışı da çalışır.",
     "icons": [
         {
-            "src": "img/Barikatlogo.png",
+            "src": "img/BarikatLogo.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "img/Barikatlogo.png",
+            "src": "img/BarikatLogo.png",
             "sizes": "512x512",
             "type": "image/png"
         }

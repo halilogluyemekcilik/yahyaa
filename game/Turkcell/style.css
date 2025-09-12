@@ -327,7 +327,16 @@ canvas {
     pointer-events: none;
     user-select: none;
     filter: none;
-    display: block;
+    display: none;
+}
+
+/* Merkezde kılcal çizgi oluşmasını engelle */
+.hub,
+.spin-img {
+    border: 0;
+    outline: none;
+    background: transparent;
+    box-shadow: none;
 }
 
 .spin-img:hover {

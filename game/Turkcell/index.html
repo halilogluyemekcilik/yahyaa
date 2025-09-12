@@ -89,7 +89,6 @@
         <div class="card" role="application" aria-label="Çark Çevirme Oyunu">
             <div class="header" style="justify-content: space-between; gap: 10px;">
                 <div></div>
-                <button id="installBtn" class="btn primary" style="display:none">Uygulamayı Yükle</button>
             </div>
 
             <div class="stage" id="wheelStage">
@@ -145,6 +144,21 @@
                 <div class="bar-bg">
                     <div class="bar-fill" id="autoCloseFill"></div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Install Modal -->
+    <div class="modal" id="installModal" role="dialog" aria-modal="true" aria-labelledby="installTitle"
+        aria-describedby="installDesc" style="display:none">
+        <div class="modal-card">
+            <div style="font-size:40px" aria-hidden="true">📲</div>
+            <h2 id="installTitle">Uygulama olarak yükle</h2>
+            <div id="installDesc" class="prize" style="font-size:18px; font-weight:700">Masaüstüne/başlat menüsüne
+                ekleyin ve internet olmadan oynayın.</div>
+            <div class="actions">
+                <button class="btn" id="dismissInstall">Daha Sonra</button>
+                <button class="btn primary" id="confirmInstall">Yükle</button>
             </div>
         </div>
     </div>

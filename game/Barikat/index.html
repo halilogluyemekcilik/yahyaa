@@ -7,7 +7,7 @@
     <title>Quiz Uygulaması</title>
     <meta name="theme-color" content="#005CB9">
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="img/Barikatlogo.png">
+    <link rel="icon" href="img/BarikatLogo.png">
     <style>
         * {
             margin: 0;
@@ -429,13 +429,73 @@
                 padding: 0.8rem 1rem;
             }
         }
+
+        /* PWA Yükleme Bannerı */
+        .install-banner {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 3000;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            padding: 0.75rem;
+        }
+
+        .install-banner .install-content {
+            max-width: 800px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #003764 0%, #005CB9 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .install-banner .install-text {
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .install-banner .install-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .install-btn,
+        .install-dismiss-btn {
+            border: none;
+            border-radius: 10px;
+            padding: 0.6rem 1rem;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        .install-btn {
+            background: linear-gradient(45deg, #005CB9, #003764);
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(0, 91, 185, 0.3);
+        }
+
+        .install-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .install-dismiss-btn {
+            background: rgba(255, 255, 255, 0.85);
+            color: #003764;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <!-- Global Logo (her ekranda göster) -->
-        <img src="img/Barikatlogo.png" alt="Barikat Logo" class="logo" id="global-logo">
+        <img src="img/BarikatLogo.png" alt="Barikat Logo" class="logo" id="global-logo">
 
         <!-- Ayarlar İkonu -->
         <button class="settings-icon" id="settings-button" onclick="openSettings()" title="Ayarlar"
@@ -494,6 +554,17 @@
         <!-- Yükleme Ekranı -->
         <div class="screen" id="loading-screen">
             <div class="loading">Sorular yükleniyor...</div>
+        </div>
+    </div>
+
+    <!-- PWA Yükleme Bannerı -->
+    <div class="install-banner" id="install-banner" style="display: none;">
+        <div class="install-content">
+            <div class="install-text">Uygulamayı cihazınıza yüklemek ister misiniz?</div>
+            <div class="install-actions">
+                <button class="install-dismiss-btn" id="install-dismiss">Daha sonra</button>
+                <button class="install-btn" id="install-cta">Yükle</button>
+            </div>
         </div>
     </div>
 
@@ -792,40 +863,9 @@
             }
         ];
 
-        // Dosyalardan soruları yükleme fonksiyonu
+        // Soruları yalnızca gömülü örneklerden kullan
         async function loadQuestions() {
-            questions = [];
-            let successCount = 0;
-
-            for (let i = 1; i <= 25; i++) {
-                try {
-                    const response = await fetch(`sorular/soru${i}.txt`);
-                    if (response.ok) {
-                        const content = await response.text();
-                        const lines = content.trim().split('\n');
-
-                        if (lines.length >= 6) {
-                            const question = {
-                                question: lines[0],
-                                options: [lines[1], lines[2], lines[3], lines[4]],
-                                correct: parseInt(lines[5])
-                            };
-                            questions.push(question);
-                            successCount++;
-                        }
-                    }
-                } catch (error) {
-                    console.log(`soru${i}.txt okunamadı:`, error.message);
-                }
-            }
-
-            if (successCount < 5) {
-                console.log(`Sadece ${successCount} soru yüklendi. Örnek sorular kullanılıyor.`);
-                questions = [...sampleQuestions];
-                return true;
-            }
-
-            console.log(`${successCount} soru başarıyla yüklendi.`);
+            questions = [...sampleQuestions];
             return true;
         }
 
@@ -1209,6 +1249,78 @@
                     console.log('Service worker kayıt hatası:', err);
                 });
             }
+        });
+
+        // PWA Yükleme Akışı
+        let deferredInstallPrompt = null;
+        const INSTALL_DISMISS_KEY = 'pwaInstallDismissedUntil';
+        const INSTALL_BANNER_ID = 'install-banner';
+
+        function isInStandaloneMode() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        }
+
+        function canShowInstallBanner() {
+            if (isInStandaloneMode()) return false;
+            const until = localStorage.getItem(INSTALL_DISMISS_KEY);
+            if (!until) return true;
+            const now = Date.now();
+            return now > Number(until);
+        }
+
+        function showInstallBanner() {
+            const banner = document.getElementById(INSTALL_BANNER_ID);
+            if (!banner) return;
+            banner.style.display = 'block';
+        }
+
+        function hideInstallBanner() {
+            const banner = document.getElementById(INSTALL_BANNER_ID);
+            if (!banner) return;
+            banner.style.display = 'none';
+        }
+
+        // beforeinstallprompt etkinliği
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            if (canShowInstallBanner()) {
+                showInstallBanner();
+            }
+        });
+
+        // Yükle butonu
+        document.addEventListener('click', async (e) => {
+            if ((e.target && e.target.id === 'install-cta')) {
+                if (!deferredInstallPrompt) {
+                    hideInstallBanner();
+                    return;
+                }
+                deferredInstallPrompt.prompt();
+                const choice = await deferredInstallPrompt.userChoice;
+                deferredInstallPrompt = null;
+                hideInstallBanner();
+                if (choice && choice.outcome === 'dismissed') {
+                    // 7 gün ertele
+                    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+                    localStorage.setItem(INSTALL_DISMISS_KEY, String(Date.now() + sevenDays));
+                }
+            }
+        });
+
+        // Daha sonra butonu
+        document.addEventListener('click', (e) => {
+            if ((e.target && e.target.id === 'install-dismiss')) {
+                hideInstallBanner();
+                const threeDays = 3 * 24 * 60 * 60 * 1000;
+                localStorage.setItem(INSTALL_DISMISS_KEY, String(Date.now() + threeDays));
+            }
+        });
+
+        // Uygulama yüklendiğinde banner'ı gizle
+        window.addEventListener('appinstalled', () => {
+            hideInstallBanner();
+            localStorage.removeItem(INSTALL_DISMISS_KEY);
         });
     </script>
 </body>
