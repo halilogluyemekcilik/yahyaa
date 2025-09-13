@@ -1,6 +1,6 @@
 // =================== DİLİMLER ===================
 const PRIZES = [
-    "Defter", "Kalem", "Termos", "Ajanda", "Stres Çarkı", "Kitap", "250 TL Hediye Çeki", "Bilet", "Tekrar Çevir"
+    "Hediyelik Set", "Online Mülakat Simülasyonu", "Hediyelik Set", "Sürpriz Hediye", "Hediyelik Set", "Pas", "Hediyelik Set", "Tekrar Çevir"
 ];
 
 // Elemanlar
@@ -84,18 +84,15 @@ function setupCanvas() {
 window.addEventListener('resize', setupCanvas);
 
 // yardımcılar
-// 12 dilim için özelleştirilebilir renk paleti (hex). Bu diziyi dilediğiniz gibi düzenleyin.
+// 8 dilim için özelleştirilebilir renk paleti (hex). Bu diziyi dilediğiniz gibi düzenleyin.
 const SEGMENT_COLORS = [
     "#EAEAEA", // beyaz
     "#0033ff", // mavi
     "#ffc200", // sarı
     "#EAEAEA", // beyaz
     "#0033ff", // mavi
-    "#ffc200", // sarı
-    "#EAEAEA", // beyaz
-    "#0033ff", // mavi
-    "#ffc200", // sarı
-    "#EAEAEA", // beyaz
+    "#EAEAEA", // sarı
+    "#ffc200", // beyaz
     "#0033ff", // mavi
 ];
 
@@ -226,7 +223,7 @@ function drawWheel() {
         const bandH = halfY * 2;
         const maxH3 = bandH * 0.98;
 
-        let fontPxMax = Math.min(44, Math.max(10, radius * (n >= 12 ? 0.11 : 0.13)));
+        let fontPxMax = Math.min(34, Math.max(10, radius * (n >= 12 ? 0.11 : 0.13)));
         let fontPxMin = 10;
         let fontPx = fontPxMin;
         let lines = [];
