@@ -110,14 +110,31 @@
                         <label><input type="checkbox" id="autoCloseToggle" checked /> Açık</label>
                     </div>
                     <div class="settings-row">
+                        <span>Dikey Konum</span>
+                        <input type="range" id="stageOffsetY" min="-500" max="500" value="0" />
+                    </div>
+                    <div class="settings-row">
                         <span>Tam Ekran</span>
                         <button class="btn-inline" id="fsToggle">Aç/Kapat</button>
                     </div>
                 </div>
 
+                <!-- Merkezde arka plan görseli (çark ve QR arkasında) -->
+                <div class="center-bg" aria-hidden="true">
+                    <img src="./assets/GencYetenek.png" alt="" draggable="false" />
+                </div>
+
                 <!-- QR Kodu - Çarkın üstüne taşındı -->
                 <div class="qr-wrap" aria-hidden="false">
                     <img src="./assets/qr-code-turkcell.png" alt="QR Kod" class="qr-img" draggable="false" />
+                </div>
+
+                <!-- QR'ın eski yerine bilgilendirme metni -->
+                <div class="qr-text" aria-hidden="false">
+                    <div class="qr-text-inner">
+                        <span>Kariyerine yeteneğin</span><br />
+                        <span>yön versin</span>
+                    </div>
                 </div>
 
                 <div id="pointer" class="pointer pointerEl" role="button" aria-label="Çarkı Döndür" tabindex="0"></div>

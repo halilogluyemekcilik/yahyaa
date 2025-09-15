@@ -7,6 +7,8 @@ const PRIZES = [
 const canvas = document.getElementById('wheel'), ctx = canvas.getContext('2d');
 const spinBtn = document.getElementById('spinBtn');
 const modal = document.getElementById('resultModal');
+const modalCard = document.querySelector('#resultModal .modal-card');
+const resultTitle = document.getElementById('resultTitle');
 const resultDesc = document.getElementById('resultDesc');
 const closeModalBtn = document.getElementById('closeModal');
 const spinAgainBtn = document.getElementById('spinAgain');
@@ -28,6 +30,7 @@ const pointerEl = document.getElementById('pointer');
 const installModal = document.getElementById('installModal');
 const confirmInstall = document.getElementById('confirmInstall');
 const dismissInstall = document.getElementById('dismissInstall');
+const stageOffsetY = document.getElementById('stageOffsetY');
 let deferredPrompt = null;
 
 // Autoplay
@@ -290,6 +293,63 @@ function draw(now = performance.now()) {
     ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
     drawWheel();
 }
+// Modal başlık ve ödül metni için otomatik sığdırma
+function fitTextToHeight(el, maxHeightPx, minPx, maxPx) {
+    if (!el) return;
+    const style = el.style;
+    let lo = minPx, hi = maxPx, best = minPx;
+    for (let i = 0; i < 18; i++) {
+        const mid = (lo + hi) / 2;
+        style.fontSize = mid + 'px';
+        // Reflow
+        const h = el.scrollHeight;
+        if (h <= maxHeightPx) { best = mid; lo = mid; }
+        else { hi = mid; }
+    }
+    style.fontSize = best + 'px';
+}
+
+function fitModalTexts() {
+    if (!modalCard || !resultTitle || !resultDesc) return;
+    // Modal iç boşluklarını hesaba kat
+    const available = modalCard.clientHeight - 32; // güvenli pay
+    // Başlık ve ödül alanlarını oranla bölüştürelim
+    const titleMax = Math.max(20, Math.floor(available * 0.22));
+    const prizeMax = Math.max(20, Math.floor(available * 0.32));
+
+    // Varsayılan küçük bir font ayarla ki ölçüm doğru başlasın
+    resultTitle.style.fontSize = '20px';
+    resultDesc.style.fontSize = '20px';
+
+    // Sığdırma (ikisini de kendi maksimumlarına)
+    fitTextToHeight(resultTitle, titleMax, 16, 64);
+    fitTextToHeight(resultDesc, prizeMax, 18, 72);
+}
+
+window.addEventListener('resize', () => {
+    if (modal && modal.classList.contains('show')) {
+        try { fitModalTexts(); } catch (e) { }
+    }
+});
+
+// Dikey konum ayarı: CSS değişkeni ile sahneyi kaydır
+if (stageOffsetY) {
+    const applyOffset = () => {
+        const val = Number(stageOffsetY.value) || 0;
+        document.documentElement.style.setProperty('--stage-offset-y', val + 'px');
+    };
+    stageOffsetY.addEventListener('input', applyOffset);
+    stageOffsetY.addEventListener('change', applyOffset);
+    // Başlangıçta ~%10 ekran yüksekliği kadar yukarı al
+    try {
+        if (!stageOffsetY.dataset.init) {
+            const defaultPx = Math.round(-window.innerHeight * 0.10);
+            stageOffsetY.value = String(defaultPx);
+            stageOffsetY.dataset.init = '1';
+        }
+    } catch (e) { }
+    applyOffset();
+}
 
 // Animasyon & yardımcılar
 function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
@@ -352,6 +412,8 @@ let modalCanAutoClose = false;
 function showResult(text) {
     resultDesc.textContent = text;
     modal.classList.add('show');
+    // Metinleri modal alanına sığacak en büyük boyuta büyüt
+    try { fitModalTexts(); } catch (e) { }
     modalCanAutoClose = false;
     setTimeout(() => { modalCanAutoClose = true; }, 1500);
     setTimeout(() => closeModalBtn.focus(), 0);

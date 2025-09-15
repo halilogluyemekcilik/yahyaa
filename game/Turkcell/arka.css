@@ -22,6 +22,11 @@
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+    /* Görsel ekranın ortasında, üst-alt kırpmasız; yanlarda mavi alan */
+    background-image: url('./assets/GencYetenek.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
 }
 
 .arka-piece {

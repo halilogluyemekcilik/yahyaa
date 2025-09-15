@@ -8,6 +8,15 @@
     --shadow: 0 20px 50px rgba(0, 0, 0, .35), inset 0 2px 0 rgba(255, 255, 255, .04);
     --card-max: 760px;
     --safe-vw: 4vw;
+    --stage-offset-y: 0px;
+}
+
+@font-face {
+    font-family: 'Gerycliff Tr Heavy';
+    src: local('Gerycliff Tr Heavy'), local('GerycliffTr-Heavy');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
 }
 
 html,
@@ -122,25 +131,74 @@ body {
     display: grid;
     place-items: center;
     isolation: isolate;
+    transform: translateY(var(--stage-offset-y));
+}
+
+/* Çark/QR arkasında ortalanmış görsel katmanı */
+.center-bg {
+    position: absolute;
+    inset: 6% 6%;
+    z-index: 0;
+    /* canvas(1) altında, stage::before(0) ile aynı seviyede bırakabiliriz */
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.center-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    opacity: 1;
 }
 
 .qr-wrap {
     position: absolute;
-    top: clamp(-220px, -25vh, -200px);
-    left: 50%;
-    transform: translateX(-50%);
+    top: clamp(-100px, -9vh, -90px);
+    right: -160px;
+    left: auto;
+    transform: none;
     z-index: 4;
     display: grid;
     place-items: center;
 }
 
 .qr-img {
-    width: min(45vmin, 180px);
+    width: min(58vmin, 220px);
     height: auto;
     image-rendering: crisp-edges;
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .25));
     user-select: none;
     border-radius: 8px;
+}
+
+/* QR metni: QR'ın eski konumunda iki satırlık bilgi */
+.qr-text {
+    position: absolute;
+    top: clamp(-165px, -14vh, -150px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    display: grid;
+    place-items: center;
+    text-align: center;
+}
+
+.qr-text-inner {
+    font-family: 'Gerycliff Tr Heavy', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color: #ffffff;
+    font-weight: 900;
+    line-height: 0.68;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, .45);
+    font-size: clamp(40px, 8vw, 64px);
+}
+
+.qr-text-inner span {
+    display: block;
+    white-space: nowrap;
 }
 
 .title-overlay {
@@ -238,6 +296,11 @@ body {
 }
 
 #autoCloseToggle {
+    accent-color: #ffc200;
+}
+
+/* Dikey Konum slider'ını sarı yap */
+#stageOffsetY {
     accent-color: #ffc200;
 }
 
@@ -406,17 +469,18 @@ canvas {
     display: grid;
     align-content: center;
     gap: clamp(6px, 2vw, 14px);
+    transform: translateY(-10%);
 }
 
 .modal-card h2 {
     margin: 0;
-    font-size: clamp(18px, 3.6vw, 24px);
+    font-size: clamp(20px, 4vw, 28px);
     line-height: 1.2;
 }
 
 .prize {
     font-weight: 900;
-    font-size: clamp(22px, 6vw, 36px);
+    font-size: clamp(24px, 6.8vw, 40px);
     margin: 6px 0 8px;
     color: #dbe7ff;
     text-shadow: none;
@@ -466,6 +530,12 @@ canvas {
     box-shadow: 0 4px 12px rgba(255, 194, 0, 0.3);
 }
 
+/* Sonuç modalındaki Kapat butonunu bir tık büyüt */
+#closeModal.btn {
+    padding: clamp(14px, 3.6vw, 20px) clamp(16px, 4vw, 26px);
+    font-size: clamp(20px, 4.6vw, 22px);
+}
+
 .btn.primary {
     background: linear-gradient(180deg, #ffc200, #e6ae00 60%, #cc9a00);
     box-shadow: 0 8px 20px rgba(255, 194, 0, 0.4), inset 0 -1px 0 rgba(0, 0, 0, .2);
@@ -492,11 +562,21 @@ canvas {
     }
 
     .qr-wrap {
-        top: clamp(-180px, -18vh, -160px);
+        top: clamp(-220px, -23vh, -200px);
+        left: 62%;
     }
 
     .qr-img {
-        width: min(35vmin, 140px);
+        width: min(48vmin, 184px);
+    }
+
+    .qr-text {
+        top: clamp(-220px, -23vh, -200px);
+        left: 38%;
+    }
+
+    .qr-text-inner {
+        font-size: clamp(16px, 4.4vw, 22px);
     }
 
     .deco-left,
@@ -511,10 +591,20 @@ canvas {
     }
 
     .qr-wrap {
-        top: clamp(-160px, -16vh, -140px);
+        top: clamp(-200px, -21vh, -180px);
+        left: 60%;
     }
 
     .qr-img {
-        width: min(30vmin, 120px);
+        width: min(42vmin, 160px);
+    }
+
+    .qr-text {
+        top: clamp(-200px, -21vh, -180px);
+        left: 40%;
+    }
+
+    .qr-text-inner {
+        font-size: clamp(14px, 4.8vw, 20px);
     }
 }
