@@ -560,7 +560,11 @@
     <!-- PWA Yükleme Bannerı -->
     <div class="install-banner" id="install-banner" style="display: none;">
         <div class="install-content">
-            <div class="install-text">Uygulamayı cihazınıza yüklemek ister misiniz?</div>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <img src="img/BarikatLogo.png" alt="Barikat Logo"
+                    style="width: 40px; height: 40px; border-radius: 8px;">
+                <div class="install-text">Barikat Quiz uygulamasını cihazınıza yüklemek ister misiniz?</div>
+            </div>
             <div class="install-actions">
                 <button class="install-dismiss-btn" id="install-dismiss">Daha sonra</button>
                 <button class="install-btn" id="install-cta">Yükle</button>
@@ -593,6 +597,7 @@
         let postTimeUpTimeout = null;
         let resultAutoReturnTimeout = null;
         let nextBtnAttentionTimeout = null;
+        let usedQuestionIndices = []; // Kullanılmış soru indekslerini takip et
 
         function scheduleNextBtnAttention() {
             const nextBtn = document.getElementById('next-btn');
@@ -829,7 +834,7 @@
                     "Çocukların veya evcil hayvanın ismi"
 
                 ],
-                correct: 3
+                correct: 2
             },
             {
                 question: "Aşağıdakilerden hangisi bir firewall işlevidir?",
@@ -869,10 +874,30 @@
             return true;
         }
 
-        // Rastgele 5 soru seçme
+        // Rastgele 5 soru seçme - kullanılmamış sorulardan
         function selectRandomQuestions() {
-            const shuffled = [...questions].sort(() => 0.5 - Math.random());
-            selectedQuestions = shuffled.slice(0, 5);
+            // Eğer tüm sorular kullanıldıysa, havuzu sıfırla
+            if (usedQuestionIndices.length >= questions.length) {
+                usedQuestionIndices = [];
+            }
+
+            // Kullanılmamış soru indekslerini bul
+            const availableIndices = [];
+            for (let i = 0; i < questions.length; i++) {
+                if (!usedQuestionIndices.includes(i)) {
+                    availableIndices.push(i);
+                }
+            }
+
+            // Kullanılabilir sorulardan 5 tanesini rastgele seç
+            const shuffled = [...availableIndices].sort(() => 0.5 - Math.random());
+            const selectedIndices = shuffled.slice(0, 5);
+
+            // Seçilen soruları selectedQuestions'a ekle
+            selectedQuestions = selectedIndices.map(index => questions[index]);
+
+            // Seçilen soruları kullanılmış olarak işaretle
+            usedQuestionIndices.push(...selectedIndices);
         }
 
         // Quiz başlatma
@@ -1142,6 +1167,7 @@
                 clearTimeout(resultAutoReturnTimeout);
                 resultAutoReturnTimeout = null;
             }
+            // Kullanılmış sorular listesini sıfırlama - böylece döngü devam eder
             showScreen('home-screen');
         }
 

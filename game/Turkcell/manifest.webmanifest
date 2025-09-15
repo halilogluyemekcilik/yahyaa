@@ -14,21 +14,21 @@
     "lang": "tr",
     "icons": [
         {
-            "src": "./assets/center-logo.png",
+            "src": "./assets/bg-pattern.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any"
         },
         {
-            "src": "./assets/center-logo.png",
+            "src": "./assets/bg-pattern.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any"
         },
         {
-            "src": "./assets/center-logo.webp",
+            "src": "./assets/bg-pattern.png",
             "sizes": "512x512",
-            "type": "image/webp",
+            "type": "image/png",
             "purpose": "maskable any"
         }
     ]

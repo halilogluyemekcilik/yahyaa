@@ -91,8 +91,8 @@ const SEGMENT_COLORS = [
     "#ffc200", // sarı
     "#EAEAEA", // beyaz
     "#0033ff", // mavi
-    "#EAEAEA", // sarı
-    "#ffc200", // beyaz
+    "#EAEAEA", // beyaz
+    "#ffc200", // sarı
     "#0033ff", // mavi
 ];
 
