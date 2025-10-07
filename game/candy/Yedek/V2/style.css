@@ -1,0 +1,345 @@
+body {
+    background: linear-gradient(180deg, #f5f2ee, #e9e4dd);
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.hidden {
+    display: none;
+}
+
+.active {
+    display: flex;
+}
+
+#game-container {
+    flex-direction: column;
+    align-items: center;
+}
+
+#hud {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+#board {
+    width: 360px;
+    height: 480px;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    gap: 2px;
+    touch-action: none;
+    /* prevent page scroll during drag */
+}
+
+.tile {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    border-radius: 6px;
+    position: relative;
+    /* allow sparkles inside */
+}
+
+/* Animations */
+@keyframes swap-left {
+    0% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes swap-right {
+    0% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes swap-up {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-100%);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes swap-down {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(100%);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.anim-swap-left {
+    animation: swap-left 0.28s ease-in-out;
+}
+
+.anim-swap-right {
+    animation: swap-right 0.28s ease-in-out;
+}
+
+.anim-swap-up {
+    animation: swap-up 0.28s ease-in-out;
+}
+
+.anim-swap-down {
+    animation: swap-down 0.28s ease-in-out;
+}
+
+/* One-way swap-to animations (hold at end) */
+@keyframes to-left {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes to-right {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes to-up {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-100%);
+    }
+}
+
+@keyframes to-down {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(100%);
+    }
+}
+
+.to-left {
+    animation: to-left 0.28s ease-in-out forwards;
+}
+
+.to-right {
+    animation: to-right 0.28s ease-in-out forwards;
+}
+
+.to-up {
+    animation: to-up 0.28s ease-in-out forwards;
+}
+
+.to-down {
+    animation: to-down 0.28s ease-in-out forwards;
+}
+
+@keyframes explode {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.2);
+        opacity: 0;
+    }
+}
+
+.anim-explode {
+    animation: explode 0.32s ease-out forwards;
+}
+
+/* Sparkle particles around exploding tiles */
+@keyframes sparkle {
+    0% {
+        transform: rotate(var(--angle)) translateX(0) scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: rotate(var(--angle)) translateX(14px) scale(0);
+        opacity: 0;
+    }
+}
+
+.sparkle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
+    /* center tiny dot */
+    background: radial-gradient(circle, #ffffff 0%, #ffe3f3 60%, rgba(255, 255, 255, 0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: sparkle 0.4s ease-out forwards;
+}
+
+.sparkle.s0 {
+    --angle: 0deg;
+}
+
+.sparkle.s1 {
+    --angle: 60deg;
+}
+
+.sparkle.s2 {
+    --angle: 120deg;
+}
+
+.sparkle.s3 {
+    --angle: 180deg;
+}
+
+.sparkle.s4 {
+    --angle: 240deg;
+}
+
+.sparkle.s5 {
+    --angle: 300deg;
+}
+
+/* Burst scatter particles */
+@keyframes burst {
+    0% {
+        transform: rotate(var(--angle)) translateX(0) scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: rotate(var(--angle)) translateX(var(--dist, 28px)) scale(0.6);
+        opacity: 0;
+    }
+}
+
+.burst {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    margin: -2.5px 0 0 -2.5px;
+    background: radial-gradient(circle, #fff 0%, #ffd9ec 60%, rgba(255, 255, 255, 0) 75%);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: burst 0.28s ease-out forwards;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-20px);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.anim-fall {
+    animation: fall 0.32s ease-out;
+}
+
+@keyframes invalid {
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-6px);
+    }
+
+    50% {
+        transform: translateX(6px);
+    }
+
+    75% {
+        transform: translateX(-4px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.anim-invalid {
+    animation: invalid 0.18s ease-in-out;
+}
+
+.card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    flex-direction: column;
+}
+
+button {
+    background: #ff69b4;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 20px;
+    border-radius: 6px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #ff85c1;
+}

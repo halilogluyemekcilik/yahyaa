@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sugar Crush</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="start-screen" class="card active">
+        <h1>Sugar Crush 🍬</h1>
+        <button id="start-btn">Oyuna Başla</button>
+    </div>
+
+    <div id="game-container" class="hidden">
+        <div id="hud">
+            <button id="settings-btn" aria-label="Ayarlar">⚙️</button>
+            <span id="score">Puan: 0</span>
+            <span id="timer">Süre: 60</span>
+        </div>
+        <div id="board"></div>
+    </div>
+
+    <div id="end-screen" class="card hidden">
+        <h2>Oyun Bitti!</h2>
+        <p>Toplam Puan: <span id="final-score"></span></p>
+        <button id="restart-btn">Tekrar Oyna</button>
+    </div>
+
+    <!-- Floating Settings Panel -->
+    <div id="settings-panel" class="settings-top">
+        <div class="settings-row">
+            <span>Tam ekran</span>
+            <button id="fullscreen-toggle">Aç</button>
+        </div>
+        <div class="settings-row">
+            <span>Ses</span>
+            <button id="sound-toggle">Aç</button>
+        </div>
+        <div class="settings-row">
+            <button id="settings-close">Kapat</button>
+        </div>
+    </div>
+
+    <audio id="pop-sound" src="sounds/pop.mp3" preload="auto"></audio>
+    <script src="script.js"></script>
+</body>
+
+</html>

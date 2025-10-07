@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <!-- 1) Kodlama ve görünüm -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>Çark Çevir – Dikey Ekran</title>
+    <meta name="description" content="Dikey ekranda çark çevir oyunu ve animasyonlu arka plan.">
+
+    <!-- 2) Tarayıcı farklarını azalt: normalize + temel reset -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"> -->
+    <link rel="stylesheet" href="https://unpkg.com/modern-normalize/modern-normalize.css">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        html {
+            overscroll-behavior: none;
+        }
+    </style>
+
+    <!-- 3) Mevcut stiller -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- 4) Tema rengi / PWA (opsiyonel) -->
+    <meta name="theme-color" content="#0f1115">
+    <link rel="icon" href="./assets/bg-pattern.png" type="image/png">
+    <link rel="apple-touch-icon" href="./assets/bg-pattern.png">
+    <link rel="manifest" href="./manifest.webmanifest">
+
+    <!-- 5) Polyfill (eski tarayıcılar için gerekirse) -->
+    <script>
+        (function () {
+            var needs = !('fetch' in window) || !('URLSearchParams' in window) || !('ResizeObserver' in window);
+            if (needs) {
+                var s = document.createElement('script');
+                s.src = 'https://cdn.polyfill.io/v3/polyfill.min.js?features=default,fetch,URL,URLSearchParams,ResizeObserver';
+                s.defer = true;
+                document.head.appendChild(s);
+            }
+        })();
+    </script>
+
+    <!-- 6) Küçük yardımcılar -->
+    <script>
+        window.normalizeWheelDelta = function (e) { return e.deltaY * (e.deltaMode === 1 ? 16 : 1); };
+        try { window.addEventListener('test', null, Object.defineProperty({}, 'passive', { get: () => { } })); } catch (e) { }
+    </script>
+</head>
+
+<body class="settings-hidden">
+
+
+    <!-- Sitenin kendi içerikleri -->
+    <!-- Sesler -->
+    <audio id="spinSfx" preload="auto">
+        <source src="./assets/spin-sfx.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="tickSfx" preload="auto">
+        <source src="./assets/tick.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="wrap">
+        <div class="card" role="application" aria-label="Çark Çevirme Oyunu">
+            <div class="header" style="justify-content: space-between; gap: 10px;">
+                <div></div>
+            </div>
+
+            <div class="stage" id="wheelStage">
+                <!-- Sol üst: Decathlon logo -->
+                <div class="brand-logo" aria-hidden="false">
+                    <img src="./assets/decathlon.png" alt="Decathlon" class="brand-logo-img" draggable="false" />
+                </div>
+                <button id="settingsBtn" class="settings-btn" aria-haspopup="true" aria-expanded="false"
+                    aria-controls="settingsPanel">⚙️</button>
+
+                <div id="settingsPanel" class="settings-panel" role="menu" aria-label="Ayarlar">
+                    <h3>Ayarlar</h3>
+                    <div class="settings-row">
+                        <span>Genel Ses</span>
+                        <input type="range" id="masterVolume" min="0" max="100" value="80" />
+                    </div>
+
+                    <div class="settings-row">
+                        <span>Otomatik Kapanma</span>
+                        <label><input type="checkbox" id="autoCloseToggle" checked /> Açık</label>
+                    </div>
+                    <div class="settings-row">
+                        <span>Dikey Konum</span>
+                        <input type="range" id="stageOffsetY" min="-500" max="500" value="0" />
+                    </div>
+                    <div class="settings-row">
+                        <span>Tam Ekran</span>
+                        <button class="btn-inline" id="fsToggle">Aç/Kapat</button>
+                    </div>
+                    <div class="settings-row">
+                        <span>Stok İşlemleri</span>
+                        <button class="btn-inline" id="resetStockBtn">Yönet</button>
+                    </div>
+                    <div class="settings-row" style="padding-top:0; justify-content:flex-end;">
+                        <span id="stockSummary" class="hint" aria-live="polite"></span>
+                    </div>
+                </div>
+
+                <!-- Merkezde arka plan görseli (çark ve QR arkasında) -->
+                <div class="center-bg" aria-hidden="true">
+                    <img src="./assets/GencYetenek.png" alt="" draggable="false" />
+                </div>
+
+
+                <div id="pointer" class="pointer pointerEl" role="button" aria-label="Çarkı Döndür" tabindex="0"></div>
+                <canvas id="wheel" aria-label="Çark"></canvas>
+
+                <div class="center-wrap" aria-hidden="false">
+                    <div class="hub" aria-hidden="true">
+                        <!-- Ortadaki LOGO = Döndür butonu -->
+                        <button id="spinBtn" class="spin-img" aria-label="Çarkı Döndür">
+                            <img src="" alt="" draggable="false" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Sonuç Modalı -->
+    <div class="modal" id="resultModal" role="dialog" aria-modal="true" aria-labelledby="resultTitle"
+        aria-describedby="resultDesc">
+        <div class="modal-card">
+            <div style="font-size:40px" aria-hidden="true">🎉</div>
+            <h2 id="resultTitle">Tebrikler!</h2>
+            <div id="resultDesc" class="prize">Ödül</div>
+            <div class="actions">
+                <button class="btn" id="closeModal">Kapat</button>
+            </div>
+            <div id="autoCloseContainer" class="auto-close" aria-hidden="true">
+                <div class="bar-bg">
+                    <div class="bar-fill" id="autoCloseFill"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stok Sıfırlama Modalı (PIN keypad) -->
+    <div class="modal" id="pinModal" role="dialog" aria-modal="true" aria-labelledby="pinTitle"
+        aria-describedby="pinDesc" style="display:none">
+        <div class="modal-card">
+            <div class="pin-view" id="pinView">
+                <h2 id="pinTitle">Yönetici Şifresi</h2>
+                <div id="pinDesc" class="prize" style="font-size:18px; font-weight:700">Stok yönetimi için şifre girin
+                </div>
+                <div class="pin-input-wrap" aria-live="polite" aria-label="Şifre giriş alanı">
+                    <input id="pinField" class="pin-field" type="password" inputmode="numeric" pattern="[0-9]*"
+                        autocomplete="one-time-code" placeholder="••••" maxlength="4" />
+                </div>
+                <div class="numpad" role="group" aria-label="Sayısal Tuş Takımı">
+                    <button class="pad" data-key="1">1</button>
+                    <button class="pad" data-key="2">2</button>
+                    <button class="pad" data-key="3">3</button>
+                    <button class="pad" data-key="4">4</button>
+                    <button class="pad" data-key="5">5</button>
+                    <button class="pad" data-key="6">6</button>
+                    <button class="pad" data-key="7">7</button>
+                    <button class="pad" data-key="8">8</button>
+                    <button class="pad" data-key="9">9</button>
+                    <button class="pad pad-del" data-key="clear" aria-label="Sil">Sil</button>
+                    <button class="pad" data-key="0">0</button>
+                    <button class="pad pad-ok" data-key="ok" aria-label="Onayla">Onayla</button>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-cancel" id="pinCancel">İptal</button>
+                </div>
+            </div>
+
+            <div class="pin-manage" id="pinManage" style="display:none">
+                <h2>Stok Durumu</h2>
+                <div class="stock-list" id="stockList"></div>
+                <div class="stock-total" id="stockTotal"></div>
+                <div class="actions">
+                    <button class="btn btn-danger" id="resetStockConfirm">Stokları Sıfırla</button>
+                    <button class="btn" id="stockClose">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Install Modal -->
+    <div class="modal" id="installModal" role="dialog" aria-modal="true" aria-labelledby="installTitle"
+        aria-describedby="installDesc" style="display:none">
+        <div class="modal-card">
+            <div style="font-size:40px" aria-hidden="true">📲</div>
+            <h2 id="installTitle">Uygulama olarak yükle</h2>
+            <div id="installDesc" class="prize" style="font-size:18px; font-weight:700">Masaüstüne/başlat menüsüne
+                ekleyin ve internet olmadan oynayın.</div>
+            <div class="actions">
+                <button class="btn" id="dismissInstall">Daha Sonra</button>
+                <button class="btn primary" id="confirmInstall">Yükle</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mevcut sitenin script'i -->
+    <script defer src="script.js"></script>
+
+
+
+    <!-- Service Worker Kayıt -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('./service-worker.js').catch(function () { });
+            });
+        }
+        // Basit indir-kopyala koruması (kolayca aşılabilir)
+        window.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+        window.addEventListener('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'p' || e.key === 'u')) { e.preventDefault(); }
+        });
+    </script>
+</body>
+
+</html>
