@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="tr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#7c3aed">
+  <title>Galeri Temizleyici</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/icon-192.png" sizes="192x192">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .hide {
+      display: none;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-purple-600 via-pink-600 to-red-600">
+  <div id="install-banner"
+    class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-white shadow-2xl rounded-2xl px-6 py-4 flex items-center gap-4 z-50 hide">
+    <p class="text-sm font-medium text-gray-700">📱 Uygulamayı ana ekrana ekleyin, hızlı erişin!</p>
+    <button id="btn-install"
+      class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4 py-2 rounded-full transition-all">Ekle</button>
+  </div>
+
+  <main id="app" class="min-h-screen flex flex-col">
+    <!-- Top progress -->
+    <div class="p-4 bg-white/10 backdrop-blur-lg">
+      <div class="flex justify-between items-center mb-2">
+        <span id="counter" class="text-white font-semibold">0 / 0</span>
+        <div class="flex gap-4">
+          <span class="text-white text-sm">❌ <span id="cnt-del">0</span></span>
+          <span class="text-white text-sm">✅ <span id="cnt-keep">0</span></span>
+        </div>
+      </div>
+      <div class="w-full bg-white/30 rounded-full h-2">
+        <div id="progress" class="bg-white rounded-full h-2 transition-all duration-300" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Permission / Empty states wrapper -->
+    <section id="state-wrapper" class="flex-1 flex items-center justify-center p-4 relative">
+      <!-- Permission ask -->
+      <div id="state-permission" class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
+        <div
+          class="bg-gradient-to-br from-purple-100 to-pink-100 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+          <span class="text-3xl text-purple-600">🖼️</span>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">Galeri Temizleyici</h1>
+        <p class="text-gray-600 mb-8">Fotoğraflarınızı hızlıca ayıklayın! Silinecekleri işaretleyin, sonra iOS'ta toplu
+          silin.</p>
+        <button id="btn-pick"
+          class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all">Fotoğrafları
+          Seç</button>
+      </div>
+
+      <!-- Empty after permission -->
+      <div id="state-empty" class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center hide">
+        <div class="text-5xl text-gray-400 mx-auto mb-4">🖼️</div>
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">Fotoğraf Seçilmedi</h2>
+        <p class="text-gray-600 mb-6">Lütfen galeriden fotoğraf seçin.</p>
+        <button id="btn-pick-again"
+          class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full font-semibold">Fotoğraf
+          Seç</button>
+      </div>
+
+      <!-- Swipe card -->
+      <div id="swipe-area" class="relative w-full max-w-md aspect-[3/4] hide">
+        <div id="card" class="absolute inset-0 cursor-grab active:cursor-grabbing">
+          <div class="w-full h-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+            <img id="media-image" class="w-full h-full object-cover hide" alt="">
+            <video id="media-video" class="w-full h-full object-cover hide" controls></video>
+          </div>
+          <div id="filename"
+            class="absolute bottom-3 left-3 right-3 bg-black/60 text-white text-xs sm:text-sm px-3 py-2 rounded-md truncate">
+          </div>
+          <div id="stamp-del"
+            class="absolute top-8 left-8 bg-red-500 text-white px-6 py-3 rounded-xl font-bold text-xl transform -rotate-12 shadow-lg opacity-0">
+            SİL</div>
+          <div id="stamp-keep"
+            class="absolute top-8 right-8 bg-green-500 text-white px-6 py-3 rounded-xl font-bold text-xl transform rotate-12 shadow-lg opacity-0">
+            SAKLA</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom actions -->
+    <div class="p-8 flex justify-center gap-8">
+      <button id="btn-del"
+        class="bg-red-500 hover:bg-red-600 text-white w-16 h-16 rounded-full shadow-xl flex items-center justify-center transform hover:scale-110 active:scale-95 transition-all">🗑️</button>
+      <button id="btn-keep"
+        class="bg-green-500 hover:bg-green-600 text-white w-16 h-16 rounded-full shadow-xl flex items-center justify-center transform hover:scale-110 active:scale-95 transition-all">✅</button>
+    </div>
+
+    <div class="p-4 text-center text-white text-sm opacity-75">Sola kaydır Sil • Sağa kaydır Sakla</div>
+  </main>
+
+  <!-- Results modal/page -->
+  <section id="results"
+    class="min-h-screen bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 p-4 overflow-y-auto hide">
+    <div class="max-w-2xl mx-auto py-8">
+      <div class="bg-white rounded-3xl shadow-2xl p-8 mb-6 text-center">
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">Seçim Tamamlandı 🎉</h2>
+        <p class="text-gray-600 mb-6"><span id="del-count">0</span> fotoğraf silinecek olarak işaretlendi.</p>
+        <button id="btn-share"
+          class="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:opacity-50 flex items-center justify-center gap-2 mx-auto">Silinecekleri
+          Paylaş/İndir</button>
+        <button id="btn-copy"
+          class="mt-3 bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all">Listeyi
+          Kopyala</button>
+        <button id="btn-restart"
+          class="w-full mt-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all">Yeniden
+          Başla</button>
+      </div>
+
+      <div id="preview" class="bg-white rounded-3xl shadow-2xl p-8 mb-6 hide">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Silinecek Fotoğraflar Önizleme</h3>
+        <div id="preview-grid" class="grid grid-cols-3 gap-2 max-h-96 overflow-y-auto"></div>
+      </div>
+
+      <div id="name-list" class="bg-white rounded-3xl shadow-2xl p-8 mb-6 hide">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Silinecek Fotoğraf İsimleri</h3>
+        <div class="max-h-60 overflow-y-auto border rounded-xl">
+          <ul id="names-ul" class="divide-y"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/service-worker.js').catch(function () { });
+      });
+    }
+  </script>
+</body>
+
+</html>
