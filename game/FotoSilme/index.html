@@ -1,142 +1,819 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#7c3aed">
-  <title>Galeri Temizleyici</title>
-  <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="icon"
-    href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNCIgZmlsbD0iIzc0M0FFRCIvPgo8cGF0aCBkPSJNMTYgOEMxMy43OTA5IDggMTIgOS43OTA5IDEyIDEyVjEySDEwQzEwIDguNjg2MjkgMTEuNjg2MyA3IDE0IDdIMThDMjAuMzEzNyA3IDIyIDguNjg2MjkgMjIgMTJWMTJIMjBDMjAgOS43OTA5IDE4LjIwOTEgOCAxNiA4WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMTRDOCAxMy40NDc3IDguNDQ3NzIgMTMgOSAxM0gyM0MyMy41NTIzIDEzIDI0IDEzLjQ0NzcgMjQgMTRWMjZDMjQgMjYuNTUyMyAyMy41NTIzIDI3IDIzIDI3SDlDOC40NDc3MiAyNyA4IDI2LjU1MjMgOCAyNlYxNFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0xMiAxOEgyMFYyMEgxMlYxOFoiIGZpbGw9IiM3NDNBRUQiLz4KPHBhdGggZD0iTTEyIDIySDIwVjI0SDEyVjIyWiIgZmlsbD0iIzc0M0FFRCIvPgo8L3N2Zz4=">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .hide {
-      display: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Galeri Temizleyici">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Galeri Temizleyici</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .welcome-screen, .result-screen {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .icon-circle {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 50px;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #1a202c;
+            margin-bottom: 15px;
+        }
+
+        p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .info-box {
+            background: #ebf8ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .info-box p {
+            color: #2c5282;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .info-box ol {
+            margin: 10px 0 0 20px;
+            color: #2c5282;
+        }
+
+        .info-box li {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        /* Ana Ekran */
+        .main-screen {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            color: white;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+
+        .card-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .card-wrapper {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 3/4;
+            position: relative;
+        }
+
+        .card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+        }
+
+        .card:active {
+            cursor: grabbing;
+        }
+
+        .card img, .card video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+        }
+
+        .swipe-indicator {
+            position: absolute;
+            top: 30px;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 22px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .swipe-delete {
+            left: 30px;
+            background: #ef4444;
+            transform: rotate(-12deg);
+        }
+
+        .swipe-keep {
+            right: 30px;
+            background: #10b981;
+            transform: rotate(12deg);
+        }
+
+        .file-name {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 12px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .action-buttons {
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .action-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-keep {
+            background: #10b981;
+            color: white;
+        }
+
+        .instruction {
+            text-align: center;
+            color: white;
+            padding: 15px;
+            opacity: 0.7;
+            font-size: 14px;
+        }
+
+        /* Sonuç Ekranı */
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-box.delete {
+            background: #fee2e2;
+        }
+
+        .stat-box.keep {
+            background: #d1fae5;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-box.delete .stat-number {
+            color: #dc2626;
+        }
+
+        .stat-box.keep .stat-number {
+            color: #059669;
+        }
+
+        .stat-label {
+            font-weight: 600;
+        }
+
+        .stat-box.delete .stat-label {
+            color: #dc2626;
+        }
+
+        .stat-box.keep .stat-label {
+            color: #059669;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px 0;
+            padding: 5px;
+        }
+
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f3f4f6;
+        }
+
+        .preview-item img, .preview-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-number {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ef4444;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .steps {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .step {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-size: 16px;
+            color: #1a202c;
+            margin-bottom: 5px;
+        }
+
+        .step-content p {
+            font-size: 14px;
+            color: #4a5568;
+            margin: 0;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border: 2px solid #fbbf24;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .warning-box p {
+            color: #92400e;
+            font-weight: 600;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            transform: scale(1.02);
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .welcome-screen, .result-screen {
+                padding: 30px 20px;
+            }
+        }
+    </style>
 </head>
-
-<body class="min-h-screen bg-gradient-to-br from-purple-600 via-pink-600 to-red-600">
-  <div id="install-banner"
-    class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-white shadow-2xl rounded-2xl px-6 py-4 flex items-center gap-4 z-50 hide">
-    <p class="text-sm font-medium text-gray-700">📱 Uygulamayı ana ekrana ekleyin, hızlı erişin!</p>
-    <button id="btn-install"
-      class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4 py-2 rounded-full transition-all">Ekle</button>
-  </div>
-
-  <main id="app" class="min-h-screen flex flex-col">
-    <!-- Top progress -->
-    <div class="p-4 bg-white/10 backdrop-blur-lg">
-      <div class="flex justify-between items-center mb-2">
-        <span id="counter" class="text-white font-semibold">0 / 0</span>
-        <div class="flex gap-4">
-          <span class="text-white text-sm">❌ <span id="cnt-del">0</span></span>
-          <span class="text-white text-sm">✅ <span id="cnt-keep">0</span></span>
+<body>
+    <!-- Hoş Geldin Ekranı -->
+    <div id="welcomeScreen" class="container">
+        <div class="welcome-screen">
+            <div class="icon-circle">📸</div>
+            <h1>Galeri Temizleyici</h1>
+            <p>Fotoğraflarınızı hızlıca ayıklayın! Silinecekleri işaretleyin, sonra iOS'ta toplu silin.</p>
+            <button class="btn-primary" onclick="selectPhotos()">Fotoğrafları Seç</button>
+            <div class="info-box">
+                <p><strong>⚠️ Nasıl Çalışır?</strong></p>
+                <ol>
+                    <li>Fotoğrafları seçin</li>
+                    <li>Kaydırarak silinecekleri belirleyin</li>
+                    <li>Silinecekleri indirin</li>
+                    <li>iOS'ta manuel silin</li>
+                </ol>
+            </div>
         </div>
-      </div>
-      <div class="w-full bg-white/30 rounded-full h-2">
-        <div id="progress" class="bg-white rounded-full h-2 transition-all duration-300" style="width: 0%"></div>
-      </div>
     </div>
 
-    <!-- Permission / Empty states wrapper -->
-    <section id="state-wrapper" class="flex-1 flex items-center justify-center p-4 relative">
-      <!-- Permission ask -->
-      <div id="state-permission" class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
-        <div
-          class="bg-gradient-to-br from-purple-100 to-pink-100 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
-          <span class="text-3xl text-purple-600">🖼️</span>
+    <!-- Ana Kaydırma Ekranı -->
+    <div id="mainScreen" class="main-screen hidden">
+        <div class="header">
+            <div class="progress-text">
+                <span id="progressText">1 / 10</span>
+                <span>
+                    <span id="deleteCount">0</span> ❌ | 
+                    <span id="keepCount">0</span> ✅
+                </span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
         </div>
-        <h1 class="text-3xl font-bold text-gray-800 mb-4">Galeri Temizleyici</h1>
-        <p class="text-gray-600 mb-8">Fotoğraflarınızı hızlıca ayıklayın! Silinecekleri işaretleyin, sonra iOS'ta toplu
-          silin.</p>
-        <button id="btn-pick"
-          class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all">Fotoğrafları
-          Seç</button>
-      </div>
 
-      <!-- Empty after permission -->
-      <div id="state-empty" class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center hide">
-        <div class="text-5xl text-gray-400 mx-auto mb-4">🖼️</div>
-        <h2 class="text-2xl font-bold text-gray-800 mb-2">Fotoğraf Seçilmedi</h2>
-        <p class="text-gray-600 mb-6">Lütfen galeriden fotoğraf seçin.</p>
-        <button id="btn-pick-again"
-          class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full font-semibold">Fotoğraf
-          Seç</button>
-      </div>
-
-      <!-- Swipe card -->
-      <div id="swipe-area" class="relative w-full max-w-md aspect-[3/4] hide">
-        <div id="card" class="absolute inset-0 cursor-grab active:cursor-grabbing">
-          <div class="w-full h-full bg-white rounded-3xl shadow-2xl overflow-hidden">
-            <img id="media-image" class="w-full h-full object-cover hide" alt="">
-            <video id="media-video" class="w-full h-full object-cover hide" controls></video>
-          </div>
-          <div id="filename"
-            class="absolute bottom-3 left-3 right-3 bg-black/60 text-white text-xs sm:text-sm px-3 py-2 rounded-md truncate">
-          </div>
-          <div id="stamp-del"
-            class="absolute top-8 left-8 bg-red-500 text-white px-6 py-3 rounded-xl font-bold text-xl transform -rotate-12 shadow-lg opacity-0">
-            SİL</div>
-          <div id="stamp-keep"
-            class="absolute top-8 right-8 bg-green-500 text-white px-6 py-3 rounded-xl font-bold text-xl transform rotate-12 shadow-lg opacity-0">
-            SAKLA</div>
+        <div class="card-container">
+            <div class="card-wrapper">
+                <div class="card" id="photoCard">
+                    <img id="photoImg" src="" alt="Fotoğraf">
+                    <div class="swipe-indicator swipe-delete" id="deleteIndicator">SİL</div>
+                    <div class="swipe-indicator swipe-keep" id="keepIndicator">SAKLA</div>
+                    <div class="file-name" id="fileName">Fotoğraf.jpg</div>
+                </div>
+            </div>
         </div>
-      </div>
-    </section>
 
-    <!-- Bottom actions -->
-    <div class="p-8 flex justify-center gap-8">
-      <button id="btn-del"
-        class="bg-red-500 hover:bg-red-600 text-white w-16 h-16 rounded-full shadow-xl flex items-center justify-center transform hover:scale-110 active:scale-95 transition-all">🗑️</button>
-      <button id="btn-keep"
-        class="bg-green-500 hover:bg-green-600 text-white w-16 h-16 rounded-full shadow-xl flex items-center justify-center transform hover:scale-110 active:scale-95 transition-all">✅</button>
+        <div class="action-buttons">
+            <button class="action-btn btn-delete" onclick="deletePhoto()">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                </svg>
+            </button>
+            <button class="action-btn btn-keep" onclick="keepPhoto()">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 6L9 17l-5-5"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="instruction">
+            Sola kaydır = Sil | Sağa kaydır = Sakla
+        </div>
     </div>
 
-    <div class="p-4 text-center text-white text-sm opacity-75">Sola kaydır Sil • Sağa kaydır Sakla</div>
-  </main>
+    <!-- Sonuç Ekranı -->
+    <div id="resultScreen" class="container hidden">
+        <div class="result-screen">
+            <div class="icon-circle">✅</div>
+            <h1>Seçim Tamamlandı!</h1>
+            <p id="resultText">X fotoğraf silinecek olarak işaretlendi</p>
 
-  <!-- Results modal/page -->
-  <section id="results"
-    class="min-h-screen bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 p-4 overflow-y-auto hide">
-    <div class="max-w-2xl mx-auto py-8">
-      <div class="bg-white rounded-3xl shadow-2xl p-8 mb-6 text-center">
-        <h2 class="text-3xl font-bold text-gray-800 mb-2">Seçim Tamamlandı 🎉</h2>
-        <p class="text-gray-600 mb-6"><span id="del-count">0</span> fotoğraf silinecek olarak işaretlendi.</p>
-        <button id="btn-share"
-          class="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:opacity-50 flex items-center justify-center gap-2 mx-auto">Silinecekleri
-          Paylaş/İndir</button>
-        <button id="btn-copy"
-          class="mt-3 bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all">Listeyi
-          Kopyala</button>
-        <button id="btn-restart"
-          class="w-full mt-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all">Yeniden
-          Başla</button>
-      </div>
+            <div class="stats">
+                <div class="stat-box delete">
+                    <div class="stat-number" id="finalDeleteCount">0</div>
+                    <div class="stat-label">Silinecek</div>
+                </div>
+                <div class="stat-box keep">
+                    <div class="stat-number" id="finalKeepCount">0</div>
+                    <div class="stat-label">Saklanacak</div>
+                </div>
+            </div>
 
-      <div id="preview" class="bg-white rounded-3xl shadow-2xl p-8 mb-6 hide">
-        <h3 class="text-xl font-bold text-gray-800 mb-4">Silinecek Fotoğraflar Önizleme</h3>
-        <div id="preview-grid" class="grid grid-cols-3 gap-2 max-h-96 overflow-y-auto"></div>
-      </div>
+            <button class="btn-secondary" onclick="downloadPhotos()" id="downloadBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                </svg>
+                <span id="downloadBtnText">Silinecekleri İndir</span>
+            </button>
 
-      <div id="name-list" class="bg-white rounded-3xl shadow-2xl p-8 mb-6 hide">
-        <h3 class="text-xl font-bold text-gray-800 mb-4">Silinecek Fotoğraf İsimleri</h3>
-        <div class="max-h-60 overflow-y-auto border rounded-xl">
-          <ul id="names-ul" class="divide-y"></ul>
+            <p style="font-size: 12px; color: #6b7280;">Fotoğraflar indirilecek, sonra iOS'ta manuel silebilirsiniz</p>
+
+            <div id="previewSection" class="hidden" style="margin: 30px 0;">
+                <h3 style="text-align: left; margin-bottom: 15px;">Silinecek Fotoğraflar</h3>
+                <div class="preview-grid" id="previewGrid"></div>
+            </div>
+
+            <div style="margin: 30px 0; text-align: left;">
+                <h3 style="margin-bottom: 20px;">📱 iOS'ta Nasıl Silinir?</h3>
+                
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Fotoğrafları İndirin</h4>
+                            <p>Yukarıdaki butona basın, fotoğraflar indirilecek</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>İndirilenler Klasörüne Gidin</h4>
+                            <p>Dosyalar uygulamasından indirilen fotoğrafları görün</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Fotoğraflar'da Benzerlerini Bulun</h4>
+                            <p>Her fotoğrafa bakarak, Fotoğraflar uygulamasında aynısını bulun ve silin</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Toplu Seçim Yapın</h4>
+                            <p>Benzer fotoğrafları seçip toplu silin</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <p>⚠️ iOS kısıtlamaları nedeniyle tam otomatik silme mümkün değil. Bu yöntem manuel ama %100 güvenilir!</p>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="restart()">Yeniden Başla</button>
         </div>
-      </div>
     </div>
-  </section>
 
-  <script src="/app.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
-        navigator.serviceWorker.register('/service-worker.js').catch(function () { });
-      });
-    }
-  </script>
+    <input type="file" id="fileInput" accept="image/*,video/*" multiple style="display: none;">
+
+    <script>
+        let photos = [];
+        let currentIndex = 0;
+        let toDeletePhotos = [];
+        let keptPhotos = [];
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        let currentY = 0;
+
+        const card = document.getElementById('photoCard');
+        const photoImg = document.getElementById('photoImg');
+        const fileName = document.getElementById('fileName');
+        const deleteIndicator = document.getElementById('deleteIndicator');
+        const keepIndicator = document.getElementById('keepIndicator');
+
+        function selectPhotos() {
+            document.getElementById('fileInput').click();
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            photos = files.map(file => ({
+                file: file,
+                url: URL.createObjectURL(file),
+                type: file.type,
+                name: file.name
+            }));
+
+            // Rastgele sırala
+            photos.sort(() => Math.random() - 0.5);
+
+            if (photos.length > 0) {
+                document.getElementById('welcomeScreen').classList.add('hidden');
+                document.getElementById('mainScreen').classList.remove('hidden');
+                showPhoto(0);
+            }
+        });
+
+        function showPhoto(index) {
+            if (index >= photos.length) {
+                showResults();
+                return;
+            }
+
+            const photo = photos[index];
+            
+            if (photo.type.startsWith('image/')) {
+                photoImg.src = photo.url;
+                photoImg.style.display = 'block';
+            } else {
+                photoImg.src = photo.url;
+                photoImg.style.display = 'block';
+            }
+
+            fileName.textContent = photo.name;
+            
+            updateProgress();
+            resetCardPosition();
+        }
+
+        function updateProgress() {
+            document.getElementById('progressText').textContent = `${currentIndex + 1} / ${photos.length}`;
+            document.getElementById('deleteCount').textContent = toDeletePhotos.length;
+            document.getElementById('keepCount').textContent = keptPhotos.length;
+            
+            const progress = ((currentIndex + 1) / photos.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function resetCardPosition() {
+            card.style.transform = 'translate(0px, 0px) rotate(0deg)';
+            card.style.opacity = '1';
+            deleteIndicator.style.opacity = '0';
+            keepIndicator.style.opacity = '0';
+        }
+
+        function deletePhoto() {
+            toDeletePhotos.push(photos[currentIndex]);
+            nextPhoto();
+        }
+
+        function keepPhoto() {
+            keptPhotos.push(photos[currentIndex]);
+            nextPhoto();
+        }
+
+        function nextPhoto() {
+            currentIndex++;
+            if (currentIndex < photos.length) {
+                showPhoto(currentIndex);
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('mainScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+            
+            document.getElementById('resultText').textContent = `${toDeletePhotos.length} fotoğraf silinecek olarak işaretlendi`;
+            document.getElementById('finalDeleteCount').textContent = toDeletePhotos.length;
+            document.getElementById('finalKeepCount').textContent = keptPhotos.length;
+
+            if (toDeletePhotos.length > 0) {
+                showPreview();
+            }
+        }
+
+        function showPreview() {
+            const previewSection = document.getElementById('previewSection');
+            const previewGrid = document.getElementById('previewGrid');
+            
+            previewSection.classList.remove('hidden');
+            previewGrid.innerHTML = '';
+
+            toDeletePhotos.forEach((photo, index) => {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                
+                const img = document.createElement('img');
+                img.src = photo.url;
+                
+                const number = document.createElement('div');
+                number.className = 'preview-number';
+                number.textContent = index + 1;
+                
+                div.appendChild(img);
+                div.appendChild(number);
+                previewGrid.appendChild(div);
+            });
+        }
+
+        async function downloadPhotos() {
+            const btn = document.getElementById('downloadBtn');
+            const btnText = document.getElementById('downloadBtnText');
+            
+            btn.disabled = true;
+            btnText.textContent = 'İndiriliyor...';
+
+            for (let i = 0; i < toDeletePhotos.length; i++) {
+                const photo = toDeletePhotos[i];
+                const a = document.createElement('a');
+                a.href = photo.url;
+                a.download = `silinecek_${i + 1}_${photo.name}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+
+            btn.disabled = false;
+            btnText.textContent = '✓ İndirme Tamamlandı';
+            
+            setTimeout(() => {
+                btnText.textContent = 'Silinecekleri İndir';
+            }, 3000);
+        }
+
+        function restart() {
+            location.reload();
+        }
+
+        // Touch/Mouse sürükleme olayları
+        card.addEventListener('mousedown', startDrag);
+        card.addEventListener('touchstart', startDrag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+
+        function startDrag(e) {
+            isDragging = true;
+            const touch = e.type === 'touchstart' ? e.touches[0] : e;
+            startX = touch.clientX;
+            startY = touch.clientY;
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            
+            const touch = e.type === 'touchmove' ? e.touches[0] : e;
+            currentX = touch.clientX - startX;
+            currentY = touch.clientY - startY;
+            
+            const rotation = currentX * 0.1;
+            const opacity = 1 - Math.abs(currentX) / 300;
+            
+            card.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rotation}deg)`;
+            card.style.opacity = opacity;
+            
+            if (currentX < -50) {
+                deleteIndicator.style.opacity = '1';
+                keepIndicator.style.opacity = '0';
+            } else if (currentX > 50) {
+                keepIndicator.style.opacity = '1';
+                deleteIndicator.style.opacity = '0';
+            } else {
+                deleteIndicator.style.opacity = '0';
+                keepIndicator.style.opacity = '0';
+            }
+        }
+
+        function endDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            if (Math.abs(currentX) > 100) {
+                if (currentX < 0) {
+                    deletePhoto();
+                } else {
+                    keepPhoto();
+                }
+            } else {
+                resetCardPosition();
+            }
+            
+            currentX = 0;
+            currentY = 0;
+        }
+    </script>
 </body>
-
 </html>
