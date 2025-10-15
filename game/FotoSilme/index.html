@@ -530,17 +530,23 @@
                 </div>
             </div>
 
-            <button class="btn-secondary" onclick="downloadPhotos()" id="downloadBtn">
+            <button class="btn-secondary" onclick="copyFileNames()" id="copyBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
                 </svg>
-                <span id="downloadBtnText">Silinecekleri İndir</span>
+                <span id="copyBtnText">Dosya İsimlerini Kopyala</span>
             </button>
 
-            <p style="font-size: 12px; color: #6b7280;">Fotoğraflar indirilecek, sonra iOS'ta manuel silebilirsiniz</p>
+            <p style="font-size: 12px; color: #6b7280;">Listeyi kopyalayın ve iOS Kısayolunuza yapıştırın</p>
+            
+            <div id="fileNameList" style="background: #f3f4f6; border-radius: 15px; padding: 15px; margin: 15px 0; max-height: 300px; overflow-y: auto; text-align: left;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #1f2937;">📋 Silinecek Dosya İsimleri:</div>
+                <pre id="fileNames" style="font-size: 12px; color: #374151; white-space: pre-wrap; word-break: break-all; font-family: monospace; margin: 0;"></pre>
+            </div>
 
-            <div id="previewSection" class="hidden" style="margin: 30px 0;">
-                <h3 style="text-align: left; margin-bottom: 15px;">Silinecek Fotoğraflar</h3>
+            <div id="previewSection" style="margin: 30px 0;">
+                <h3 style="text-align: left; margin-bottom: 15px;">📸 Silinecek Fotoğraflar Önizleme</h3>
                 <div class="preview-grid" id="previewGrid"></div>
             </div>
 
@@ -593,6 +599,15 @@
     <input type="file" id="fileInput" accept="image/*,video/*" multiple style="display: none;">
 
     <script>
+        // Service Worker kaydı
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(function(registration) {
+                console.log('Service Worker kayıtlı:', registration);
+            }).catch(function(error) {
+                console.log('Service Worker kayıt hatası:', error);
+            });
+        }
+
         let photos = [];
         let currentIndex = 0;
         let toDeletePhotos = [];
@@ -697,16 +712,36 @@
             document.getElementById('finalDeleteCount').textContent = toDeletePhotos.length;
             document.getElementById('finalKeepCount').textContent = keptPhotos.length;
 
+            // Dosya isimlerini listele
+            const fileNamesList = toDeletePhotos.map(photo => photo.name).join('\n');
+            document.getElementById('fileNames').textContent = fileNamesList;
+
             if (toDeletePhotos.length > 0) {
                 showPreview();
             }
         }
 
-        function showPreview() {
-            const previewSection = document.getElementById('previewSection');
-            const previewGrid = document.getElementById('previewGrid');
+        function copyFileNames() {
+            const fileNamesList = toDeletePhotos.map(photo => photo.name).join('\n');
             
-            previewSection.classList.remove('hidden');
+            navigator.clipboard.writeText(fileNamesList).then(() => {
+                const btn = document.getElementById('copyBtn');
+                const btnText = document.getElementById('copyBtnText');
+                
+                btnText.textContent = '✓ Kopyalandı!';
+                btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                
+                setTimeout(() => {
+                    btnText.textContent = 'Dosya İsimlerini Kopyala';
+                    btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                }, 2000);
+            }).catch(err => {
+                alert('Kopyalama başarısız. Manuel olarak seçip kopyalayın.');
+            });
+        }
+
+        function showPreview() {
+            const previewGrid = document.getElementById('previewGrid');
             previewGrid.innerHTML = '';
 
             toDeletePhotos.forEach((photo, index) => {
@@ -724,33 +759,6 @@
                 div.appendChild(number);
                 previewGrid.appendChild(div);
             });
-        }
-
-        async function downloadPhotos() {
-            const btn = document.getElementById('downloadBtn');
-            const btnText = document.getElementById('downloadBtnText');
-            
-            btn.disabled = true;
-            btnText.textContent = 'İndiriliyor...';
-
-            for (let i = 0; i < toDeletePhotos.length; i++) {
-                const photo = toDeletePhotos[i];
-                const a = document.createElement('a');
-                a.href = photo.url;
-                a.download = `silinecek_${i + 1}_${photo.name}`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                
-                await new Promise(resolve => setTimeout(resolve, 200));
-            }
-
-            btn.disabled = false;
-            btnText.textContent = '✓ İndirme Tamamlandı';
-            
-            setTimeout(() => {
-                btnText.textContent = 'Silinecekleri İndir';
-            }, 3000);
         }
 
         function restart() {
