@@ -167,22 +167,51 @@
         input.type = 'file';
         input.multiple = true;
         input.accept = 'image/*,video/*';
+        input.style.display = 'none';
+
         input.onchange = (e) => {
-            const files = Array.from(e.target.files).map(file => ({
+            const files = Array.from(e.target.files);
+            if (files.length === 0) {
+                showEmpty();
+                return;
+            }
+
+            const processedFiles = files.map(file => ({
                 file,
                 url: URL.createObjectURL(file),
                 type: file.type,
                 name: file.name,
                 originalFile: file,
             }));
-            const shuffled = files.sort(() => Math.random() - 0.5);
+
+            const shuffled = processedFiles.sort(() => Math.random() - 0.5);
             state.photos = shuffled;
             state.currentIndex = 0;
             state.toDelete = [];
             state.kept = [];
-            if (state.photos.length === 0) { showEmpty(); } else { renderCurrent(); }
+
+            if (state.photos.length === 0) {
+                showEmpty();
+            } else {
+                renderCurrent();
+            }
         };
+
+        input.onerror = () => {
+            console.error('File input error');
+            showEmpty();
+        };
+
+        // Add to DOM temporarily for better mobile support
+        document.body.appendChild(input);
         input.click();
+
+        // Clean up after a delay
+        setTimeout(() => {
+            if (document.body.contains(input)) {
+                document.body.removeChild(input);
+            }
+        }, 1000);
     }
 
     // Share or download list
@@ -293,21 +322,84 @@
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         state.deferredPrompt = e;
+        state.showInstall = true;
         hide(el.installBanner, false);
     });
+
     window.addEventListener('appinstalled', () => {
         state.deferredPrompt = null;
-        hide(el.installBanner, true);
-    });
-    el.btnInstall.addEventListener('click', async () => {
-        if (!state.deferredPrompt) return;
-        state.deferredPrompt.prompt();
-        try { await state.deferredPrompt.userChoice; } catch (_) { }
-        state.deferredPrompt = null;
+        state.showInstall = false;
         hide(el.installBanner, true);
     });
 
+    // Check if already installed
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+        hide(el.installBanner, true);
+    }
+
+    el.btnInstall.addEventListener('click', async () => {
+        if (!state.deferredPrompt) {
+            // Fallback for iOS Safari
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                alert('iOS\'ta ana ekrana eklemek için Safari menüsünden "Ana Ekrana Ekle" seçeneğini kullanın.');
+            }
+            return;
+        }
+
+        try {
+            state.deferredPrompt.prompt();
+            const choiceResult = await state.deferredPrompt.userChoice;
+            console.log('User choice:', choiceResult.outcome);
+        } catch (error) {
+            console.error('Install prompt error:', error);
+        }
+
+        state.deferredPrompt = null;
+        state.showInstall = false;
+        hide(el.installBanner, true);
+    });
+
+    // Mobile-specific improvements
+    function preventZoom() {
+        document.addEventListener('touchstart', function (event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    }
+
+    // Prevent context menu on long press
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+    });
+
+    // Handle orientation change
+    window.addEventListener('orientationchange', () => {
+        setTimeout(() => {
+            if (state.photos.length > 0 && state.currentIndex < state.photos.length) {
+                renderCurrent();
+            }
+        }, 100);
+    });
+
+    // Prevent pull-to-refresh
+    document.addEventListener('touchmove', (e) => {
+        if (e.touches.length > 1) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
     // Init
+    preventZoom();
     showPermission();
     updateTopBar();
 })();
