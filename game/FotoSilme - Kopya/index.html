@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Galeri Temizleyici">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Galeri Temizleyici</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .welcome-screen, .result-screen {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .icon-circle {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 50px;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #1a202c;
+            margin-bottom: 15px;
+        }
+
+        p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .info-box {
+            background: #ebf8ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .info-box p {
+            color: #2c5282;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .info-box ol {
+            margin: 10px 0 0 20px;
+            color: #2c5282;
+        }
+
+        .info-box li {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        /* Ana Ekran */
+        .main-screen {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            color: white;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+
+        .card-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .card-wrapper {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 3/4;
+            position: relative;
+        }
+
+        .card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+        }
+
+        .card:active {
+            cursor: grabbing;
+        }
+
+        .card img, .card video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+        }
+
+        .swipe-indicator {
+            position: absolute;
+            top: 30px;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 22px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .swipe-delete {
+            left: 30px;
+            background: #ef4444;
+            transform: rotate(-12deg);
+        }
+
+        .swipe-keep {
+            right: 30px;
+            background: #10b981;
+            transform: rotate(12deg);
+        }
+
+        .file-name {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 12px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .action-buttons {
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .action-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-keep {
+            background: #10b981;
+            color: white;
+        }
+
+        .instruction {
+            text-align: center;
+            color: white;
+            padding: 15px;
+            opacity: 0.7;
+            font-size: 14px;
+        }
+
+        /* Sonuç Ekranı */
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-box.delete {
+            background: #fee2e2;
+        }
+
+        .stat-box.keep {
+            background: #d1fae5;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-box.delete .stat-number {
+            color: #dc2626;
+        }
+
+        .stat-box.keep .stat-number {
+            color: #059669;
+        }
+
+        .stat-label {
+            font-weight: 600;
+        }
+
+        .stat-box.delete .stat-label {
+            color: #dc2626;
+        }
+
+        .stat-box.keep .stat-label {
+            color: #059669;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px 0;
+            padding: 5px;
+        }
+
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f3f4f6;
+        }
+
+        .preview-item img, .preview-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-number {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ef4444;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .steps {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .step {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-size: 16px;
+            color: #1a202c;
+            margin-bottom: 5px;
+        }
+
+        .step-content p {
+            font-size: 14px;
+            color: #4a5568;
+            margin: 0;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border: 2px solid #fbbf24;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .warning-box p {
+            color: #92400e;
+            font-weight: 600;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            transform: scale(1.02);
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .welcome-screen, .result-screen {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hoş Geldin Ekranı -->
+    <div id="welcomeScreen" class="container">
+        <div class="welcome-screen">
+            <div class="icon-circle">📸</div>
+            <h1>Galeri Temizleyici</h1>
+            <p>Fotoğraflarınızı hızlıca ayıklayın! Silinecekleri işaretleyin, sonra iOS'ta toplu silin.</p>
+            <button class="btn-primary" onclick="selectPhotos()">Fotoğrafları Seç</button>
+            <div class="info-box">
+                <p><strong>⚠️ Nasıl Çalışır?</strong></p>
+                <ol>
+                    <li>Fotoğrafları seçin</li>
+                    <li>Kaydırarak silinecekleri belirleyin</li>
+                    <li>Silinecekleri indirin</li>
+                    <li>iOS'ta manuel silin</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ana Kaydırma Ekranı -->
+    <div id="mainScreen" class="main-screen hidden">
+        <div class="header">
+            <div class="progress-text">
+                <span id="progressText">1 / 10</span>
+                <span>
+                    <span id="deleteCount">0</span> ❌ | 
+                    <span id="keepCount">0</span> ✅
+                </span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="card-container">
+            <div class="card-wrapper">
+                <div class="card" id="photoCard">
+                    <img id="photoImg" src="" alt="Fotoğraf">
+                    <div class="swipe-indicator swipe-delete" id="deleteIndicator">SİL</div>
+                    <div class="swipe-indicator swipe-keep" id="keepIndicator">SAKLA</div>
+                    <div class="file-name" id="fileName">Fotoğraf.jpg</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="action-btn btn-delete" onclick="deletePhoto()">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                </svg>
+            </button>
+            <button class="action-btn btn-keep" onclick="keepPhoto()">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 6L9 17l-5-5"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="instruction">
+            Sola kaydır = Sil | Sağa kaydır = Sakla
+        </div>
+    </div>
+
+    <!-- Sonuç Ekranı -->
+    <div id="resultScreen" class="container hidden">
+        <div class="result-screen">
+            <div class="icon-circle">✅</div>
+            <h1>Seçim Tamamlandı!</h1>
+            <p id="resultText">X fotoğraf silinecek olarak işaretlendi</p>
+
+            <div class="stats">
+                <div class="stat-box delete">
+                    <div class="stat-number" id="finalDeleteCount">0</div>
+                    <div class="stat-label">Silinecek</div>
+                </div>
+                <div class="stat-box keep">
+                    <div class="stat-number" id="finalKeepCount">0</div>
+                    <div class="stat-label">Saklanacak</div>
+                </div>
+            </div>
+
+            <button class="btn-secondary" onclick="copyFileNames()" id="copyBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                </svg>
+                <span id="copyBtnText">Dosya İsimlerini Kopyala</span>
+            </button>
+
+            <p style="font-size: 12px; color: #6b7280;">Listeyi kopyalayın ve iOS Kısayolunuza yapıştırın</p>
+            
+            <div id="fileNameList" style="background: #f3f4f6; border-radius: 15px; padding: 15px; margin: 15px 0; max-height: 300px; overflow-y: auto; text-align: left;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #1f2937;">📋 Silinecek Dosya İsimleri:</div>
+                <pre id="fileNames" style="font-size: 12px; color: #374151; white-space: pre-wrap; word-break: break-all; font-family: monospace; margin: 0;"></pre>
+            </div>
+
+            <div id="previewSection" style="margin: 30px 0;">
+                <h3 style="text-align: left; margin-bottom: 15px;">📸 Silinecek Fotoğraflar Önizleme</h3>
+                <div class="preview-grid" id="previewGrid"></div>
+            </div>
+
+            <div style="margin: 30px 0; text-align: left;">
+                <h3 style="margin-bottom: 20px;">📱 iOS'ta Nasıl Silinir?</h3>
+                
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Fotoğrafları İndirin</h4>
+                            <p>Yukarıdaki butona basın, fotoğraflar indirilecek</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>İndirilenler Klasörüne Gidin</h4>
+                            <p>Dosyalar uygulamasından indirilen fotoğrafları görün</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Fotoğraflar'da Benzerlerini Bulun</h4>
+                            <p>Her fotoğrafa bakarak, Fotoğraflar uygulamasında aynısını bulun ve silin</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Toplu Seçim Yapın</h4>
+                            <p>Benzer fotoğrafları seçip toplu silin</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <p>⚠️ iOS kısıtlamaları nedeniyle tam otomatik silme mümkün değil. Bu yöntem manuel ama %100 güvenilir!</p>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="restart()">Yeniden Başla</button>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" accept="image/*,video/*" multiple style="display: none;">
+
+    <script>
+        // Service Worker kaydı
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(function(registration) {
+                console.log('Service Worker kayıtlı:', registration);
+            }).catch(function(error) {
+                console.log('Service Worker kayıt hatası:', error);
+            });
+        }
+
+        let photos = [];
+        let currentIndex = 0;
+        let toDeletePhotos = [];
+        let keptPhotos = [];
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        let currentY = 0;
+
+        const card = document.getElementById('photoCard');
+        const photoImg = document.getElementById('photoImg');
+        const fileName = document.getElementById('fileName');
+        const deleteIndicator = document.getElementById('deleteIndicator');
+        const keepIndicator = document.getElementById('keepIndicator');
+
+        function selectPhotos() {
+            document.getElementById('fileInput').click();
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            photos = files.map(file => ({
+                file: file,
+                url: URL.createObjectURL(file),
+                type: file.type,
+                name: file.name
+            }));
+
+            // Rastgele sırala
+            photos.sort(() => Math.random() - 0.5);
+
+            if (photos.length > 0) {
+                document.getElementById('welcomeScreen').classList.add('hidden');
+                document.getElementById('mainScreen').classList.remove('hidden');
+                showPhoto(0);
+            }
+        });
+
+        function showPhoto(index) {
+            if (index >= photos.length) {
+                showResults();
+                return;
+            }
+
+            const photo = photos[index];
+            
+            if (photo.type.startsWith('image/')) {
+                photoImg.src = photo.url;
+                photoImg.style.display = 'block';
+            } else {
+                photoImg.src = photo.url;
+                photoImg.style.display = 'block';
+            }
+
+            fileName.textContent = photo.name;
+            
+            updateProgress();
+            resetCardPosition();
+        }
+
+        function updateProgress() {
+            document.getElementById('progressText').textContent = `${currentIndex + 1} / ${photos.length}`;
+            document.getElementById('deleteCount').textContent = toDeletePhotos.length;
+            document.getElementById('keepCount').textContent = keptPhotos.length;
+            
+            const progress = ((currentIndex + 1) / photos.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function resetCardPosition() {
+            card.style.transform = 'translate(0px, 0px) rotate(0deg)';
+            card.style.opacity = '1';
+            deleteIndicator.style.opacity = '0';
+            keepIndicator.style.opacity = '0';
+        }
+
+        function deletePhoto() {
+            toDeletePhotos.push(photos[currentIndex]);
+            nextPhoto();
+        }
+
+        function keepPhoto() {
+            keptPhotos.push(photos[currentIndex]);
+            nextPhoto();
+        }
+
+        function nextPhoto() {
+            currentIndex++;
+            if (currentIndex < photos.length) {
+                showPhoto(currentIndex);
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('mainScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+            
+            document.getElementById('resultText').textContent = `${toDeletePhotos.length} fotoğraf silinecek olarak işaretlendi`;
+            document.getElementById('finalDeleteCount').textContent = toDeletePhotos.length;
+            document.getElementById('finalKeepCount').textContent = keptPhotos.length;
+
+            // Dosya isimlerini listele
+            const fileNamesList = toDeletePhotos.map(photo => photo.name).join('\n');
+            document.getElementById('fileNames').textContent = fileNamesList;
+
+            if (toDeletePhotos.length > 0) {
+                showPreview();
+            }
+        }
+
+        function copyFileNames() {
+            const fileNamesList = toDeletePhotos.map(photo => photo.name).join('\n');
+            
+            navigator.clipboard.writeText(fileNamesList).then(() => {
+                const btn = document.getElementById('copyBtn');
+                const btnText = document.getElementById('copyBtnText');
+                
+                btnText.textContent = '✓ Kopyalandı!';
+                btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                
+                setTimeout(() => {
+                    btnText.textContent = 'Dosya İsimlerini Kopyala';
+                    btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                }, 2000);
+            }).catch(err => {
+                alert('Kopyalama başarısız. Manuel olarak seçip kopyalayın.');
+            });
+        }
+
+        function showPreview() {
+            const previewGrid = document.getElementById('previewGrid');
+            previewGrid.innerHTML = '';
+
+            toDeletePhotos.forEach((photo, index) => {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                
+                const img = document.createElement('img');
+                img.src = photo.url;
+                
+                const number = document.createElement('div');
+                number.className = 'preview-number';
+                number.textContent = index + 1;
+                
+                div.appendChild(img);
+                div.appendChild(number);
+                previewGrid.appendChild(div);
+            });
+        }
+
+        function restart() {
+            location.reload();
+        }
+
+        // Touch/Mouse sürükleme olayları
+        card.addEventListener('mousedown', startDrag);
+        card.addEventListener('touchstart', startDrag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+
+        function startDrag(e) {
+            isDragging = true;
+            const touch = e.type === 'touchstart' ? e.touches[0] : e;
+            startX = touch.clientX;
+            startY = touch.clientY;
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            
+            const touch = e.type === 'touchmove' ? e.touches[0] : e;
+            currentX = touch.clientX - startX;
+            currentY = touch.clientY - startY;
+            
+            const rotation = currentX * 0.1;
+            const opacity = 1 - Math.abs(currentX) / 300;
+            
+            card.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rotation}deg)`;
+            card.style.opacity = opacity;
+            
+            if (currentX < -50) {
+                deleteIndicator.style.opacity = '1';
+                keepIndicator.style.opacity = '0';
+            } else if (currentX > 50) {
+                keepIndicator.style.opacity = '1';
+                deleteIndicator.style.opacity = '0';
+            } else {
+                deleteIndicator.style.opacity = '0';
+                keepIndicator.style.opacity = '0';
+            }
+        }
+
+        function endDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            if (Math.abs(currentX) > 100) {
+                if (currentX < 0) {
+                    deletePhoto();
+                } else {
+                    keepPhoto();
+                }
+            } else {
+                resetCardPosition();
+            }
+            
+            currentX = 0;
+            currentY = 0;
+        }
+    </script>
+</body>
+</html>

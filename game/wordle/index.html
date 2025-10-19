@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mini Wordle (TR)</title>
+    <style>
+        :root {
+            --bg: #0b1020;
+            --text: #e5e7eb;
+            --muted: #9ca3af;
+            --ok: #16a34a;
+            --mid: #eab308;
+            --no: #374151;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: linear-gradient(180deg, var(--bg), #0b1328);
+            color: var(--text);
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial
+        }
+
+        .wrap {
+            width: min(900px, 92%);
+            margin: 32px auto 60px
+        }
+
+        h1 {
+            margin: 0 0 6px;
+            font-size: clamp(28px, 5vw, 40px);
+            text-align: center;
+        }
+
+        p.lead {
+            margin: 0 0 16px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .game {
+            display: grid;
+            gap: 16px;
+            justify-items: center;
+            margin-top: 18px
+        }
+
+        .grid {
+            display: grid;
+            gap: 8px;
+            justify-content: center;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .row {
+            display: grid;
+            gap: 8px;
+            grid-auto-flow: column;
+            justify-content: center
+        }
+
+        .tile {
+            width: var(--tile-size, 54px);
+            height: var(--tile-size, 54px);
+            min-width: 40px;
+            min-height: 40px;
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, .18);
+            background: rgba(255, 255, 255, .03);
+            font-weight: 800;
+            font-size: 1.25rem;
+            text-transform: uppercase;
+            box-shadow: var(--shadow);
+            aspect-ratio: 1;
+        }
+
+        .tile.filled {
+            border-color: rgba(255, 255, 255, .28)
+        }
+
+        .tile.correct {
+            background: var(--ok);
+            border-color: var(--ok);
+            color: #fff
+        }
+
+        .tile.present {
+            background: var(--mid);
+            border-color: var(--mid);
+            color: #000
+        }
+
+        .tile.absent {
+            background: var(--no);
+            border-color: var(--no);
+            color: #d1d5db
+        }
+
+        @keyframes flip {
+            0% {
+                transform: rotateX(0)
+            }
+
+            50% {
+                transform: rotateX(90deg)
+            }
+
+            100% {
+                transform: rotateX(0)
+            }
+        }
+
+        .tile.reveal {
+            animation: flip .35s ease;
+            transform-origin: center
+        }
+
+        .kbd {
+            display: grid;
+            gap: 8px;
+            grid-template-rows: auto auto auto;
+        }
+
+        .kbd-row {
+            display: grid;
+            grid-auto-flow: column;
+            gap: 8px;
+            align-items: stretch;
+        }
+
+        .key {
+            min-width: 40px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, .18);
+            background: rgba(255, 255, 255, .04);
+            color: var(--text);
+            font-weight: 700;
+            cursor: pointer
+        }
+
+        .key.large {
+            min-width: 50px;
+            padding: 12px 16px;
+        }
+
+        .key.enter {
+            min-width: 50px;
+            padding: 12px 16px;
+        }
+
+        .key:hover {
+            filter: brightness(1.07)
+        }
+
+        .key.correct {
+            background: var(--ok);
+            border-color: var(--ok);
+            color: #fff
+        }
+
+        .key.present {
+            background: var(--mid);
+            border-color: var(--mid);
+            color: #000
+        }
+
+        .key.absent {
+            background: var(--no);
+            border-color: var(--no);
+            color: #d1d5db
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-weight: 700;
+            cursor: pointer;
+            background: linear-gradient(135deg, #7c3aed, #22d3ee);
+            color: #fff;
+            box-shadow: var(--shadow)
+        }
+
+        .btn.out {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, .25);
+            color: var(--text)
+        }
+
+        .status {
+            color: var(--muted);
+            min-height: 24px
+        }
+
+        dialog {
+            border: 0;
+            border-radius: 12px;
+            padding: 18px;
+            background: #0b1120;
+            color: var(--text)
+        }
+
+        dialog::backdrop {
+            background: rgba(0, 0, 0, .6)
+        }
+
+        .modal-content {
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            margin: 0 0 16px;
+            font-size: 1.5rem;
+        }
+
+        .modal-content p {
+            margin: 0 0 20px;
+            color: var(--muted);
+        }
+
+        .word-display {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+        }
+
+        .word-display strong {
+            color: var(--ok);
+            font-size: 1.2rem;
+        }
+
+        .field {
+            margin: 10px 0
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 700
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, .18);
+            background: rgba(255, 255, 255, .03);
+            color: var(--text);
+            outline: transparent
+        }
+
+        small.error {
+            color: #fca5a5;
+            min-height: 18px;
+            display: block
+        }
+
+        @media (max-width:520px) {
+            .tile {
+                width: 46px;
+                height: 46px
+            }
+
+            .key {
+                padding: 8px 10px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="wrap">
+        <h1>Mini Wordle (TR)</h1>
+        <p class="lead">Önce gizli kelimeyi yaz; kelime uzunluğuna göre ızgara oluşur. 6 tahminde çözmeye çalış.</p>
+
+        <div class="game">
+            <div id="grid" class="grid" role="grid" aria-label="Wordle ızgarası"></div>
+            <div id="kbd" class="kbd" aria-label="Ekran klavyesi"></div>
+            <div class="actions">
+                <button id="restart" class="btn out" type="button">Yeniden Başlat</button>
+                <span id="status" class="status" aria-live="polite"></span>
+            </div>
+        </div>
+    </main>
+
+    <dialog id="setup" aria-label="Gizli kelime belirle">
+        <form id="setup-form" method="dialog">
+            <h3>Gizli Kelime</h3>
+            <div class="field">
+                <label for="secret">Kelime (3–10 harf)</label>
+                <input id="secret" type="text" placeholder="ör. ÇİÇEK" required />
+                <small class="error"></small>
+            </div>
+            <div class="field">
+                <label for="tries">Hak Sayısı</label>
+                <input id="tries" type="number" min="3" max="10" value="6" />
+            </div>
+            <div class="actions">
+                <button class="btn" value="ok">Başlat</button>
+                <button class="btn out" value="cancel" formnovalidate>Vazgeç</button>
+            </div>
+            <p class="status">Türkçe karakterler desteklenir: Ç Ğ İ I Ö Ş Ü</p>
+        </form>
+    </dialog>
+
+    <dialog id="congratulations" aria-label="Tebrikler">
+        <div class="modal-content">
+            <h2>🎉 Tebrikler! 🎉</h2>
+            <p>Kelimeyi doğru tahmin ettiniz!</p>
+            <div class="word-display">
+                <strong>Doğru Kelime: <span id="correct-word-win"></span></strong>
+            </div>
+            <div class="actions">
+                <button class="btn" onclick="document.getElementById('congratulations').close(); openSetup();">Yeni
+                    Oyun</button>
+                <button class="btn out"
+                    onclick="document.getElementById('congratulations').close(); document.getElementById('restart').style.display = 'block';">Kapat</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="game-over" aria-label="Oyun Bitti">
+        <div class="modal-content">
+            <h2>😔 Maalesef</h2>
+            <p>Tüm haklarınız bitti!</p>
+            <div class="word-display">
+                <strong>Doğru Kelime: <span id="correct-word-lose"></span></strong>
+            </div>
+            <div class="actions">
+                <button class="btn" onclick="document.getElementById('game-over').close(); openSetup();">Yeni
+                    Oyun</button>
+                <button class="btn out"
+                    onclick="document.getElementById('game-over').close(); document.getElementById('restart').style.display = 'block';">Kapat</button>
+            </div>
+        </div>
+    </dialog>
+
+    <script>
+        // -------- Mini Wordle (TR) --------
+        const $ = (s, c = document) => c.querySelector(s);
+        const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
+
+        const setup = $('#setup');
+        const form = $('#setup-form');
+        const grid = $('#grid');
+        const kbd = $('#kbd');
+        const statusEl = $('#status');
+        const restart = $('#restart');
+        const congratsModal = $('#congratulations');
+        const gameOverModal = $('#game-over');
+
+        const toUp = s => (s || '').toLocaleUpperCase('tr-TR');
+        const isLetter = ch => /^[A-ZÇĞİIÖŞÜa-zçğıiöşü]$/i.test(ch);
+
+        const KBD_ROWS = [
+            ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'Ğ', 'Ü', 'BACK'],
+            ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ş', 'İ'],
+            ['Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Ö', 'Ç', 'ENTER']
+        ];
+
+        let secret = '', wordLen = 5, maxRows = 6;
+        let row = 0, col = 0, board = [], locked = false;
+
+        function openSetup() {
+            $('#secret', setup).value = '';
+            $('#tries', setup).value = 6;
+            statusEl.textContent = '';
+            setup.showModal();
+        }
+
+        function initBoard() {
+            grid.innerHTML = '';
+            board = Array.from({ length: maxRows }, () => '');
+
+            // Create rows based on maxRows (number of attempts)
+            for (let r = 0; r < maxRows; r++) {
+                const rowEl = document.createElement('div');
+                rowEl.className = 'row';
+                rowEl.setAttribute('role', 'row');
+                rowEl.style.gridTemplateColumns = `repeat(${wordLen}, 1fr)`;
+
+                // Create tiles based on wordLen (target word length)
+                for (let c = 0; c < wordLen; c++) {
+                    const t = document.createElement('div');
+                    t.className = 'tile';
+                    t.setAttribute('role', 'gridcell');
+                    t.setAttribute('aria-label', `Satır ${r + 1}, Sütun ${c + 1}`);
+                    rowEl.appendChild(t);
+                }
+                grid.appendChild(rowEl);
+            }
+
+            // Set responsive sizing
+            const tileSize = Math.min(54, Math.max(40, (900 - (wordLen - 1) * 8) / wordLen));
+            grid.style.setProperty('--tile-size', `${tileSize}px`);
+        }
+
+        function buildKeyboard() {
+            kbd.innerHTML = '';
+
+            // İlk iki satırı oluştur
+            for (let i = 0; i < 2; i++) {
+                const r = document.createElement('div');
+                r.className = 'kbd-row';
+
+                KBD_ROWS[i].forEach((k, colIndex) => {
+                    const b = document.createElement('button');
+                    b.type = 'button';
+
+                    if (k === 'BACK') {
+                        b.className = 'key large';
+                        b.textContent = '⌫';
+                    } else {
+                        b.className = 'key';
+                        b.textContent = k;
+                    }
+
+                    b.dataset.key = k;
+                    b.addEventListener('click', onKeyBtn);
+                    r.appendChild(b);
+                });
+                kbd.appendChild(r);
+            }
+
+            // Üçüncü satır - ENTER tuşu iki satıra yayılacak
+            const lastRow = document.createElement('div');
+            lastRow.className = 'kbd-row';
+
+            KBD_ROWS[2].forEach((k, colIndex) => {
+                const b = document.createElement('button');
+                b.type = 'button';
+
+                if (k === 'ENTER') {
+                    b.className = 'key enter';
+                    b.textContent = 'ENTER';
+                } else {
+                    b.className = 'key';
+                    b.textContent = k;
+                }
+
+                b.dataset.key = k;
+                b.addEventListener('click', onKeyBtn);
+                lastRow.appendChild(b);
+            });
+            kbd.appendChild(lastRow);
+        }
+
+        function curRowEl() { return grid.children[row]; }
+        function drawRow() {
+            const rowEl = curRowEl(); if (!rowEl) return;
+            const letters = (board[row] || '').padEnd(wordLen, ' ').slice(0, wordLen).split('');
+            [...rowEl.children].forEach((tile, i) => {
+                tile.textContent = letters[i].trim() ? letters[i] : '';
+                tile.classList.toggle('filled', !!letters[i].trim());
+            });
+        }
+
+        function onKeyBtn(e) { onKey(e.currentTarget.dataset.key); }
+        function onPhysical(e) {
+            if (locked) return;
+            // Oyun başlamamışsa (secret boşsa) tuşları işleme
+            if (!secret) return;
+            const k = e.key;
+            if (k === 'Enter') return onKey('ENTER');
+            if (k === 'Backspace') return onKey('BACK');
+            if (k.length === 1 && isLetter(k)) return onKey(toUp(k));
+        }
+        window.addEventListener('keydown', onPhysical);
+
+        function onKey(k) {
+            if (locked) return;
+            // Oyun başlamamışsa (secret boşsa) tuşları işleme
+            if (!secret) return;
+            if (k === 'ENTER') return submitRow();
+            if (k === 'BACK') {
+                if (col > 0) { board[row] = board[row].slice(0, -1); col--; drawRow(); }
+                return;
+            }
+            if (isLetter(k) && col < wordLen) {
+                board[row] = (board[row] || '') + k; col++; drawRow();
+            }
+        }
+
+        function evaluate(guess, target) {
+            const res = Array(wordLen).fill('absent');
+            const t = target.split(''); const g = guess.split('');
+            // greens
+            for (let i = 0; i < wordLen; i++) {
+                if (g[i] === t[i]) { res[i] = 'correct'; t[i] = null; g[i] = null; }
+            }
+            // counts
+            const cnt = {};
+            for (const ch of t) if (ch) cnt[ch] = (cnt[ch] || 0) + 1;
+            // yellows
+            for (let i = 0; i < wordLen; i++) {
+                const ch = g[i]; if (!ch) continue;
+                if (cnt[ch] > 0) { res[i] = 'present'; cnt[ch]--; }
+            }
+            return res;
+        }
+
+        function shadeKeyboard(guess, res) {
+            const pri = { correct: 3, present: 2, absent: 1 }, best = {};
+            for (let i = 0; i < guess.length; i++) {
+                const ch = guess[i], st = res[i];
+                best[ch] = (best[ch] && pri[best[ch]] > pri[st]) ? best[ch] : st;
+            }
+            $$('.key', kbd).forEach(b => {
+                const k = b.dataset.key;
+                if (!k || k === 'ENTER' || k === 'BACK') return;
+                const st = best[k]; if (!st) return;
+                b.classList.remove('correct', 'present', 'absent');
+                b.classList.add(st);
+            });
+        }
+
+        function revealRow(res) {
+            const rowEl = curRowEl(); if (!rowEl) return;
+            [...rowEl.children].forEach((tile, i) => {
+                setTimeout(() => {
+                    tile.classList.add('reveal');
+                    tile.classList.remove('correct', 'present', 'absent');
+                    tile.classList.add(res[i]);
+                }, i * 180);
+            });
+        }
+
+        function endGame(win) {
+            locked = true;
+            // Animasyonların bitmesini bekle
+            setTimeout(() => {
+                if (win) {
+                    $('#correct-word-win').textContent = secret;
+                    congratsModal.showModal();
+                } else {
+                    $('#correct-word-lose').textContent = secret;
+                    gameOverModal.showModal();
+                }
+            }, 800);
+        }
+
+        function submitRow() {
+            if (col < wordLen) { statusEl.textContent = 'Eksik harf var.'; return; }
+            const guess = board[row];
+            const res = evaluate(guess, secret);
+            revealRow(res); shadeKeyboard(guess, res);
+            if (guess === secret) return endGame(true);
+            row++; col = 0;
+            if (row >= maxRows) return endGame(false);
+            statusEl.textContent = `Kalan hak: ${maxRows - row}`;
+        }
+
+        function startGame(word, tries = 6) {
+            secret = toUp(word);
+            wordLen = secret.length;
+            maxRows = Math.max(3, Math.min(10, parseInt(tries) || 6));
+            row = 0; col = 0; locked = false;
+            initBoard(); buildKeyboard(); drawRow();
+            statusEl.textContent = `Kelime ${wordLen} harf — ${maxRows} hak`;
+            // Oyun başladığında yeniden başlat tuşunu gizle
+            restart.style.display = 'none';
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const inp = $('#secret', setup), tries = $('#tries', setup), err = $('.error', setup);
+            err.textContent = '';
+            const raw = toUp(inp.value.trim());
+            if (!raw) { err.textContent = 'Kelime zorunlu.'; return; }
+            if (!/^[A-ZÇĞİIÖŞÜa-zçğıiöşü]+$/.test(raw)) { err.textContent = 'Sadece harf kullanın.'; return; }
+            if (raw.length < 3 || raw.length > 10) { err.textContent = '3–10 harf olmalı.'; return; }
+            setup.close('ok'); startGame(raw, tries.value);
+        });
+
+        restart.addEventListener('click', () => {
+            restart.style.display = 'none';
+            openSetup();
+        });
+
+        // ilk açılışta kelime sor
+        setTimeout(openSetup, 200);
+    </script>
+</body>
+
+</html>
