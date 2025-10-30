@@ -29,6 +29,16 @@ const candyImages = ["sugar1.png", "sugar2.png", "sugar3.png", "sugar4.png", "su
 let isSoundOn = true;
 
 function startGame() {
+    // reset any previous game state to ensure interactivity
+    try { clearInterval(timer); } catch (_) { }
+    isAnimating = false;
+    tileClicked = null;
+    dragStart = null;
+    justDragged = false;
+    // clean lingering window listeners from prior drags
+    window.removeEventListener("pointermove", pointerMoveWindow);
+    window.removeEventListener("pointerup", pointerUpWindow);
+    window.removeEventListener("pointercancel", pointerUpWindow);
     score = 0;
     timeLeft = 30;
     scoreText.textContent = "Puan: " + score;
@@ -39,6 +49,8 @@ function startGame() {
     endScreen.classList.add("hidden");
 
     createBoard();
+    resetTileState();
+    ensureTilesInteractive();
     if (!delegatedBound) {
         board.addEventListener("pointerdown", delegatedPointerDown);
         delegatedBound = true;
@@ -98,6 +110,14 @@ function syncSoundButton() {
 
 function endGame() {
     clearInterval(timer);
+    isAnimating = false;
+    dragStart = null;
+    tileClicked = null;
+    justDragged = false;
+    // clean lingering listeners and make sure tiles won't trap events
+    window.removeEventListener("pointermove", pointerMoveWindow);
+    window.removeEventListener("pointerup", pointerUpWindow);
+    window.removeEventListener("pointercancel", pointerUpWindow);
     gameContainer.classList.add("hidden");
     endScreen.classList.remove("hidden");
     finalScore.textContent = score;
