@@ -4,6 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0b4251">
+    <meta name="description" content="Çalışma sürenizi takip edin - Süre Takip uygulaması">
+
+    <!-- iOS PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Süre Takip">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+
+    <!-- Android PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512x512.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="shortcut icon" href="./favicon.ico">
+
     <title>Süre Takip</title>
     <style>
         :root {
@@ -264,6 +284,99 @@
             font-weight: 700;
         }
 
+        /* PWA Install Banner */
+        .install-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg,
+                    rgba(11, 66, 81, 0.95) 0%,
+                    rgba(135, 187, 215, 0.95) 100%);
+            -webkit-backdrop-filter: blur(8px) saturate(160%);
+            backdrop-filter: blur(8px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
+            padding: 16px 20px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: calc(100% - 32px);
+            text-align: center;
+            z-index: 1000;
+            display: none;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .install-banner.show {
+            display: block;
+        }
+
+        .install-banner-content {
+            color: #ffffff;
+            margin-bottom: 12px;
+        }
+
+        .install-banner-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: var(--color1);
+        }
+
+        .install-banner-text {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .install-banner-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .install-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .install-btn-primary {
+            background: var(--color1);
+            color: #0b2d33;
+        }
+
+        .install-btn-primary:hover {
+            background: #ffd54a;
+            transform: translateY(-2px);
+        }
+
+        .install-btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+
+        .install-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
         /* Mobile-first fit: keep content within viewport without scroll */
         @media (max-width: 400px) {
             .container {
@@ -396,6 +509,18 @@
         </div>
 
         <div class="last-update" id="lastUpdate"></div>
+    </div>
+
+    <!-- PWA Install Banner -->
+    <div class="install-banner" id="installBanner">
+        <div class="install-banner-content">
+            <div class="install-banner-title">📱 Uygulamayı Yükle</div>
+            <div class="install-banner-text">Ana ekranınıza ekleyerek hızlıca erişin</div>
+        </div>
+        <div class="install-banner-buttons">
+            <button class="install-btn install-btn-primary" id="installButton">Yükle</button>
+            <button class="install-btn install-btn-secondary" id="dismissButton">Daha Sonra</button>
+        </div>
     </div>
 
     <script>
@@ -666,6 +791,113 @@
 
         // Start on page load
         init();
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('Service Worker registered:', reg))
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            });
+        }
+
+        // PWA Install Banner Control
+        let deferredPrompt;
+        const installBanner = document.getElementById('installBanner');
+        const installButton = document.getElementById('installButton');
+        const dismissButton = document.getElementById('dismissButton');
+
+        // Check if app is already installed (standalone mode)
+        function isStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches ||
+                window.navigator.standalone === true ||
+                document.referrer.includes('android-app://');
+        }
+
+        // Check if user has dismissed the banner
+        function isBannerDismissed() {
+            return localStorage.getItem('pwa-banner-dismissed') === 'true';
+        }
+
+        // Show install banner if conditions are met
+        function showInstallBanner() {
+            // Don't show if already installed or dismissed
+            if (isStandalone() || isBannerDismissed()) {
+                return;
+            }
+
+            // Wait a bit before showing (better UX)
+            setTimeout(() => {
+                if (installBanner && !isStandalone() && !isBannerDismissed()) {
+                    installBanner.classList.add('show');
+                }
+            }, 3000); // Show after 3 seconds
+        }
+
+        // Handle install button click
+        if (installButton) {
+            installButton.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    // Show the install prompt
+                    deferredPrompt.prompt();
+
+                    // Wait for user response
+                    const { outcome } = await deferredPrompt.userChoice;
+
+                    if (outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    } else {
+                        console.log('User dismissed the install prompt');
+                    }
+
+                    // Clear the deferred prompt
+                    deferredPrompt = null;
+
+                    // Hide banner
+                    installBanner.classList.remove('show');
+                } else {
+                    // Fallback: try to show native install prompt
+                    alert('Lütfen tarayıcı menüsünden "Ana ekrana ekle" seçeneğini kullanın.');
+                }
+            });
+        }
+
+        // Handle dismiss button click
+        if (dismissButton) {
+            dismissButton.addEventListener('click', () => {
+                installBanner.classList.remove('show');
+                localStorage.setItem('pwa-banner-dismissed', 'true');
+            });
+        }
+
+        // Listen for beforeinstallprompt event (Android Chrome)
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+
+            // Show our custom banner
+            showInstallBanner();
+        });
+
+        // Check on page load
+        window.addEventListener('load', () => {
+            // If not standalone and banner not dismissed, show it after a delay
+            if (!isStandalone() && !isBannerDismissed()) {
+                // Try to show banner after a short delay
+                showInstallBanner();
+            }
+        });
+
+        // Listen for app installed event
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA was installed');
+            deferredPrompt = null;
+            installBanner.classList.remove('show');
+            localStorage.removeItem('pwa-banner-dismissed'); // Reset for future updates
+        });
     </script>
 </body>
 

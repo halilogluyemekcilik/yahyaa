@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description"
+        content="HMGS ve Hakimlik/Savcılık sınav sonuçlarınızı takip edin ve analiz edin. Mobil uygulama gibi çalışır.">
+    <meta name="keywords" content="hmgs, hakimlik, savcılık, sınav, takip, sonuç, analiz, puan, net, gelişim">
+    <meta name="author" content="Sınav Takip Sistemi">
+
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Sınav Takip">
+    <meta name="msapplication-TileColor" content="#667eea">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+    <title>HMGS/Hakimlik-Savcılık Sınav Takip Sistemi</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📈 HMGS/Hakimlik-Savcılık Gelişim Takip Sistemi</h1>
+            <p>Sınav sonuçlarınızı takip edin ve gelişiminizi analiz edin</p>
+        </header>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2>Yeni Sınav Sonucu Ekle</h2>
+                <form id="examForm">
+                    <div class="form-group">
+                        <label for="examName">Sınav Adı:</label>
+                        <input type="text" id="examName" placeholder="Örn: 1. Deneme" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="examType">Sınav Türü:</label>
+                        <select id="examType" class="form-control">
+                            <option value="hmgs">HMGS</option>
+                            <option value="hakimlik-savcilik" selected>Hakimlik/Savcılık</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="examDate">Sınav Tarihi:</label>
+                        <input type="date" id="examDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="totalQuestions">Toplam Soru Sayısı:</label>
+                        <input type="number" id="totalQuestions" min="1" value="100" readonly>
+                        <small style="color: #718096; font-size: 0.9rem;">Sınav türüne göre otomatik güncellenir</small>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Sınavı Başlat</button>
+                </form>
+
+                <div class="current-exam" id="currentExam" style="display: none;">
+                    <h3>Aktif Sınav: <span id="currentExamName"></span> (<span id="currentExamType"></span>)</h3>
+                    <p>Tarih: <span id="currentExamDate"></span></p>
+                    <p>Toplam Soru: <span id="currentExamTotal"></span></p>
+                    <button type="button" class="btn-finish" onclick="finishExam()">Sınavı Bitir ve Kaydet</button>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <h2>Sınav Sonuçları</h2>
+
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <h3>Toplam Sınav</h3>
+                        <span id="totalExams">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Ortalama Başarı</h3>
+                        <span id="averageScore">%0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>En İyi Ders</h3>
+                        <span id="bestSubject">-</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>En Yüksek Net</h3>
+                        <span id="highestNet">0</span>
+                    </div>
+                </div>
+
+                <div class="actions-section">
+                    <button class="action-btn btn-compare" onclick="showCompareModal()" title="İki sınavı karşılaştır">
+                        📊 Sınav Karşılaştır
+                    </button>
+                    <button class="action-btn btn-export" onclick="exportData()"
+                        title="Verilerinizi JSON olarak indirin">
+                        💾 Verileri Dışa Aktar
+                    </button>
+                    <button class="action-btn btn-import" onclick="document.getElementById('importFile').click()"
+                        title="Yedekten veri yükleyin">
+                        📥 Verileri İçe Aktar
+                    </button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;"
+                        onchange="importData(event)">
+                    <button class="action-btn btn-clear" onclick="clearAllData()" title="Tüm verileri sil">
+                        🗑️ Verileri Temizle
+                    </button>
+                </div>
+
+                <div class="graphs-section" id="graphsSection" style="display: none;">
+                    <h3>Grafiklerle Gelişim Takibi</h3>
+                    <div class="chart-container">
+                        <canvas id="netChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="subjectChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="exam-table-container">
+                    <h3>Ders Bazında Sonuçlar</h3>
+                    <div class="table-wrapper">
+                        <table id="examTable" class="exam-table">
+                            <thead>
+                                <tr>
+                                    <th>Ders</th>
+                                    <th>Doğru</th>
+                                    <th>Yanlış</th>
+                                    <th>Net</th>
+                                    <th>Başarı %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="examTableBody">
+                            </tbody>
+                            <tfoot>
+                                <tr class="total-row">
+                                    <td><strong>TOPLAM</strong></td>
+                                    <td id="totalCorrect">0</td>
+                                    <td id="totalWrong">0</td>
+                                    <td id="totalNet">0</td>
+                                    <td id="totalScore">%0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="recent-exams">
+                    <div class="section-header">
+                        <h3>Kaydedilen Sınavlar</h3>
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" data-filter="all"
+                                onclick="filterExams('all')">Tümü</button>
+                            <button class="filter-btn" data-filter="hmgs" onclick="filterExams('hmgs')">HMGS</button>
+                            <button class="filter-btn" data-filter="hakimlik-savcilik"
+                                onclick="filterExams('hakimlik-savcilik')">Hakimlik/Savcılık</button>
+                        </div>
+                    </div>
+                    <div id="savedExams" class="exam-list">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobil Uygulama İndirme Banner'ı -->
+    <div id="mobileInstallBanner" class="mobile-install-banner" style="display: none;">
+        <div class="banner-content">
+            <div class="banner-icon">📱</div>
+            <div class="banner-text">
+                <h4>Mobil Uygulama Olarak İndirmek İster Misiniz?</h4>
+                <p>Uygulamayı ana ekranınıza ekleyerek daha hızlı erişim sağlayın. Çevrimdışı çalışır!</p>
+            </div>
+            <div class="banner-actions">
+                <button id="mobileInstallBtn" class="btn btn-primary">Evet, İndir</button>
+                <button id="mobileDismissBtn" class="btn btn-secondary">Hayır, Teşekkürler</button>
+            </div>
+            <button class="banner-close" id="mobileBannerClose">✕</button>
+        </div>
+    </div>
+
+    <!-- PWA Install Prompt (Eski - yedek olarak tutuluyor) -->
+    <div id="pwaInstallPrompt" class="pwa-install-prompt" style="display: none;">
+        <div class="pwa-content">
+            <div class="pwa-icon">📱</div>
+            <div class="pwa-text">
+                <h4>Ana Ekrana Ekle</h4>
+                <p>Bu uygulamayı ana ekranınıza ekleyerek daha hızlı erişim sağlayın!</p>
+            </div>
+            <div class="pwa-actions">
+                <button id="pwaInstallBtn" class="btn btn-primary">Ekle</button>
+                <button id="pwaDismissBtn" class="btn btn-secondary">Sonra</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js', {
+                    scope: './'
+                })
+                    .then(registration => {
+                        console.log('Tyt Takip SW kaydı başarılı. Kapsam:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('Tyt Takip SW kaydı başarısız:', error);
+                    });
+            });
+        }
+
+        let deferredPrompt;
+        const mobileInstallBanner = document.getElementById('mobileInstallBanner');
+        const mobileInstallBtn = document.getElementById('mobileInstallBtn');
+        const mobileDismissBtn = document.getElementById('mobileDismissBtn');
+        const mobileBannerClose = document.getElementById('mobileBannerClose');
+        const pwaInstallPrompt = document.getElementById('pwaInstallPrompt');
+        const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+        const pwaDismissBtn = document.getElementById('pwaDismissBtn');
+
+        // Banner'ın daha önce gösterilip gösterilmediğini kontrol et
+        const bannerDismissed = localStorage.getItem('mobileBannerDismissed');
+        const bannerShowTime = localStorage.getItem('mobileBannerShowTime');
+        const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000); // 7 gün
+
+        // iOS için özel kontrol
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+        // Eğer zaten yüklüyse banner gösterme
+        if (isStandalone) {
+            console.log('Uygulama zaten yüklü');
+        } else {
+            // Mobil cihaz kontrolü
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+            // Eğer mobil cihazsa ve daha önce reddedilmediyse veya 7 gün geçtiyse banner göster
+            if (isMobile && (!bannerDismissed || (bannerShowTime && parseInt(bannerShowTime) < oneWeekAgo))) {
+                // Sayfa yüklendikten 3 saniye sonra banner göster
+                setTimeout(() => {
+                    if (mobileInstallBanner) {
+                        mobileInstallBanner.style.display = 'block';
+                        mobileInstallBanner.classList.add('show');
+                    }
+                }, 3000);
+            }
+        }
+
+        // PWA Install Prompt (Android Chrome için)
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('🎯 PWA install prompt tetiklendi!');
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Mobil banner'ı gizle, PWA prompt göster
+            if (mobileInstallBanner) {
+                mobileInstallBanner.style.display = 'none';
+            }
+            if (pwaInstallPrompt) {
+                pwaInstallPrompt.style.display = 'block';
+            }
+        });
+
+        // Mobil banner install butonu (Android için PWA, iOS için yönlendirme)
+        if (mobileInstallBtn) {
+            mobileInstallBtn.addEventListener('click', () => {
+                if (isIOS) {
+                    // iOS için App Store veya talimat göster
+                    showIOSInstallInstructions();
+                    if (mobileInstallBanner) {
+                        mobileInstallBanner.style.display = 'none';
+                        localStorage.setItem('mobileBannerDismissed', 'true');
+                        localStorage.setItem('mobileBannerShowTime', Date.now().toString());
+                    }
+                } else if (deferredPrompt) {
+                    // Android için PWA install
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('✅ PWA kurulumu kabul edildi');
+                            if (mobileInstallBanner) {
+                                mobileInstallBanner.style.display = 'none';
+                            }
+                        } else {
+                            console.log('❌ PWA kurulumu reddedildi');
+                        }
+                        deferredPrompt = null;
+                    });
+                } else {
+                    // PWA desteklenmiyorsa genel talimatlar
+                    showInstallInstructions();
+                }
+            });
+        }
+
+        // Banner'ı kapat
+        if (mobileDismissBtn) {
+            mobileDismissBtn.addEventListener('click', () => {
+                if (mobileInstallBanner) {
+                    mobileInstallBanner.style.display = 'none';
+                    localStorage.setItem('mobileBannerDismissed', 'true');
+                    localStorage.setItem('mobileBannerShowTime', Date.now().toString());
+                }
+            });
+        }
+
+        if (mobileBannerClose) {
+            mobileBannerClose.addEventListener('click', () => {
+                if (mobileInstallBanner) {
+                    mobileInstallBanner.style.display = 'none';
+                    localStorage.setItem('mobileBannerDismissed', 'true');
+                    localStorage.setItem('mobileBannerShowTime', Date.now().toString());
+                }
+            });
+        }
+
+        // iOS kurulum talimatları fonksiyonu
+        function showIOSInstallInstructions() {
+            const modal = document.createElement('div');
+            modal.className = 'exam-detail-modal';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h3>📱 iOS'ta Ana Ekrana Ekleme</h3>
+                        <button class="close-btn">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="install-instructions">
+                            <ol style="line-height: 2; padding-left: 20px;">
+                                <li>Safari tarayıcısının alt kısmındaki <strong>Paylaş</strong> (⬆️) butonuna dokunun</li>
+                                <li>Açılan menüden <strong>"Ana Ekrana Ekle"</strong> seçeneğini seçin</li>
+                                <li>Uygulama adını onaylayın ve <strong>"Ekle"</strong> butonuna dokunun</li>
+                                <li>Uygulama ana ekranınıza eklenecektir!</li>
+                            </ol>
+                            <p style="margin-top: 20px; color: #718096; font-size: 0.9rem;">
+                                💡 Chrome kullanıyorsanız, Safari ile açmanız gerekebilir.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            const closeBtn = modal.querySelector('.close-btn');
+            closeBtn.addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) modal.remove();
+            });
+        }
+
+        // Genel kurulum talimatları
+        function showInstallInstructions() {
+            const modal = document.createElement('div');
+            modal.className = 'exam-detail-modal';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h3>📱 Ana Ekrana Ekleme</h3>
+                        <button class="close-btn">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="install-instructions">
+                            <p style="margin-bottom: 15px;"><strong>Tarayıcı menüsünden "Ana Ekrana Ekle" veya "Add to Home Screen" seçeneğini kullanabilirsiniz.</strong></p>
+                            <ul style="line-height: 2; padding-left: 20px;">
+                                <li><strong>Android Chrome:</strong> Menü (⋮) → Ana Ekrana Ekle</li>
+                                <li><strong>Android Firefox:</strong> Menü → Sayfayı Ekle → Ana Ekran</li>
+                                <li><strong>iOS Safari:</strong> Paylaş (⬆️) → Ana Ekrana Ekle</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            const closeBtn = modal.querySelector('.close-btn');
+            closeBtn.addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) modal.remove();
+            });
+        }
+
+        if (pwaInstallBtn) {
+            pwaInstallBtn.addEventListener('click', () => {
+                if (pwaInstallPrompt) pwaInstallPrompt.style.display = 'none';
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('✅ Tyt PWA kurulumu kabul edildi');
+                        } else {
+                            console.log('❌ Tyt PWA kurulumu reddedildi');
+                        }
+                        deferredPrompt = null;
+                    });
+                }
+            });
+        }
+
+        if (pwaDismissBtn) {
+            pwaDismissBtn.addEventListener('click', () => {
+                if (pwaInstallPrompt) pwaInstallPrompt.style.display = 'none';
+                // 24 saat boyunca tekrar gösterme
+                localStorage.setItem('pwaInstallDismissed', 'true');
+                localStorage.setItem('pwaInstallPromptTime', Date.now().toString());
+            });
+        }
+
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('🎉 Tyt PWA başarıyla kuruldu!');
+            if (pwaInstallPrompt) pwaInstallPrompt.style.display = 'none';
+        });
+    </script>
+</body>
+
+</html>
