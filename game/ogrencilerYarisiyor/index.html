@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aileler Yarışıyor — Hakkari Atatürk MTAL</title>
+  <meta name="description" content="Hakkari Atatürk Mesleki ve Teknik Anadolu Lisesi Family Feud yarışma oyunu" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       EKRAN 1: KARŞILAMA
+  ══════════════════════════════════════ -->
+  <div id="screen-welcome" class="screen active">
+    <div class="bg-circles">
+      <div class="bg-circle c1"></div>
+      <div class="bg-circle c2"></div>
+      <div class="bg-circle c3"></div>
+    </div>
+    <button id="btn-rules" class="corner-btn top-left" aria-label="Kurallar">❓ Kurallar</button>
+    <button id="btn-settings" class="corner-btn top-right" aria-label="Ayarlar">⚙️ Ayarlar</button>
+    <div class="welcome-content">
+      <div class="school-badge">🏫</div>
+      <h1 class="school-name">Hakkari Atatürk<br>Mesleki ve Teknik<br>Anadolu Lisesi</h1>
+      <p class="welcome-sub">Yarışmacı arkadaşlara başarılar dileriz! 🎉</p>
+      <div class="game-title-block">
+        <span class="game-title-line"></span>
+        <h2 class="game-title">AİLELER YARIŞIYOR</h2>
+        <span class="game-title-line"></span>
+      </div>
+      <button id="btn-start" class="btn-primary btn-xl pulse">🎮 Yarışmaya Başla</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       EKRAN 2: TAKIM KURULUMU
+  ══════════════════════════════════════ -->
+  <div id="screen-setup" class="screen">
+    <div class="setup-container">
+      <h2 class="setup-title">Takımları Belirleyin</h2>
+      <div class="teams-row">
+        <div class="team-card blue-team">
+          <div class="team-card-icon">🔵</div>
+          <label for="team1-name">1. Takım</label>
+          <input type="text" id="team1-name" class="name-input" placeholder="Takım 1 adı" maxlength="20" autocomplete="off" />
+        </div>
+        <div class="vs-circle">VS</div>
+        <div class="team-card red-team">
+          <div class="team-card-icon">🔴</div>
+          <label for="team2-name">2. Takım</label>
+          <input type="text" id="team2-name" class="name-input" placeholder="Takım 2 adı" maxlength="20" autocomplete="off" />
+        </div>
+      </div>
+      <div class="starter-box">
+        <h3 class="starter-title">İlk soruya hangi takım başlayacak?</h3>
+        <div class="starter-btns">
+          <button id="starter-btn-0" class="starter-btn blue-btn" data-team="0">
+            <span>🔵</span><span id="starter-name-0">Takım 1</span>
+          </button>
+          <button id="starter-btn-1" class="starter-btn red-btn" data-team="1">
+            <span>🔴</span><span id="starter-name-1">Takım 2</span>
+          </button>
+        </div>
+      </div>
+      <button id="btn-play" class="btn-primary btn-xl" disabled>🚀 Oyunu Başlat</button>
+      <button id="btn-back" class="btn-ghost">← Geri Dön</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       EKRAN 3: ANA OYUN
+  ══════════════════════════════════════ -->
+  <div id="screen-game" class="screen">
+
+    <!-- HEADER -->
+    <header class="game-header">
+      <div class="team-block" id="team-block-0">
+        <div class="team-block-name" id="hdr-name-0">Takım 1</div>
+        <div class="team-block-score" id="hdr-score-0">0</div>
+      </div>
+      <div class="center-block">
+        <div class="acc-label">BİRİKEN PUAN</div>
+        <div class="acc-value" id="acc-points">0</div>
+        <div class="x2-badge hidden" id="x2-badge">× 2</div>
+        <button id="btn-x2" class="btn-x2-header hidden" title="X2 Puan Modu">⚡ X2</button>
+      </div>
+      <div class="team-block team-block-right" id="team-block-1">
+        <div class="team-block-name" id="hdr-name-1">Takım 2</div>
+        <div class="team-block-score" id="hdr-score-1">0</div>
+      </div>
+    </header>
+
+    <!-- AKTİF TAKIM BANNER -->
+    <div class="active-banner" id="active-banner">
+      <span id="active-banner-text">🔵 Takım 1 oynuyor</span>
+    </div>
+
+    <!-- SORU + SAYAÇ -->
+    <div class="question-row">
+      <div class="question-box">
+        <div class="question-num" id="question-num">Soru 1 / 12</div>
+        <p class="question-text" id="question-text">Soru yükleniyor...</p>
+      </div>
+      <div class="timer-wrap hidden" id="timer-wrap">
+        <svg class="timer-svg" viewBox="0 0 100 100">
+          <circle class="timer-track" cx="50" cy="50" r="44"/>
+          <circle class="timer-ring" id="timer-ring" cx="50" cy="50" r="44"
+            stroke-dasharray="276.46" stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-num" id="timer-num">30</div>
+      </div>
+    </div>
+
+    <!-- CEVAP KARTLARI -->
+    <div class="answers-grid" id="answers-grid"></div>
+
+    <!-- YANLIŞ GÖSTERGELERİ -->
+    <div class="wrong-row" id="wrong-row">
+      <div class="wrong-slot" id="ws-0"></div>
+      <div class="wrong-slot" id="ws-1"></div>
+      <div class="wrong-slot" id="ws-2"></div>
+    </div>
+
+    <!-- KONTROL PANELİ -->
+    <div class="control-panel">
+      <div class="input-row">
+        <input type="text" id="answer-input" class="answer-input" placeholder="Cevabı buraya yazın..." autocomplete="off" />
+        <button id="btn-submit" class="btn-submit">✔ Gönder</button>
+      </div>
+      <div class="action-row">
+        <button id="btn-show-remaining" class="btn-show-rem hidden">👁 Kalan Cevapları Göster</button>
+        <button id="btn-next-q" class="btn-next-q hidden">⏭ Sonraki Soru</button>
+        <button id="btn-end-game-manual" class="btn-end-game-manual">🏁 Oyunu Bitir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       EKRAN 4: OYUN SONU
+  ══════════════════════════════════════ -->
+  <div id="screen-gameover" class="screen">
+    <div class="gameover-content">
+      <div class="trophy">🏆</div>
+      <h1 class="gameover-title">Oyun Bitti!</h1>
+      <div class="final-scores-row">
+        <div class="final-card" id="final-card-0">
+          <div class="final-icon">🔵</div>
+          <div class="final-name" id="final-name-0">Takım 1</div>
+          <div class="final-score" id="final-score-0">0</div>
+          <div class="final-label">puan</div>
+        </div>
+        <div class="final-vs">VS</div>
+        <div class="final-card" id="final-card-1">
+          <div class="final-icon">🔴</div>
+          <div class="final-name" id="final-name-1">Takım 2</div>
+          <div class="final-score" id="final-score-1">0</div>
+          <div class="final-label">puan</div>
+        </div>
+      </div>
+      <div class="winner-text" id="winner-text">🎉 Kazanan belirleniyor...</div>
+      <button id="btn-restart" class="btn-primary btn-xl">🔄 Yeniden Oyna</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       MODAL: AYARLAR
+  ══════════════════════════════════════ -->
+  <div id="modal-settings" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2>⚙️ Ayarlar</h2>
+        <button class="close-btn" data-close="modal-settings">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-row">
+          <span class="setting-label">Soru Süresi Sayacı</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="timer-toggle" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-row hidden" id="timer-sec-row">
+          <label class="setting-label" for="timer-sec-input">Süre (Saniye)</label>
+          <input type="number" id="timer-sec-input" class="num-input" value="30" min="5" max="120" />
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">⚡ X2 Puan Butonu</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="x2-toggle" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">🖥️ Tam Ekran</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="fullscreen-toggle" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button id="btn-save-settings" class="btn-primary">💾 Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       MODAL: KURALLAR
+  ══════════════════════════════════════ -->
+  <div id="modal-rules" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-box modal-wide">
+      <div class="modal-head">
+        <h2>❓ Oyun Kuralları</h2>
+        <button class="close-btn" data-close="modal-rules">✕</button>
+      </div>
+      <div class="modal-body rules-body">
+        <h3>🎮 Oyun Yöneticisi Rehberi</h3>
+        <div class="rule-section"><h4>🎯 Temel Akış</h4>
+          <ol>
+            <li>İki takım oluşturun ve isimlerini girin.</li>
+            <li>İlk soruya başlayacak takımı seçin.</li>
+            <li>Soru ekrana gelir, yarışmacı cevap verir.</li>
+            <li>Yönetici doğru cevabı yazıp <strong>Gönder</strong>'e basar. Sistem eşleştirme yapar.</li>
+            <li>Kutu animasyonla açılır, puan birikir.</li>
+          </ol>
+        </div>
+        <div class="rule-section"><h4>✘ Yanlış Cevap</h4>
+          <ul>
+            <li>Takım yanlış cevap verdiğinde <strong>"✘ Yanlış"</strong> butonuna basın.</li>
+            <li>3 yanlışta <strong>Çalma Turu</strong> başlar.</li>
+          </ul>
+        </div>
+        <div class="rule-section"><h4>🤝 Çalma Turu</h4>
+          <ul>
+            <li>Diğer takım tek cevap hakkı kazanır.</li>
+            <li>Doğru → Biriken puan çalan takıma gider.</li>
+            <li>Yanlış → Biriken puan önceki takıma gider.</li>
+            <li>Çalma sonrası kalan cevaplar gösterilebilir, puan verilmez.</li>
+          </ul>
+        </div>
+        <div class="rule-section"><h4>⚡ X2 Puan Modu</h4>
+          <ul>
+            <li>"X2 Puan" butonunu aktif edin → Puan 2 katına çıkar.</li>
+          </ul>
+        </div>
+        <div class="rule-section"><h4>⏭ Tur Geçişi</h4>
+          <ul>
+            <li>Çalma turu bittikten sonra <strong>"Sonraki Soru"</strong> butonu aktif olur.</li>
+            <li>Önce <strong>"Kalan Cevapları Göster"</strong>'e basabilirsiniz (isteğe bağlı).</li>
+            <li>"Sonraki Soru"'ya basınca yeni takım seçimi yapılır.</li>
+          </ul>
+        </div>
+        <div class="rule-section"><h4>🕐 Süre Sayacı</h4>
+          <ul>
+            <li>Ayarlar'dan sayacı açın ve süreyi girin.</li>
+            <li>Sarı → dikkat etme zamanı. Kırmızı + titreşim → kritik! Son 5 sn → sesli uyarı!</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-primary close-btn" data-close="modal-rules">Anladım! 👍</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       MODAL: YENİ TUR TAKIM SEÇİMİ
+  ══════════════════════════════════════ -->
+  <div id="modal-team-pick" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-head"><h2>🎯 Yeni Tur Başlıyor!</h2></div>
+      <div class="modal-body">
+        <p class="pick-prompt">Bu soruya hangi takım başlayacak?</p>
+        <div class="starter-btns">
+          <button id="pick-btn-0" class="starter-btn blue-btn" data-team="0">
+            <span>🔵</span><span id="pick-name-0">Takım 1</span>
+          </button>
+          <button id="pick-btn-1" class="starter-btn red-btn" data-team="1">
+            <span>🔴</span><span id="pick-name-1">Takım 2</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       OVERLAY: SÜRE DOLDU
+  ══════════════════════════════════════ -->
+  <div id="overlay-timesup" class="full-overlay hidden">
+    <div class="timesup-box">
+      <div class="timesup-icon">⏰</div>
+      <div class="timesup-text">SÜRE DOLDU!</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       OVERLAY: ÇALMA TURU
+  ══════════════════════════════════════ -->
+  <div id="overlay-steal" class="full-overlay steal-ov hidden">
+    <div class="steal-box">
+      <div class="steal-icon">🤝</div>
+      <div class="steal-title">ÇALMA TURU!</div>
+      <div class="steal-team" id="steal-team-name">Takım 2</div>
+      <div class="steal-sub">bir cevap hakkı kazandı!</div>
+      <button id="btn-steal-ok" class="btn-primary btn-xl">Devam Et →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       OVERLAY: TUR SONU SKOR ÖZETİ
+  ══════════════════════════════════════ -->
+  <div id="overlay-round-summary" class="full-overlay hidden">
+    <div class="round-summary-box">
+      <div class="rs-trophy">🏁</div>
+      <div class="round-summary-title">Tur Bitti!</div>
+      <div class="round-winner-text" id="round-winner-text">Puan kazanıldı!</div>
+      <div class="round-scores">
+        <div class="round-score-card" id="rs-card-0">
+          <div class="rs-icon">🔵</div>
+          <div class="rs-name" id="rs-name-0">Takım 1</div>
+          <div class="rs-score" id="rs-score-0">0</div>
+          <div class="rs-label">toplam puan</div>
+        </div>
+        <div class="rs-divider">VS</div>
+        <div class="round-score-card" id="rs-card-1">
+          <div class="rs-icon">🔴</div>
+          <div class="rs-name" id="rs-name-1">Takım 2</div>
+          <div class="rs-score" id="rs-score-1">0</div>
+          <div class="rs-label">toplam puan</div>
+        </div>
+      </div>
+      <button id="btn-summary-continue" class="btn-primary btn-xl">Sonraki Soruya Geç ⏭</button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    © Tüm hakları saklıdır &nbsp;|&nbsp;
+    <a href="https://yahyahaliloglu.com.tr/" target="_blank" rel="noopener" class="footer-link">Yahya HALİLOĞLU</a>
+    tarafından yapılmıştır
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="utils.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
+
