@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="101 (Yüz Bir) kart oyunu puan tablosu. Offline çalışan, mobil uyumlu skor takip uygulaması.">
+  <meta name="theme-color" content="#0d1f14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>101 Puan Tablosu</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ========== SCREEN 1 — WELCOME ========== -->
+  <section id="screen-welcome" class="screen active">
+    <div class="welcome-logo">
+      <span class="card-icon">1<span class="zero">0</span>1</span>
+      <h1 class="welcome-title">101 Puan Tablosu</h1>
+    </div>
+    <p class="welcome-subtitle">Türkiye'nin en sevilen taş oyunu için puan takip sistemi</p>
+    <h2 class="welcome-question">Kaç Kişi Oynayacak?</h2>
+    <div class="player-select-group">
+      <button id="btn-2-players" class="btn-player-count" onclick="selectPlayerCount(2)">
+        <span class="count-number">2</span>
+        <span class="count-label">Kişi / Takım</span>
+      </button>
+      <button id="btn-4-players" class="btn-player-count" onclick="selectPlayerCount(4)">
+        <span class="count-number">4</span>
+        <span class="count-label">Kişi</span>
+      </button>
+    </div>
+
+  </section>
+
+  <!-- ========== SCREEN 2 — NAME EDIT ========== -->
+  <section id="screen-names" class="screen">
+    <div class="names-header">
+      <h2>✏️ İsimleri Düzenle</h2>
+      <p>İstersen isimleri değiştirebilirsin</p>
+    </div>
+    <div class="names-form" id="names-form"></div>
+    <div class="names-actions">
+      <button id="btn-start-game" class="btn btn-primary btn-lg btn-block" onclick="startGame()">
+        🎮 Oyuna Başla
+      </button>
+      <button class="btn btn-ghost btn-block" onclick="goBackToWelcome()">← Geri Dön</button>
+    </div>
+  </section>
+
+  <!-- ========== SCREEN 3 — SCOREBOARD ========== -->
+  <section id="screen-scoreboard" class="screen">
+    <div class="scoreboard-header">
+      <button class="btn btn-ghost btn-sm" onclick="confirmNewGame()">← Yeni</button>
+      <div class="round-info">El: <span id="round-display">1</span></div>
+      <button class="btn btn-danger btn-sm" onclick="confirmFinishGame()">🏁 Bitir</button>
+    </div>
+
+    <div class="scoreboard-content" id="scoreboard-content">
+      <!-- Dynamic content rendered by JS -->
+    </div>
+
+    <!-- Input Panel -->
+    <div class="input-panel" id="input-panel">
+      <div class="input-panel-header">
+        <h3>Puan Girişi</h3>
+        <span class="el-badge" id="el-badge">El 1</span>
+      </div>
+      <div class="input-grid" id="input-grid"></div>
+      <div class="input-panel-actions">
+        <button id="btn-save-round" class="btn btn-success btn-block" onclick="submitRound()" disabled>
+          ✓ El'i Kaydet
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SCREEN 4 — RESULTS ========== -->
+  <section id="screen-results" class="screen">
+    <div class="results-header">
+      <span class="trophy-icon">🏆</span>
+      <h2>Oyun Sonuçları</h2>
+    </div>
+    <div class="results-cards" id="results-cards"></div>
+    <div class="results-actions">
+      <button class="btn btn-primary btn-block btn-lg" onclick="toggleAllDetails()">
+        📋 Tüm Puanları Gör
+      </button>
+      <button class="btn btn-success btn-block" onclick="resetGame()">🔄 Yeni Oyun</button>
+    </div>
+  </section>
+
+  <!-- ========== MODAL ========== -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-content" id="modal-content">
+      <div class="modal-icon" id="modal-icon">⚠️</div>
+      <h3 id="modal-title">Emin misiniz?</h3>
+      <div class="modal-body" id="modal-body"></div>
+      <p id="modal-message">Bu işlem geri alınamaz.</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal()">İptal</button>
+        <button class="btn btn-primary" id="modal-confirm-btn">Evet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
